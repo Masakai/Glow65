@@ -8,7 +8,7 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 ![status](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey) ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<p align="center"><img src="documents/images/demo.gif" alt="Glow65 powering on, starting Microsoft BASIC and running a short program while the front panel LEDs glow" width="860"></p>
+<p align="center"><img src="documents/images/demo.gif" alt="Glow65 powering on, starting Microsoft BASIC and running a short program while the front panel LEDs glow" width="860"><br><sub>Screen recording of the real app. The keyboard input was sent by a script (launch options), not typed by hand.</sub></p>
 
 ## What it is
 
@@ -17,7 +17,7 @@ Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UAR
 - **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals. Switches for POWER, RESET, RUN/STOP, STEP, STEP MODE and SPEED.
 - **Terminal.** Connected to the UART. Use it to talk to the monitor and BASIC.
 
-The panel is for watching the CPU work. At 1 kHz and below, each bus cycle is shown one at a time. At 100 kHz and above, LED brightness is the fraction of cycles in which the bit was 1, so the LEDs glow the way real panel LEDs do.
+The panel is for watching the CPU work. At 1 kHz and below, each bus access is shown one at a time. At 100 kHz and above, LED brightness is the fraction of accesses in which the bit was 1, which imitates the glow of an old panel's LEDs. The extra dummy reads and writes of real hardware are not reproduced, so the bus view differs slightly from a real 6502.
 
 The startup banner (click the (i) button on the panel to show it again) lists what is and is not original work:
 
@@ -92,12 +92,12 @@ swift run glow65-cli --rom file.bin@C000
 | POWER | On: clears RAM and starts from reset. Off: all LEDs go dark |
 | RESET | Resets the CPU. RAM is kept |
 | RUN/STOP | Stops or resumes the CPU |
-| STEP | While stopped, runs one instruction (INSTR) or one bus cycle (CYCLE) |
+| STEP | While stopped, runs one instruction (INSTR) or one bus access (CYCLE) |
 | STEP MODE | Chooses between INSTR and CYCLE stepping |
 | SPEED | 1 Hz, 10 Hz, 100 Hz, 1 kHz, 100 kHz, 1 MHz |
 | (i) button | Shows the credits |
 
-While an instruction is shown cycle by cycle, the register LEDs show the values from before the instruction.
+While an instruction is shown access by access, the register LEDs show the values from before the instruction.
 
 For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on and types the given text. `--no-splash` skips the startup banner.
 

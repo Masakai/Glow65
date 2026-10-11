@@ -8,7 +8,7 @@ macOS 向けの 6502 ワンボードマイコン エミュレータ(Swift 製)�
 
 ![status](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey) ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<p align="center"><img src="documents/images/demo.gif" alt="Glow65 の電源を入れ、Microsoft BASIC を起動して短いプログラムを実行する様子。フロントパネルの LED が光る" width="860"></p>
+<p align="center"><img src="documents/images/demo.gif" alt="Glow65 の電源を入れ、Microsoft BASIC を起動して短いプログラムを実行する様子。フロントパネルの LED が光る" width="860"><br><sub>実際のアプリの画面収録です。キーボード入力は手打ちではなく、起動オプションのスクリプトで送っています。</sub></p>
 
 ## 概要
 
@@ -17,7 +17,7 @@ Glow65 は、架空の 6502 ボードをエミュレートします。構成は 
 - **フロントパネル**: アドレスバス、データバス、PC、SP、A、X、Y、ステータスフラグ、バス信号の LED。スイッチは POWER、RESET、RUN/STOP、STEP、STEP MODE、SPEED。
 - **端末**: UART につながり、モニタと BASIC を操作します。
 
-パネルは CPU の動きを観察するためのものです。1kHz 以下では、バスサイクルを1つずつ表示します。100kHz 以上では、各ビットが 1 だったサイクルの割合を LED の明るさにするので、実機のパネルのように残光が出ます。
+パネルは CPU の動きを観察するためのものです。1kHz 以下では、バスアクセスを1つずつ表示します。100kHz 以上では、各ビットが 1 だったアクセスの割合を LED の明るさにするので、昔のパネルの LED の光り方を模した残光が出ます。実機にある余分なダミーリード/ダミーライトは再現していないため、バスの表示は実際の 6502 と少し異なります。
 
 起動バナーには、自作の部分とそうでない部分が表示されます(パネルの (i) ボタンで再表示できます)。
 
@@ -92,12 +92,12 @@ swift run glow65-cli --rom file.bin@C000
 | POWER | ON で RAM を消去してリセットから開始。OFF で全 LED が消灯 |
 | RESET | CPU をリセット。RAM は保持 |
 | RUN/STOP | CPU の停止と再開 |
-| STEP | 停止中に、1命令(INSTR)または1バスサイクル(CYCLE)進める |
+| STEP | 停止中に、1命令(INSTR)または1バスアクセス(CYCLE)進める |
 | STEP MODE | INSTR と CYCLE の切り替え |
 | SPEED | 1Hz、10Hz、100Hz、1kHz、100kHz、1MHz |
 | (i) ボタン | クレジットを表示 |
 
-1サイクルずつ表示している間、レジスタの LED は命令を実行する前の値を示します。
+1アクセスずつ表示している間、レジスタの LED は命令を実行する前の値を示します。
 
 動作確認用に、`Glow65App --power-on --input 'd f000 f00f\r'` は電源を入れて文字列を入力します。`--no-splash` は起動バナーを出しません。
 
