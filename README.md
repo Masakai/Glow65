@@ -43,6 +43,10 @@ See [NOTICE.md](NOTICE.md) for details. No Altair or IMSAI names, logos, or phot
 - [cc65](https://cc65.github.io/) to build the ROMs: `brew install cc65`
 - Python 3 (standard library only) to convert the BASIC source
 
+## Write your own program
+
+Glow65 is for learning, so the first thing to try is your own program. The [tutorial](tutorial/README.md) takes you from five lines of assembly to a binary counter on the LEDs: assemble it (or type the bytes), load it, run it, then slow the CPU down and step through every bus access.
+
 ## Quick start
 
 ```bash
@@ -79,6 +83,7 @@ Without `basic.bin` the app still starts, with the monitor only.
 swift run glow65-cli                    # run from the repository root
 swift run glow65-cli --mhz 2            # change the clock
 swift run glow65-cli --rom file.bin@C000
+swift run glow65-cli --load tutorial/counter.bin@0300   # a program for RAM, loaded after power-on
 ```
 
 `--rom` replaces the default ROMs, so list every ROM you need (for example both `ROM/monitor.bin@F000` and `ROM/basic/build/basic.bin@C000`). Quit with Ctrl-\\. Ctrl-C is passed to the program (BASIC uses it to break).
@@ -97,6 +102,8 @@ swift run glow65-cli --rom file.bin@C000
 
 While an instruction is shown access by access, the register LEDs show the values from before the instruction.
 
+To load your own program, use **File → Load Program…** (⌘O) after turning POWER on, or the launch option `--load file.bin@0300`. Build a binary from assembly with `Tools/assemble.sh` (needs cc65).
+
 For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on and types the given text. `--no-splash` skips the startup banner.
 
 ## Memory map
@@ -104,6 +111,9 @@ For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on a
 | Address | Contents |
 |---|---|
 | `$0000-$7FFF` | RAM, 32 KB |
+| `$0200-$027F` | (inside RAM) the monitor's line buffer |
+| `$0300-$03FF` | (inside RAM) free for your programs |
+| `$0400-$7FFF` | (inside RAM) BASIC programs and variables |
 | `$A000` | UART status (bit 0: receive ready, bit 1: transmit empty) / control |
 | `$A001` | UART data |
 | `$C000-$EFFF` | Microsoft BASIC (about 8.6 KB used) |
@@ -160,7 +170,8 @@ Sources/glow65-cli/    Command-line front end
 Sources/Glow65App/     SwiftUI app: front panel, terminal, startup banner
 ROM/monitor.s         Monitor ROM source (ca65)
 ROM/basic/            BASIC: upstream source, prelude, linker config
-Tools/                Build and conversion scripts
+Tools/                Build and conversion scripts (assemble.sh builds your own programs)
+tutorial/             Tutorial: write, load and watch your first program
 Tests/                Unit and integration tests
 documents/designs/    Design document (Japanese)
 ```

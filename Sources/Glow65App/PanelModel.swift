@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Glow65
 import SwiftUI
@@ -36,6 +37,10 @@ final class PanelModel: ObservableObject {
     @Published var stepsByCycle = false
     @Published var speed = SpeedSetting.mhz1
     @Published private(set) var romError: String?
+    /// プログラムの読み込み結果など、短い案内。
+    @Published private(set) var statusMessage: String?
+    /// `--load` で指定されたプログラム。電源を入れるたびに RAM へ読み込む。
+    private var launchPrograms: [ProgramImage] = []
 
     private var timer: Timer?
     private var lastTx: UInt64 = 0
@@ -65,6 +70,13 @@ final class PanelModel: ObservableObject {
         func value(_ name: String) -> String? {
             guard let i = args.firstIndex(of: name), i + 1 < args.count else { return nil }
             return args[i + 1]
+        }
+        for (i, arg) in args.enumerated() where arg == "--load" && i + 1 < args.count {
+            do {
+                launchPrograms.append(try ProgramImage.load(spec: args[i + 1]))
+            } catch {
+                statusMessage = "Could not load \(args[i + 1]): \(error)"
+            }
         }
         if args.contains("--power-on") { setPower(true) }
         if let seconds = value("--power-on-after").flatMap(Double.init) {
@@ -129,9 +141,68 @@ final class PanelModel: ObservableObject {
         if on {
             terminal.clear()
             isRunSwitchOn = true
+            statusMessage = nil
             runner.powerOn()
+            launchPrograms.forEach(load)
         } else {
             runner.powerOff()
+        }
+    }
+
+    // MARK: プログラムの読み込み
+
+    /// プログラムを RAM に読み込む。電源が入っているときだけ受け付ける。
+    func load(_ image: ProgramImage) {
+        guard isPowerOn else {
+            statusMessage = "Power is off. Flip POWER on first (powering on clears RAM), then load the program."
+            return
+        }
+        runner.loadProgram(image) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    let addr = String(image.address, radix: 16, uppercase: true).leftPadded(to: 4)
+                    self?.statusMessage = "Loaded \(image.name) (\(image.bytes.count) bytes) at $\(addr). In the monitor, type G \(addr) to run it."
+                case .failure(.outOfRAM):
+                    self?.statusMessage = "\(image.name) does not fit in RAM ($0000-$7FFF) at that address."
+                case .failure(.poweredOff):
+                    self?.statusMessage = "Power is off. Flip POWER on first, then load the program."
+                case .failure:
+                    self?.statusMessage = "Could not load \(image.name)."
+                }
+            }
+        }
+    }
+
+    /// ファイル選択パネルを開き、選んだバイナリを指定アドレスに読み込む。
+    func presentLoadPanel() {
+        let panel = NSOpenPanel()
+        panel.title = "Load Program"
+        panel.message = "Choose a raw binary (for example one built with Tools/assemble.sh)."
+        panel.prompt = "Load"
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+
+        let label = NSTextField(labelWithString: "Load at $")
+        let field = NSTextField(string: "0300")
+        field.frame.size.width = 70
+        let stack = NSStackView(views: [label, field])
+        stack.orientation = .horizontal
+        stack.spacing = 6
+        stack.edgeInsets = NSEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        panel.accessoryView = stack
+        panel.isAccessoryViewDisclosed = true
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        guard let address = UInt16(field.stringValue.trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: "$", with: ""), radix: 16) else {
+            statusMessage = "\"\(field.stringValue)\" is not a hexadecimal address."
+            return
+        }
+        do {
+            load(try ProgramImage.load(path: url.path, address: address))
+        } catch {
+            statusMessage = "Could not read \(url.lastPathComponent)."
         }
     }
 
@@ -224,5 +295,11 @@ final class PanelModel: ObservableObject {
         rxLED = glow(rxLED, rx != lastRx ? 1 : 0, decay: decay)
         lastTx = tx
         lastRx = rx
+    }
+}
+
+private extension String {
+    func leftPadded(to width: Int) -> String {
+        String(repeating: "0", count: max(0, width - count)) + self
     }
 }

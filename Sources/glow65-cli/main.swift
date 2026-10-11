@@ -2,10 +2,12 @@ import Darwin
 import Foundation
 import Glow65
 
-// 使い方: glow65-cli [--rom ファイル@16進アドレス]... [--mhz N]
+// 使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N]
+// --load は電源投入後に RAM へ生のバイナリを書き込む(例: --load tutorial/counter.bin@0300)。
 // 既定では ROM/monitor.bin を $F000、ROM/basic/build/basic.bin(あれば)を $C000 に読み込む。終了は Ctrl-\。
 
 var romSpecs: [(path: String, address: UInt16)] = []
+var loadSpecs: [String] = []
 var megahertz = 1.0
 
 var args = CommandLine.arguments.dropFirst()
@@ -18,6 +20,9 @@ while let arg = args.popFirst() {
             fatalError("--rom の書式は ファイル@16進アドレス: \(spec)")
         }
         romSpecs.append((parts[0], address))
+    case "--load":
+        guard let spec = args.popFirst() else { fatalError("--load にはファイル@アドレスを指定する") }
+        loadSpecs.append(spec)
     case "--mhz":
         guard let value = args.popFirst(), let mhz = Double(value), mhz > 0 else {
             fatalError("--mhz には正の数を指定する")
@@ -78,6 +83,16 @@ machine.uart.onTransmit = { byte in
 }
 
 machine.powerOn()
+for spec in loadSpecs {
+    do {
+        let image = try ProgramImage.load(spec: spec)
+        try machine.bus.loadRAM(image.bytes, at: image.address)
+    } catch {
+        restoreTerminal()
+        FileHandle.standardError.write(Data("プログラムを読み込めない: \(error)\n".utf8))
+        exit(1)
+    }
+}
 
 // 10ms 分ずつ実行して実時間に合わせる
 let sliceSeconds = 0.01

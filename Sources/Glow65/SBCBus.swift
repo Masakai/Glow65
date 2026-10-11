@@ -68,6 +68,15 @@ public final class SBCBus: Bus {
         rom.replaceSubrange(offset..<(offset + image.count), with: image)
     }
 
+    /// プログラムを RAM に書き込む。`address` から末尾までが RAM($0000-$7FFF)に収まる必要がある。
+    public func loadRAM(_ bytes: [UInt8], at address: UInt16) throws {
+        let start = Int(address)
+        guard start + bytes.count <= MemoryMap.ramSize else {
+            throw ProgramLoadError.outOfRAM(address: address, count: bytes.count)
+        }
+        ram.replaceSubrange(start..<(start + bytes.count), with: bytes)
+    }
+
     /// 電源投入時の RAM をランダムに近い状態にするのではなく、0 で初期化する。
     public func clearRAM() {
         for i in ram.indices { ram[i] = 0 }

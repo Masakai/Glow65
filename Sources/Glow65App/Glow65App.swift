@@ -22,6 +22,12 @@ struct Glow65App: App {
                 .frame(minWidth: 940, minHeight: 760)
         }
         .windowResizability(.contentMinSize)
+        .commands {
+            CommandGroup(after: .newItem) {
+                Button("Load Program…") { model.presentLoadPanel() }
+                    .keyboardShortcut("o")
+            }
+        }
     }
 }
 
@@ -38,6 +44,10 @@ struct ContentView: View {
                 FrontPanelView(model: model)
                 if let error = model.romError {
                     Text(error).foregroundStyle(.orange).font(.callout)
+                }
+                if let message = model.statusMessage {
+                    Text(message).foregroundStyle(Color(white: 0.7)).font(.callout)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 TerminalView(terminal: model.terminal) { model.typed($0) }
             }

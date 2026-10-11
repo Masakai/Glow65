@@ -166,6 +166,26 @@ public final class MachineRunner {
         queue.async { [self] in machine.triggerNMI() }
     }
 
+    /// プログラムを RAM に読み込む(電源が入っているときだけ)。結果は `completion` に返る。
+    ///
+    /// 電源投入で RAM が消去されるため、電源を入れた後に呼ぶ。CPU の実行は止めない。
+    public func loadProgram(_ image: ProgramImage, completion: @escaping (Result<Void, ProgramLoadError>) -> Void) {
+        queue.async { [self] in
+            guard machine.isPoweredOn else {
+                completion(.failure(.poweredOff))
+                return
+            }
+            do {
+                try machine.bus.loadRAM(image.bytes, at: image.address)
+                completion(.success(()))
+            } catch let error as ProgramLoadError {
+                completion(.failure(error))
+            } catch {
+                completion(.failure(.unreadable(image.name)))
+            }
+        }
+    }
+
     /// キーボード入力を UART へ送る。
     public func sendInput(_ byte: UInt8) {
         machine.uart.receive(byte)

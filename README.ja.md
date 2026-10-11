@@ -43,6 +43,10 @@ Glow65 は**全体が独自実装ではありません**。
 - ROM のビルドに [cc65](https://cc65.github.io/): `brew install cc65`
 - BASIC ソースの変換に Python 3(標準ライブラリのみ)
 
+## 自作プログラムを動かす
+
+Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)では、5行のアセンブリを書いて、LED に 2 進数のカウンタを表示するところまで進みます。アセンブルして(またはバイトを手入力して)読み込み、実行し、そのあと CPU を遅くして、バスアクセスを1つずつ辿ります。
+
 ## クイックスタート
 
 ```bash
@@ -79,6 +83,7 @@ RUN
 swift run glow65-cli                    # リポジトリのルートで実行
 swift run glow65-cli --mhz 2            # クロックを変える
 swift run glow65-cli --rom file.bin@C000
+swift run glow65-cli --load tutorial/counter.bin@0300   # RAM に置くプログラム(電源投入後に読み込む)
 ```
 
 `--rom` を指定すると既定の ROM は読み込まれません。必要な ROM をすべて並べてください(例: `ROM/monitor.bin@F000` と `ROM/basic/build/basic.bin@C000`)。終了は Ctrl-\\ です。Ctrl-C はプログラムに渡されます(BASIC の中断に使われます)。
@@ -97,6 +102,8 @@ swift run glow65-cli --rom file.bin@C000
 
 1アクセスずつ表示している間、レジスタの LED は命令を実行する前の値を示します。
 
+自作のプログラムを読み込むには、POWER を入れたあとに **File → Load Program…**(⌘O)を使うか、起動オプション `--load file.bin@0300` を使います。アセンブリから生のバイナリを作るには `Tools/assemble.sh` を使います(cc65 が必要)。
+
 動作確認用に、`Glow65App --power-on --input 'd f000 f00f\r'` は電源を入れて文字列を入力します。`--no-splash` は起動バナーを出しません。
 
 ## メモリマップ
@@ -104,6 +111,9 @@ swift run glow65-cli --rom file.bin@C000
 | アドレス | 内容 |
 |---|---|
 | `$0000-$7FFF` | RAM 32KB |
+| `$0200-$027F` | (RAM の中)モニタの行入力バッファ |
+| `$0300-$03FF` | (RAM の中)自作プログラム用に空けてある領域 |
+| `$0400-$7FFF` | (RAM の中)BASIC のプログラムと変数 |
 | `$A000` | UART 状態(bit0: 受信可、bit1: 送信可)/制御 |
 | `$A001` | UART データ |
 | `$C000-$EFFF` | Microsoft BASIC(約 8.6KB を使用) |
@@ -160,7 +170,8 @@ Sources/glow65-cli/    コマンドライン版
 Sources/Glow65App/     SwiftUI アプリ: フロントパネル、端末、起動バナー
 ROM/monitor.s         モニタ ROM のソース(ca65)
 ROM/basic/            BASIC: 原典、マクロ、リンカ設定
-Tools/                ビルドと変換のスクリプト
+Tools/                ビルドと変換のスクリプト(assemble.sh は自作プログラムのビルド用)
+tutorial/             チュートリアル: はじめてのプログラムを書き、読み込み、観察する
 Tests/                単体テストと結合テスト
 documents/designs/    設計書(日本語)
 ```
