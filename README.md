@@ -137,6 +137,7 @@ The monitor has a fixed jump table that BASIC and your programs can call:
 |---|---|
 | `D aaaa [bbbb]` | Dump memory (128 bytes if the end is omitted) |
 | `E aaaa bb bb ...` | Write bytes |
+| `L aaaa [bbbb]` | Disassemble (16 instructions if the end is omitted) |
 | `G aaaa` | Call the routine at `aaaa` (returns to the monitor on RTS) |
 | `B` | Start BASIC |
 | `?` | Help |

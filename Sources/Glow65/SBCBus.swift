@@ -68,6 +68,11 @@ public final class SBCBus: Bus {
         rom.replaceSubrange(offset..<(offset + image.count), with: image)
     }
 
+    /// テスト用: RAM の指定位置に書き込む(範囲外なら何もしない)。
+    func poke(_ address: UInt16, _ bytes: [UInt8]) {
+        try? loadRAM(bytes, at: address)
+    }
+
     /// プログラムを RAM に書き込む。`address` から末尾までが RAM($0000-$7FFF)に収まる必要がある。
     public func loadRAM(_ bytes: [UInt8], at address: UInt16) throws {
         let start = Int(address)

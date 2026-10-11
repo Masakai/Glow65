@@ -34,10 +34,20 @@ You need to put the 11 bytes `A9 00 8D F0 03 18 69 01 4C 02 03` in RAM at `$0300
 
 ```
 E 0300 A9 00 8D F0 03 18 69 01 4C 02 03
-D 0300 030F
+L 0300 0308
 ```
 
-`E` writes bytes. `D` shows memory: the first 11 bytes of the line should read `A9 00 8D F0 03 18 69 01 4C 02 03`.
+`E` writes bytes. `L` lists them as instructions (a disassembler), so you can check that the bytes you typed are the program you meant. It should print:
+
+```
+0300  A9 00     LDA   #$00
+0302  8D F0 03  STA   $03F0
+0305  18        CLC
+0306  69 01     ADC   #$01
+0308  4C 02 03  JMP   $0302
+```
+
+(`D 0300 030F` shows the same memory as raw bytes instead.)
 
 **Option B: assemble and load a file.** This needs [cc65](https://cc65.github.io/) (`brew install cc65`). The repository already contains the result as `counter.bin`, so you can skip the first command.
 
@@ -102,7 +112,7 @@ The first byte of the line is the last value the program wrote to `$03F0`.
 
 ## 6. Experiments
 
-Press RESET, change a byte with `E`, and run it again with `G 0300`. The bytes are at these addresses:
+Press RESET, change a byte with `E`, check the result with `L 0300 0308`, and run it again with `G 0300`. The bytes are at these addresses:
 
 ```
 0300  A9 00        lda #$00
@@ -114,6 +124,6 @@ Press RESET, change a byte with `E`, and run it again with `G 0300`. The bytes a
 
 1. **Count by 2.** `E 0307 02` changes `adc #$01` to `adc #$02`. The A LEDs now skip the lowest bit.
 2. **Write somewhere else.** `E 0303 F1` makes `sta` write to `$03F1`. Check with `D 03F0 03FF`.
-3. **Count down.** `E 0305 38 E9 01` replaces `clc` / `adc #$01` with `sec` / `sbc #$01`. Same length, opposite direction.
+3. **Count down.** `E 0305 38 E9 01` replaces `clc` / `adc #$01` with `sec` / `sbc #$01`. Same length, opposite direction. `L 0300 0308` now shows `SEC` and `SBC   #$01` at `$0305` and `$0306`.
 
 When you are ready for more, change `counter.s`, run `Tools/assemble.sh` again, and load the new file. Programs must fit in the 256 bytes at `$0300-$03FF` (see `ROM/user.cfg`).

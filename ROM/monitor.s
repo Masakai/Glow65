@@ -5,6 +5,7 @@
 ; コマンド:
 ;   D aaaa [bbbb]    メモリダンプ(省略時は128バイト)
 ;   E aaaa bb bb ..  メモリ書き込み
+;   L aaaa [bbbb]    逆アセンブル(終了アドレス省略時は16命令)
 ;   G aaaa           JSR で実行(RTS で戻るとモニタに戻る)
 ;   B                BASIC をコールドスタート($C000)
 ;   ?                ヘルプ
@@ -23,6 +24,15 @@ VAL       = $F4         ; 2バイト: 解析した16進値
 IDX       = $F6         ; 入力バッファ内の読み取り位置
 TMP       = $F7
 STR       = $F8         ; 2バイト: 文字列ポインタ
+
+; 逆アセンブラの作業領域(DB1 と DB2 は連続させる)
+DOP       = $FA         ; オペコード
+DMN       = $FB         ; ニーモニックの番号($FF = 未定義命令)
+DMODE     = $FC         ; アドレッシングモード番号
+DLEN      = $FD         ; 命令の長さ(1-3)
+DB1       = $FE         ; 第1オペランドバイト
+DB2       = $FF         ; 第2オペランドバイト
+DCNT      = TMP         ; 表示する命令数(0 = 終了アドレスまで)
 
         .segment "CODE"
 
@@ -245,6 +255,9 @@ CMDLOOP:
 :       cmp #'G'
         bne :+
         jmp CMD_G
+:       cmp #'L'
+        bne :+
+        jmp CMD_L
 :       cmp #'B'
         bne :+
         jmp BASIC
@@ -334,6 +347,200 @@ CMD_G:
         jmp MONITOR
 @call:  jmp (VAL)
 
+; ---- 逆アセンブル: L aaaa [bbbb] ----
+CMD_L:
+        jsr PARSEHEX
+        jcs ERR
+        jsr VAL_TO_PTR
+        jsr PARSEHEX            ; PARSEHEX は TMP(= DCNT)を使うので、DCNT はこのあとに設定する
+        bcs @default
+        lda VAL
+        sta ENDP
+        lda VAL+1
+        sta ENDP+1
+        lda #0                  ; 0 = 終了アドレスまで
+        sta DCNT
+        beq @loop
+@default:
+        lda #16                 ; 終了アドレスがなければ 16 命令
+        sta DCNT
+@loop:  jsr DISASM_ONE
+        bcs @done               ; $FFFF を越えたら終わり
+        lda DCNT
+        beq @range
+        dec DCNT
+        bne @loop
+        beq @done
+@range: sec                     ; ENDP >= PTR の間つづける
+        lda ENDP
+        sbc PTR
+        lda ENDP+1
+        sbc PTR+1
+        bcs @loop
+@done:  jmp CMDLOOP
+
+; PTR の命令を1つ表示し、PTR を次の命令に進める。$FFFF を越えたら C=1 で戻る。
+DISASM_ONE:
+        lda PTR+1
+        jsr PRHEX
+        lda PTR
+        jsr PRHEX
+        lda #' '
+        jsr CHROUT
+        jsr CHROUT
+        ldy #0
+        lda (PTR),y
+        sta DOP
+        tax
+        lda OPMN,x
+        sta DMN
+        lda OPMODE,x
+        sta DMODE
+        lda DMN
+        cmp #$FF
+        bne @legal
+        lda #3                  ; 未定義命令は「.BYTE $xx」(1バイト)として表示する
+        sta DMODE
+        lda DOP
+        sta DB1
+        lda #1
+        sta DLEN
+        bne @show
+@legal: ldx DMODE
+        lda MODELEN,x
+        sta DLEN
+        cmp #2
+        bcc @show
+        ldy #1                  ; オペランドは、命令の長さの分だけ読む(I/O を無駄に読まない)
+        lda (PTR),y
+        sta DB1
+        lda DLEN
+        cmp #3
+        bcc @show
+        iny
+        lda (PTR),y
+        sta DB2
+@show:  lda DOP
+        jsr PRHEX
+        lda #' '
+        jsr CHROUT
+        ldx #1                  ; オペランドバイトの欄(2つ)
+@col:   cpx DLEN
+        bcs @blank
+        lda DB1-1,x
+        jsr PRHEX
+        lda #' '
+        jsr CHROUT
+        jmp @next
+@blank: lda #' '
+        jsr CHROUT
+        jsr CHROUT
+        jsr CHROUT
+@next:  inx
+        cpx #3
+        bcc @col
+        lda #' '
+        jsr CHROUT
+        jsr DIS_MNEMONIC
+        jsr DIS_OPERAND
+        jsr CRLF
+        clc
+        lda PTR
+        adc DLEN
+        sta PTR
+        lda PTR+1
+        adc #0
+        sta PTR+1
+        rts                     ; C = $FFFF を越えたか
+
+; ニーモニックを 6 文字の欄に表示する
+DIS_MNEMONIC:
+        lda DMN
+        cmp #$FF
+        bne @mn
+        lda #'.'
+        jsr CHROUT
+        lda #'B'
+        jsr CHROUT
+        lda #'Y'
+        jsr CHROUT
+        lda #'T'
+        jsr CHROUT
+        lda #'E'
+        jsr CHROUT
+        lda #' '
+        jmp CHROUT
+@mn:    asl a                   ; 番号 x 3
+        clc
+        adc DMN
+        tax
+        lda MNEM,x
+        jsr CHROUT
+        lda MNEM+1,x
+        jsr CHROUT
+        lda MNEM+2,x
+        jsr CHROUT
+        lda #' '
+        jsr CHROUT
+        jsr CHROUT
+        jmp CHROUT
+
+; オペランドを、モードに応じた書式で表示する
+DIS_OPERAND:
+        ldx DMODE
+        lda MPRE,x
+        beq @nopre
+        jsr CHROUT
+@nopre: lda MSIZE,x
+        beq @suffix
+        pha
+        lda #'$'
+        jsr CHROUT
+        pla
+        cmp #3
+        beq @rel
+        cmp #2
+        bne @one
+        lda DB2
+        jsr PRHEX
+@one:   lda DB1
+        jsr PRHEX
+        jmp @suffix
+@rel:   lda DB1                 ; 分岐先 = この命令のアドレス + 2 + 符号付きオフセット
+        clc
+        adc PTR
+        sta VAL
+        lda #0
+        ldx DB1
+        bpl @pos
+        lda #$FF
+@pos:   adc PTR+1
+        sta VAL+1
+        clc
+        lda VAL
+        adc #2
+        sta VAL
+        bcc @nc
+        inc VAL+1
+@nc:    lda VAL+1
+        jsr PRHEX
+        lda VAL
+        jsr PRHEX
+@suffix:
+        lda DMODE               ; 添字 = モード番号 x 3
+        asl a
+        clc
+        adc DMODE
+        tax
+        ldy #3
+@sl:    lda MSUF,x
+        beq @end
+        jsr CHROUT
+        inx
+        dey
+        bne @sl
+@end:   rts
+
 NMI_ISR:
 IRQ_ISR:
         rti
@@ -344,8 +551,38 @@ Banner:
 HelpText:
         .byte "D AAAA [BBBB]  DUMP", $0D, $0A
         .byte "E AAAA BB ..   WRITE", $0D, $0A
+        .byte "L AAAA [BBBB]  LIST", $0D, $0A
         .byte "G AAAA         GO", $0D, $0A
         .byte "B              BASIC", $0D, $0A, 0
+
+; ---- 逆アセンブラの表 ----
+; MNEM、OPMN、OPMODE は Tools/gen_disasm_tables.py が CPU コアの表から生成する。
+        .include "disasm_tables.inc"
+
+; モード番号 → 命令の長さ
+MODELEN:
+        .byte 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2
+; モード番号 → オペランドの前に付ける文字(0 = なし)
+MPRE:
+        .byte 0, 'A', '#', 0, 0, 0, 0, 0, 0, '(', '(', '(', 0
+; モード番号 → オペランドの桁数(0 = なし、1 = 2桁、2 = 4桁、3 = 相対分岐)
+MSIZE:
+        .byte 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 3
+; モード番号 → オペランドの後ろに付ける文字(3 文字ずつ、0 で終わり)
+MSUF:
+        .byte 0, 0, 0               ; 0 implied
+        .byte 0, 0, 0               ; 1 accumulator
+        .byte 0, 0, 0               ; 2 immediate
+        .byte 0, 0, 0               ; 3 zeroPage
+        .byte ",X", 0               ; 4 zeroPageX
+        .byte ",Y", 0               ; 5 zeroPageY
+        .byte 0, 0, 0               ; 6 absolute
+        .byte ",X", 0               ; 7 absoluteX
+        .byte ",Y", 0               ; 8 absoluteY
+        .byte ")", 0, 0             ; 9 indirect
+        .byte ",X)"                 ; 10 indexedIndirect
+        .byte "),Y"                 ; 11 indirectIndexed
+        .byte 0, 0, 0               ; 12 relative
 
         .segment "VECTORS"
         .word NMI_ISR
