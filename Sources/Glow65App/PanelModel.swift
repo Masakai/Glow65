@@ -67,6 +67,7 @@ final class PanelModel: ObservableObject {
     /// - `--input <文字列>`: 文字列を入力する(`\r` は CR)。既定では起動の 1 秒後に一括で送る。
     /// - `--input-after <秒>`: 入力を始めるまでの秒数。
     /// - `--type-delay <秒>`: 1 文字ごとの間隔(指定すると打鍵のように 1 文字ずつ送る)。
+    /// - `--script <台本>`: 操作を時刻どおりに自動実行する(下の `runScript` を参照)。
     private func applyLaunchArguments() {
         let args = CommandLine.arguments
         func value(_ name: String) -> String? {
@@ -80,6 +81,7 @@ final class PanelModel: ObservableObject {
                 statusMessage = "Could not load \(args[i + 1]): \(error)"
             }
         }
+        if let script = value("--script") { runScript(script) }
         if args.contains("--power-on") { setPower(true) }
         if let seconds = value("--power-on-after").flatMap(Double.init) {
             DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { [weak self] in
@@ -94,6 +96,41 @@ final class PanelModel: ObservableObject {
                 let when = start + delay * Double(index)
                 DispatchQueue.main.asyncAfter(deadline: .now() + when) { [weak self] in
                     self?.typed(byte)
+                }
+            }
+        }
+    }
+
+    /// `--script "秒:命令;秒:命令;..."` で、操作を時刻どおりに自動実行する(画面収録や動作確認用)。
+    ///
+    /// 命令: `poweron`、`poweroff`、`reset`、`run`、`stop`、`step`、`speed=<Hz>`(1、10、100、1000、100000、1000000)、
+    /// `mode=cycle` または `mode=instr`、`input=<文字列>`(`\r` は CR。1 文字 0.04 秒で打つ)。
+    private func runScript(_ script: String) {
+        for step in script.split(separator: ";") {
+            let parts = step.split(separator: ":", maxSplits: 1).map(String.init)
+            guard parts.count == 2, let at = Double(parts[0]) else { continue }
+            let command = parts[1].split(separator: "=", maxSplits: 1).map(String.init)
+            let argument = command.count > 1 ? command[1] : ""
+            DispatchQueue.main.asyncAfter(deadline: .now() + at) { [weak self] in
+                guard let self else { return }
+                switch command[0] {
+                case "poweron": self.setPower(true)
+                case "poweroff": self.setPower(false)
+                case "reset": self.pressReset()
+                case "run": self.setRun(true)
+                case "stop": self.setRun(false)
+                case "step": self.pressStep()
+                case "mode": self.stepsByCycle = argument == "cycle"
+                case "speed":
+                    if let hz = Double(argument), let s = SpeedSetting.allCases.first(where: { $0.hertz == hz }) {
+                        self.setSpeed(s)
+                    }
+                case "input":
+                    let text = argument.replacingOccurrences(of: "\\r", with: "\r")
+                    for (i, byte) in text.utf8.enumerated() {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.04 * Double(i)) { self.typed(byte) }
+                    }
+                default: break
                 }
             }
         }
