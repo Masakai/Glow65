@@ -46,8 +46,8 @@ Glow65 は**全体が独自実装ではありません**。
 ## クイックスタート
 
 ```bash
-git clone <このリポジトリ>
-cd <このリポジトリ>
+git clone https://github.com/Masakai/Glow65.git
+cd Glow65
 
 brew install cc65
 Tools/build_monitor.sh     # ROM/monitor.bin を生成

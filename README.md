@@ -46,8 +46,8 @@ See [NOTICE.md](NOTICE.md) for details. No Altair or IMSAI names, logos, or phot
 ## Quick start
 
 ```bash
-git clone <this repository>
-cd <this repository>
+git clone https://github.com/Masakai/Glow65.git
+cd Glow65
 
 brew install cc65
 Tools/build_monitor.sh     # builds ROM/monitor.bin
