@@ -8,7 +8,7 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 ![status](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey) ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<p align="center"><img src="documents/images/frontpanel.png" alt="The Glow65 front panel with LEDs, switches and a terminal running Microsoft BASIC" width="860"></p>
+<p align="center"><img src="documents/images/demo.gif" alt="Glow65 powering on, starting Microsoft BASIC and running a short program while the front panel LEDs glow" width="860"></p>
 
 ## What it is
 
@@ -84,6 +84,8 @@ swift run glow65-cli --rom file.bin@C000
 `--rom` replaces the default ROMs, so list every ROM you need (for example both `ROM/monitor.bin@F000` and `ROM/basic/build/basic.bin@C000`). Quit with Ctrl-\\. Ctrl-C is passed to the program (BASIC uses it to break).
 
 ## Front panel
+
+<p align="center"><img src="documents/images/frontpanel.png" alt="The Glow65 front panel with LEDs, switches and a terminal running Microsoft BASIC" width="860"></p>
 
 | Control | Action |
 |---|---|

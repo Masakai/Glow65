@@ -53,14 +53,34 @@ final class PanelModel: ObservableObject {
         applyLaunchArguments()
     }
 
-    /// 動作確認用の起動オプション: `--power-on` と `--input <文字列>`(`\r` は CR)。
+    /// 動作確認と画面収録用の起動オプション。
+    ///
+    /// - `--power-on`: 起動直後に電源を入れる。
+    /// - `--power-on-after <秒>`: 指定の秒数後に電源を入れる。
+    /// - `--input <文字列>`: 文字列を入力する(`\r` は CR)。既定では起動の 1 秒後に一括で送る。
+    /// - `--input-after <秒>`: 入力を始めるまでの秒数。
+    /// - `--type-delay <秒>`: 1 文字ごとの間隔(指定すると打鍵のように 1 文字ずつ送る)。
     private func applyLaunchArguments() {
         let args = CommandLine.arguments
+        func value(_ name: String) -> String? {
+            guard let i = args.firstIndex(of: name), i + 1 < args.count else { return nil }
+            return args[i + 1]
+        }
         if args.contains("--power-on") { setPower(true) }
-        if let i = args.firstIndex(of: "--input"), i + 1 < args.count {
-            let text = args[i + 1].replacingOccurrences(of: "\\r", with: "\r")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                for byte in text.utf8 { self?.typed(byte) }
+        if let seconds = value("--power-on-after").flatMap(Double.init) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { [weak self] in
+                self?.setPower(true)
+            }
+        }
+        if let raw = value("--input") {
+            let text = raw.replacingOccurrences(of: "\\r", with: "\r")
+            let start = value("--input-after").flatMap(Double.init) ?? 1.0
+            let delay = value("--type-delay").flatMap(Double.init) ?? 0
+            for (index, byte) in text.utf8.enumerated() {
+                let when = start + delay * Double(index)
+                DispatchQueue.main.asyncAfter(deadline: .now() + when) { [weak self] in
+                    self?.typed(byte)
+                }
             }
         }
     }

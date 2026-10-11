@@ -30,6 +30,7 @@ struct ContentView: View {
     /// 動作確認用の起動オプション(--power-on / --no-splash)があるときは出さない。
     @State private var showsSplash = !CommandLine.arguments.contains("--no-splash")
         && !CommandLine.arguments.contains("--power-on")
+        && !CommandLine.arguments.contains("--power-on-after")
 
     var body: some View {
         ZStack {

@@ -8,7 +8,7 @@ macOS 向けの 6502 ワンボードマイコン エミュレータ(Swift 製)�
 
 ![status](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey) ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<p align="center"><img src="documents/images/frontpanel.png" alt="LED とスイッチを備えた Glow65 のフロントパネルと、Microsoft BASIC が動く端末" width="860"></p>
+<p align="center"><img src="documents/images/demo.gif" alt="Glow65 の電源を入れ、Microsoft BASIC を起動して短いプログラムを実行する様子。フロントパネルの LED が光る" width="860"></p>
 
 ## 概要
 
@@ -84,6 +84,8 @@ swift run glow65-cli --rom file.bin@C000
 `--rom` を指定すると既定の ROM は読み込まれません。必要な ROM をすべて並べてください(例: `ROM/monitor.bin@F000` と `ROM/basic/build/basic.bin@C000`)。終了は Ctrl-\\ です。Ctrl-C はプログラムに渡されます(BASIC の中断に使われます)。
 
 ## フロントパネル
+
+<p align="center"><img src="documents/images/frontpanel.png" alt="LED とスイッチを備えた Glow65 のフロントパネルと、Microsoft BASIC が動く端末" width="860"></p>
 
 | 操作 | 動作 |
 |---|---|
