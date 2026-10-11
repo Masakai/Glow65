@@ -2,6 +2,8 @@
 
 **English** | [日本語](README.ja.md)
 
+Chapters: **1. LED counter** · [2. Addition and the carry flag](02-addition.md) · [3. The UART](03-uart.md)
+
 You will write a five-line 6502 program, load it into Glow65, and watch it count in binary on the LEDs. Everything below was run on Glow65 and checked by the tests in `Tests/Glow65Tests/TutorialTests.swift`.
 
 ## 1. The program
@@ -74,9 +76,10 @@ At 1 MHz this loop runs about 90,000 times a second, so you cannot follow the co
 
 1. Set **SPEED** to **10 Hz**. The loop now takes a little over a second, and the panel shows each bus access in turn.
 2. Watch the address bus. It walks through `$0300`, `$0301`, `$0302` and so on, so the PC LEDs and the low address LEDs change as the program advances.
-3. Watch **SYNC**. It lights on the first access of every instruction (the opcode fetch).
-4. Watch **WRITE**. It lights once per loop, for the `sta`. At that moment the address bus shows `$03F0` and the data bus shows the value of A.
-5. Switch **RUN/STOP** to STOP, set **STEP MODE** to CYCLE, and press **STEP** repeatedly. One press is one bus access.
+3. Watch **INSTRUCTION AT PC**. It shows the instruction being executed, for example `0302  8D F0 03  STA $03F0`, so you can match the LEDs to the program.
+4. Watch **SYNC**. It lights on the first access of every instruction (the opcode fetch).
+5. Watch **WRITE**. It lights once per loop, for the `sta`. At that moment the address bus shows `$03F0` and the data bus shows the value of A.
+6. Switch **RUN/STOP** to STOP, set **STEP MODE** to CYCLE, and press **STEP** repeatedly. One press is one bus access.
 
 The first trip through the program, access by access:
 
@@ -127,3 +130,5 @@ Press RESET, change a byte with `E`, check the result with `L 0300 0308`, and ru
 3. **Count down.** `E 0305 38 E9 01` replaces `clc` / `adc #$01` with `sec` / `sbc #$01`. Same length, opposite direction. `L 0300 0308` now shows `SEC` and `SBC   #$01` at `$0305` and `$0306`.
 
 When you are ready for more, change `counter.s`, run `Tools/assemble.sh` again, and load the new file. Programs must fit in the 256 bytes at `$0300-$03FF` (see `ROM/user.cfg`).
+
+Next: [2. Addition and the carry flag →](02-addition.md)

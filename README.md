@@ -45,7 +45,7 @@ See [NOTICE.md](NOTICE.md) for details. No Altair or IMSAI names, logos, or phot
 
 ## Write your own program
 
-Glow65 is for learning, so the first thing to try is your own program. The [tutorial](tutorial/README.md) takes you from five lines of assembly to a binary counter on the LEDs: assemble it (or type the bytes), load it, run it, then slow the CPU down and step through every bus access.
+Glow65 is for learning, so the first thing to try is your own program. The [tutorial](tutorial/README.md) has three chapters: [an LED counter](tutorial/README.md) (assemble or type the bytes, load, run, then slow the CPU down and step through every bus access), [16-bit addition and the carry flag](tutorial/02-addition.md), and [printing text through the UART](tutorial/03-uart.md).
 
 ## Quick start
 
@@ -173,7 +173,7 @@ Sources/Glow65App/     SwiftUI app: front panel, terminal, startup banner
 ROM/monitor.s         Monitor ROM source (ca65)
 ROM/basic/            BASIC: upstream source, prelude, linker config
 Tools/                Build and conversion scripts (assemble.sh builds your own programs)
-tutorial/             Tutorial: write, load and watch your first program
+tutorial/             Tutorial: three chapters (LED counter, addition, UART) with sample programs
 Tests/                Unit and integration tests
 documents/designs/    Design document (Japanese)
 ```
