@@ -68,6 +68,15 @@ public final class SBCBus: Bus {
         rom.replaceSubrange(offset..<(offset + image.count), with: image)
     }
 
+    /// 副作用のない読み出し(パネルの表示用)。バス監視にも UART にも触れず、I/O は `$FF` を返す。
+    public func peek(_ address: UInt16) -> UInt8 {
+        switch address {
+        case 0x0000..<0x8000: return ram[Int(address)]
+        case MemoryMap.romBase...0xFFFF: return rom[Int(address - MemoryMap.romBase)]
+        default: return 0xFF
+        }
+    }
+
     /// テスト用: RAM の指定位置に書き込む(範囲外なら何もしない)。
     func poke(_ address: UInt16, _ bytes: [UInt8]) {
         try? loadRAM(bytes, at: address)

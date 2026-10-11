@@ -14,7 +14,7 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UART), and ROM holding a small monitor and Microsoft BASIC. The window has two parts:
 
-- **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals. Switches for POWER, RESET, RUN/STOP, STEP, STEP MODE and SPEED.
+- **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, RUN/STOP, STEP, STEP MODE and SPEED.
 - **Terminal.** Connected to the UART. Use it to talk to the monitor and BASIC.
 
 The panel is for watching the CPU work. At 1 kHz and below, each bus access is shown one at a time. At 100 kHz and above, LED brightness is the fraction of accesses in which the bit was 1, which imitates the glow of an old panel's LEDs. The extra dummy reads and writes of real hardware are not reproduced, so the bus view differs slightly from a real 6502.
@@ -99,6 +99,7 @@ swift run glow65-cli --load tutorial/counter.bin@0300   # a program for RAM, loa
 | STEP MODE | Chooses between INSTR and CYCLE stepping |
 | SPEED | 1 Hz, 10 Hz, 100 Hz, 1 kHz, 100 kHz, 1 MHz |
 | (i) button | Shows the credits |
+| INSTRUCTION AT PC | Not a switch: the instruction at the PC, for example `0302  8D F0 03  STA $03F0`. While an instruction is replayed access by access, it shows the instruction being replayed |
 
 While an instruction is shown access by access, the register LEDs show the values from before the instruction.
 

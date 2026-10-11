@@ -1,3 +1,5 @@
+import Core6502
+
 /// 動作速度の設定(SPEED スイッチ)。
 public enum SpeedSetting: Int, CaseIterable, Sendable {
     case hz1, hz10, hz100, khz1, khz100, mhz1
@@ -51,6 +53,9 @@ public struct PanelSnapshot: Sendable {
     public var status: UInt8 = 0
     public var irqLine = false
     public var nmiPending = false
+
+    /// PC の位置の命令(これから、または今実行している命令)。電源が切れていれば nil。
+    public var instruction: DisassembledInstruction?
 
     public var uartTransmitCount: UInt64 = 0
     public var uartReceiveCount: UInt64 = 0

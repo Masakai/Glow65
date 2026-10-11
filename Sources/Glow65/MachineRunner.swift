@@ -313,6 +313,7 @@ public final class MachineRunner {
         s.y = regs.y
         s.sp = regs.sp
         s.pc = regs.pc
+        s.instruction = Disassembler.disassemble(at: regs.pc, read: machine.bus.peek)
         s.status = regs.p
         s.irqLine = machine.cpu.irqLine
         s.nmiPending = machine.cpu.nmiPending

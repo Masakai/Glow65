@@ -30,6 +30,8 @@ final class PanelModel: ObservableObject {
     @Published private(set) var txLED = 0.0
     @Published private(set) var rxLED = 0.0
     @Published private(set) var cycleCount: UInt64 = 0
+    /// PC の位置の命令(逆アセンブルした 1 行)。電源が切れていれば空。
+    @Published private(set) var instructionLine = ""
 
     // スイッチの状態
     @Published var isPowerOn = false
@@ -262,6 +264,7 @@ final class PanelModel: ObservableObject {
         let s = runner.snapshot
         if s.isPoweredOn != isPowerOn && !s.isPoweredOn { isPowerOn = false }
         cycleCount = s.cycles
+        instructionLine = s.isPoweredOn ? (s.instruction?.line ?? "") : ""
 
         guard s.isPoweredOn else {
             // 電源 OFF は瞬時に消灯

@@ -94,6 +94,21 @@ final class RunnerTests: XCTestCase {
         XCTAssertEqual(runner.machine.bus.ram[0x300], 0x55)
     }
 
+    func testSnapshotShowsTheInstructionAtPC() {
+        let runner = makeRunner()
+        runner.powerOn()
+        runner.setSpeed(.hz1)
+        runner.drainForTesting()
+        // 最初に実行する命令は ROM の LDA #$55
+        XCTAssertEqual(runner.snapshot.instruction?.line, "F000  A9 55    LDA #$55")
+        // 1 Hz で 2 サイクル(= LDA が終わる)進めると、次の命令に変わる
+        for _ in 0..<21 { runner.advanceForTesting(seconds: 0.1) }
+        XCTAssertEqual(runner.snapshot.instruction?.line, "F002  8D 00 03 STA $0300")
+        runner.powerOff()
+        runner.drainForTesting()
+        XCTAssertNil(runner.snapshot.instruction)
+    }
+
     func testStopFreezesAndRunResumes() {
         let runner = makeRunner()
         runner.powerOn()

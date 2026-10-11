@@ -219,6 +219,21 @@ struct FrontPanelView: View {
                     Text("CYCLES \(model.cycleCount)")
                         .font(.system(size: 10, design: .monospaced))
                         .foregroundStyle(PanelStyle.label.opacity(0.8))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("INSTRUCTION AT PC")
+                            .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(PanelStyle.label)
+                        Text(model.instructionLine.isEmpty ? " " : model.instructionLine)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(Color(red: 0.55, green: 1.0, blue: 0.6))
+                            .lineLimit(1)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.black.opacity(0.55))
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                    }
+                    .padding(.top, 6)
                 }
             }
 

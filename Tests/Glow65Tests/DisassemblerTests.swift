@@ -82,6 +82,25 @@ final class DisassemblerTests: XCTestCase {
         }
     }
 
+    /// パネルに出す Swift 製の逆アセンブラも、同じ基準の書式と一致する。
+    func testSwiftDisassemblerMatchesTheSameReference() {
+        for opcode in 0...255 {
+            for (b1, b2) in [(UInt8(0x12), UInt8(0x34)), (UInt8(0xF0), UInt8(0xAB)), (UInt8(0x7F), UInt8(0x00))] {
+                let memory: [UInt8] = [UInt8(opcode), b1, b2]
+                let result = Disassembler.disassemble(at: 0x0300) { address in
+                    let i = Int(address) - 0x0300
+                    return (0..<3).contains(i) ? memory[i] : 0
+                }
+                // モニタの表示は「バイト欄が固定幅 + 区切り + ニーモニック6文字」。Swift 側は詰めた書式なので、
+                // 空白を 1 つにそろえて比べる。
+                let squeeze = { (s: String) in s.split(separator: " ").joined(separator: " ") }
+                XCTAssertEqual(squeeze(result.line),
+                               squeeze(expectedLine(address: 0x0300, opcode: UInt8(opcode), b1: b1, b2: b2)),
+                               "opcode \(String(format: "%02X", opcode))")
+            }
+        }
+    }
+
     func testTutorialCounterListing() throws {
         let (machine, out) = try makeMachine()
         try machine.bus.loadRAM([0xA9, 0x00, 0x8D, 0xF0, 0x03, 0x18, 0x69, 0x01, 0x4C, 0x02, 0x03], at: 0x0300)
