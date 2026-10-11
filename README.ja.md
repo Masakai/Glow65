@@ -1,6 +1,6 @@
 # Glow65
 
-[English](README.md) | **日本語**
+[English](README.md) | **日本語** | [Webサイト](https://masakai.github.io/Glow65/)
 
 **6502 の学習用に、CPU の動作がわかるよう、昔のコンピュータのように LED が光る GUI を持ったエミュレータを作成しました。**
 
