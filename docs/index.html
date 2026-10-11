@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glow65 — See the 6502 think</title>
+<meta name="description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel. Runs Microsoft BASIC.">
+<meta property="og:title" content="Glow65 — See the 6502 think">
+<meta property="og:description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://masakai.github.io/Glow65/">
+<meta property="og:image" content="https://masakai.github.io/Glow65/assets/splash.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307080c'/%3E%3Ccircle cx='9' cy='16' r='3.4' fill='%23ff2a1a'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23ff2a1a' opacity='.55'/%3E%3Ccircle cx='23' cy='16' r='3.4' fill='%23ff2a1a' opacity='.25'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#07080c; --bg2:#0d1018; --panel:#11151f; --line:rgba(255,255,255,.09);
+  --text:#e9ebf1; --mute:#9aa1b2; --dim:#6b7285;
+  --led:#ff2a1a; --amber:#ff9a2e; --green:#3dff7a;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI","Noto Sans JP",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+html[data-lang="en"] [lang="ja"]{display:none!important}
+html[data-lang="ja"] [lang="en"]{display:none!important}
+.wrap{width:min(1120px,100% - 40px);margin-inline:auto}
+
+/* 背景 */
+.bg{position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(900px 520px at 78% -8%,rgba(255,42,26,.20),transparent 62%),
+  radial-gradient(700px 480px at 6% 24%,rgba(255,154,46,.07),transparent 60%),var(--bg)}
+.bg::after{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 60% at 50% 20%,#000 30%,transparent 80%)}
+
+/* ナビ */
+nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px) saturate(1.3);background:rgba(7,8,12,.72);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:58px}
+.logo{font:800 18px var(--mono);letter-spacing:.14em;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo i{display:inline-flex;gap:4px}
+.logo i b{width:7px;height:7px;border-radius:50%;background:var(--led);box-shadow:0 0 8px var(--led);animation:blink 1.6s infinite}
+.logo i b:nth-child(2){animation-delay:.25s}.logo i b:nth-child(3){animation-delay:.5s}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+nav ul{display:flex;gap:22px;list-style:none;margin:0 0 0 auto;padding:0;font-size:14px;color:var(--mute)}
+nav ul a{text-decoration:none}nav ul a:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font:600 14px var(--sans);text-decoration:none;cursor:pointer;transition:.18s}
+.btn:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08)}
+.btn.primary{background:linear-gradient(180deg,#ff4a38,#e0210f);border-color:#ff6a58;box-shadow:0 6px 28px -6px rgba(255,42,26,.7)}
+.btn.primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.lang{font:600 12px var(--mono);padding:6px 10px;white-space:nowrap}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:6px}
+
+/* ヒーロー */
+.hero{padding:76px 0 34px;text-align:center}
+.eyebrow{font:600 12px var(--mono);letter-spacing:.3em;color:var(--amber);text-transform:uppercase}
+h1{font:900 clamp(56px,11vw,132px)/.95 var(--mono);letter-spacing:.06em;margin:18px 0 6px;
+  background:linear-gradient(180deg,#fff 20%,#ffb4a8 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 28px rgba(255,42,26,.45))}
+.tag{font:600 clamp(20px,3.2vw,32px)/1.3 var(--sans);margin:10px 0 0}
+.tag em{font-style:normal;color:var(--led);text-shadow:0 0 18px rgba(255,42,26,.7)}
+.lead{max-width:680px;margin:18px auto 0;color:var(--mute);font-size:17px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:22px;font:12px var(--mono);color:var(--dim)}
+.badges span{padding:3px 10px;border:1px solid var(--line);border-radius:99px}
+
+/* ライブパネル */
+.demo{margin:46px auto 0;max-width:1000px;border-radius:20px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#171c2a,#0d111b);padding:26px 26px 22px;text-align:left;
+  box-shadow:0 40px 90px -30px rgba(255,42,26,.35),0 0 0 1px rgba(255,255,255,.03) inset}
+.demo-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.demo-top b{font:700 12px var(--mono);letter-spacing:.2em;color:var(--mute)}
+.demo-top small{font:12px var(--mono);color:var(--dim)}
+.rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:18px 34px}
+.row h4{margin:0 0 7px;font:600 10px var(--mono);letter-spacing:.16em;color:var(--mute)}
+.leds{display:flex;gap:0}
+.grp{display:flex;gap:6px;margin-right:12px}
+.grp:last-child{margin-right:0}
+.cell{display:flex;flex-direction:column;align-items:center;gap:3px;font:8px var(--mono);color:var(--dim)}
+.led{--l:0;--c:var(--led);display:block;width:15px;height:15px;border-radius:50%;
+  background:radial-gradient(circle at 36% 30%,rgba(255,255,255,calc(var(--l)*.65)),transparent 52%),
+             color-mix(in srgb,var(--c) calc(12% + var(--l)*88%),#150909);
+  border:1px solid rgba(0,0,0,.6);box-shadow:0 0 calc(var(--l)*15px) calc(var(--l)*2px) color-mix(in srgb,var(--c) calc(var(--l)*80%),transparent)}
+.led.amber{--c:var(--amber)}.led.green{--c:var(--green)}
+.sig{display:flex;gap:14px;flex-wrap:wrap}
+.sig .cell{font-size:9px;color:var(--mute)}
+.regs{font:12px var(--mono);color:var(--mute);display:flex;gap:16px;flex-wrap:wrap;margin-top:6px}
+.regs b{color:var(--text);font-weight:600}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.ctl .btn{padding:7px 14px;font:600 12px var(--mono);letter-spacing:.08em}
+.ctl .btn[aria-pressed="true"]{border-color:var(--green);color:var(--green)}
+.speeds{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.speeds .btn{padding:7px 10px}
+.speeds .btn[aria-checked="true"]{background:rgba(255,154,46,.14);border-color:var(--amber);color:var(--amber)}
+.mode{font:11px var(--mono);color:var(--dim);margin-top:12px;min-height:1.4em}
+.prog{margin-top:16px;font:12px/1.7 var(--mono);color:var(--mute);background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:12px;padding:12px 16px;overflow-x:auto}
+.prog span{display:block;white-space:pre}
+.prog .cur{color:#fff;background:linear-gradient(90deg,rgba(255,42,26,.28),transparent);margin:0 -16px;padding:0 16px}
+
+/* セクション */
+section{padding:84px 0}
+.kicker{font:600 12px var(--mono);letter-spacing:.28em;color:var(--amber);text-transform:uppercase}
+h2{font:800 clamp(28px,4.6vw,44px)/1.15 var(--sans);margin:12px 0 14px;letter-spacing:-.01em}
+.sub{color:var(--mute);max-width:640px;margin:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px;margin-top:40px}
+.card{padding:26px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));transition:.25s;position:relative;overflow:hidden}
+.card:hover{border-color:rgba(255,42,26,.5);transform:translateY(-3px);box-shadow:0 18px 50px -22px rgba(255,42,26,.55)}
+.card .ico{font:800 13px var(--mono);color:var(--led);letter-spacing:.1em;margin-bottom:12px;text-shadow:0 0 12px rgba(255,42,26,.6)}
+.card h3{margin:0 0 8px;font:700 19px var(--sans)}
+.card p{margin:0;color:var(--mute);font-size:15px}
+.shots{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;margin-top:42px;align-items:start}
+.shot{margin:0}
+.shot img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid var(--line);box-shadow:0 30px 80px -30px rgba(0,0,0,.9),0 0 70px -24px rgba(255,42,26,.45)}
+.shot figcaption{font:12px var(--mono);color:var(--dim);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:38px}
+.box{border:1px solid var(--line);border-radius:16px;padding:26px;background:rgba(255,255,255,.025)}
+.box h3{margin:0 0 6px;font:700 17px var(--sans)}
+.box p{color:var(--mute);margin:0 0 12px;font-size:15px}
+table{width:100%;border-collapse:collapse;font:13px var(--mono)}
+td,th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:600;font-size:11px;letter-spacing:.12em}
+td:first-child{color:var(--amber);white-space:nowrap}
+pre{margin:0;padding:18px 20px;background:#05060a;border:1px solid var(--line);border-radius:14px;font:13px/1.75 var(--mono);color:#cfd5e3;overflow-x:auto;position:relative}
+pre .c{color:var(--dim)}
+.copy{position:absolute;top:10px;right:10px;padding:5px 10px;font:11px var(--mono)}
+.steps{counter-reset:s;display:grid;gap:12px;margin:26px 0 0;padding:0;list-style:none}
+.steps li{counter-increment:s;display:flex;gap:14px;color:var(--mute)}
+.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--mono);color:#fff;background:var(--led);box-shadow:0 0 14px rgba(255,42,26,.6)}
+.honest{border:1px solid rgba(255,154,46,.35);background:linear-gradient(180deg,rgba(255,154,46,.07),rgba(255,154,46,.02));border-radius:18px;padding:30px}
+.honest table td:first-child{color:var(--text)}
+footer{padding:46px 0 70px;border-top:1px solid var(--line);color:var(--dim);font-size:14px}
+footer .wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between}
+footer a{color:var(--mute)}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.logo i b{animation:none}}
+@media (max-width:520px){
+  .wrap{width:min(1120px,100% - 28px)}
+  .led{width:11px;height:11px}
+  .grp{gap:3px;margin-right:7px}
+  .cell{font-size:7px}
+  nav .wrap{gap:10px}
+  .logo{font-size:15px;letter-spacing:.1em}
+  .demo{padding:16px 12px}
+}
+@media (max-width:820px){
+  nav ul{display:none}nav .lang{margin-left:auto}
+  .shots,.two{grid-template-columns:1fr}
+  .demo{padding:18px 14px}.speeds{margin-left:0}
+  .hero{padding-top:48px}section{padding:60px 0}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Glow65"><i aria-hidden="true"><b></b><b></b><b></b></i>GLOW65</a>
+    <ul>
+      <li><a href="#demo"><span lang="en">Live demo</span><span lang="ja">デモ</span></a></li>
+      <li><a href="#features"><span lang="en">Features</span><span lang="ja">特長</span></a></li>
+      <li><a href="#how"><span lang="en">How it works</span><span lang="ja">仕組み</span></a></li>
+      <li><a href="#start"><span lang="en">Get started</span><span lang="ja">使い方</span></a></li>
+      <li><a href="#credits"><span lang="en">Credits</span><span lang="ja">クレジット</span></a></li>
+    </ul>
+    <button class="btn lang" id="langBtn" type="button" aria-label="Switch language">EN / 日本語</button>
+    <a class="btn" href="https://github.com/Masakai/Glow65"><span lang="en">GitHub</span><span lang="ja">GitHub</span> ↗</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow"><span lang="en">A 6502 emulator for learning</span><span lang="ja">6502 学習用エミュレータ</span></div>
+    <h1>GLOW65</h1>
+    <p class="tag"><span lang="en">See the 6502 <em>think</em>.</span><span lang="ja">6502 が<em>考える</em>様子を、LED で見る。</span></p>
+    <p class="lead">
+      <span lang="en">A macOS emulator whose front panel lights up like an old computer's — address bus, data bus, registers and flags, cycle by cycle. It runs Microsoft BASIC.</span>
+      <span lang="ja">昔のコンピュータのように LED が光る GUI を持った macOS 用エミュレータ。アドレスバス、データバス、レジスタ、フラグが 1 サイクルずつ見えます。Microsoft BASIC も動きます。</span>
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="ja">使ってみる</span></a>
+      <a class="btn" href="https://github.com/Masakai/Glow65"><span lang="en">View on GitHub</span><span lang="ja">GitHub で見る</span> ↗</a>
+    </div>
+    <div class="badges"><span>macOS 14+</span><span>Swift</span><span>MIT License</span><span>NMOS 6502</span></div>
+
+    <!-- ライブデモ: ブラウザ内で小さな 6502 プログラムを実行し、実際のバス動作を LED に出す -->
+    <div class="demo" id="demo" aria-label="Interactive LED panel demo">
+      <div class="demo-top">
+        <b>FRONT PANEL · LIVE</b>
+        <small><span lang="en">A tiny 6502 program runs in your browser (JavaScript). The Swift app shows the same kind of view.</span><span lang="ja">小さな 6502 プログラムをブラウザ内(JavaScript)で実行しています。Swift 製アプリでも同じ種類の表示が出ます。</span></small>
+      </div>
+      <div class="rows">
+        <div class="row"><h4>ADDRESS BUS</h4><div class="leds" id="addr"></div></div>
+        <div class="row"><h4>DATA BUS</h4><div class="leds" id="data"></div></div>
+        <div class="row"><h4>PC</h4><div class="leds" id="pc"></div></div>
+        <div class="row"><h4>A</h4><div class="leds" id="ra"></div></div>
+        <div class="row"><h4>X</h4><div class="leds" id="rx"></div></div>
+        <div class="row"><h4>STATUS P</h4><div class="leds" id="flags"></div></div>
+        <div class="row"><h4>CPU</h4>
+          <div class="sig" id="sig"></div>
+          <div class="regs"><span>CYCLES <b id="cyc">0</b></span><span>SP <b>FD</b></span></div>
+        </div>
+      </div>
+      <div class="ctl" role="group" aria-label="Controls">
+        <button class="btn" id="run" type="button" aria-pressed="true">RUN</button>
+        <button class="btn" id="step" type="button">STEP</button>
+        <button class="btn" id="reset" type="button">RESET</button>
+        <div class="speeds" role="radiogroup" aria-label="Speed" id="speeds"></div>
+      </div>
+      <div class="mode" id="mode" aria-live="polite"></div>
+      <div class="prog" id="prog" aria-label="Program"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="features">
+  <div class="wrap">
+    <div class="kicker reveal"><span lang="en">Features</span><span lang="ja">特長</span></div>
+    <h2 class="reveal"><span lang="en">Built to make the CPU visible.</span><span lang="ja">CPU の動きを、見えるようにする。</span></h2>
+    <p class="sub reveal"><span lang="en">Most emulators run fast and show nothing. Glow65 slows down, lights up, and lets you step through every bus cycle.</span><span lang="ja">多くのエミュレータは速く動くだけで、中身は見えません。Glow65 は速度を落とし、光らせ、バスサイクルを 1 つずつ辿れます。</span></p>
+    <div class="cards">
+      <div class="card reveal"><div class="ico">01 / LEDS</div><h3><span lang="en">A real front panel</span><span lang="ja">本物のようなフロントパネル</span></h3><p><span lang="en">Address bus, data bus, PC, SP, A, X, Y, status flags, SYNC / READ / WRITE and UART activity — all as LEDs.</span><span lang="ja">アドレスバス、データバス、PC、SP、A、X、Y、フラグ、SYNC / READ / WRITE、UART の動きを LED で表示します。</span></p></div>
+      <div class="card reveal"><div class="ico">02 / STEP</div><h3><span lang="en">Step one cycle at a time</span><span lang="ja">1 サイクルずつ進める</span></h3><p><span lang="en">Stop the CPU, then step by instruction or by single bus cycle. Speeds from 1 Hz to 1 MHz.</span><span lang="ja">CPU を止めて、1 命令または 1 バスサイクルずつ進められます。速度は 1Hz から 1MHz まで。</span></p></div>
+      <div class="card reveal"><div class="ico">03 / GLOW</div><h3><span lang="en">LEDs that actually glow</span><span lang="ja">本当に残光する LED</span></h3><p><span lang="en">At high speed each LED shows how often its bit was 1 — just like a real panel's flicker and glow.</span><span lang="ja">高速時は、各ビットが 1 だった割合を明るさにします。実機のパネルのちらつきと残光に近い見え方です。</span></p></div>
+      <div class="card reveal"><div class="ico">04 / BASIC</div><h3><span lang="en">Runs Microsoft BASIC</span><span lang="ja">Microsoft BASIC が動く</span></h3><p><span lang="en">Microsoft's 1978 6502 BASIC, converted from its original assembler source and built for this board.</span><span lang="ja">1978 年の Microsoft 6502 BASIC を、原典のアセンブラソースから変換して、このボード向けにビルドしています。</span></p></div>
+      <div class="card reveal"><div class="ico">05 / TESTED</div><h3><span lang="en">Verified CPU core</span><span lang="ja">検証済みの CPU コア</span></h3><p><span lang="en">Passes Klaus Dormann's functional test — 96,241,367 cycles, decimal mode included.</span><span lang="ja">Klaus Dormann の機能テストに合格(96,241,367 サイクル、10 進モードを含む)。</span></p></div>
+      <div class="card reveal"><div class="ico">06 / OPEN</div><h3><span lang="en">Small and readable</span><span lang="ja">小さく、読みやすい</span></h3><p><span lang="en">Swift, no dependencies. The CPU core is one file with no UI code. MIT licensed.</span><span lang="ja">Swift 製で依存ライブラリはなし。CPU コアは UI を含まない 1 ファイル。MIT ライセンス。</span></p></div>
+    </div>
+
+    <div class="shots">
+      <figure class="shot reveal"><img src="assets/frontpanel.png" alt="The Glow65 front panel with LEDs and a terminal running Microsoft BASIC" loading="lazy"><figcaption><span lang="en">The app: front panel on top, terminal below.</span><span lang="ja">アプリ画面: 上にフロントパネル、下に端末。</span></figcaption></figure>
+      <figure class="shot reveal"><img src="assets/splash.png" alt="The Glow65 startup banner with credits" loading="lazy"><figcaption><span lang="en">The startup banner lists what is original and what is not.</span><span lang="ja">起動バナー。自作の部分とそうでない部分を表示します。</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker reveal"><span lang="en">How it works</span><span lang="ja">仕組み</span></div>
+    <h2 class="reveal"><span lang="en">An imaginary 6502 board.</span><span lang="ja">架空の 6502 ボード。</span></h2>
+    <p class="sub reveal"><span lang="en">No real machine's ROM is used. The board, the monitor and the panel are written for this project.</span><span lang="ja">実在機の ROM は使っていません。ボード、モニタ、パネルはこのプロジェクトのために書きました。</span></p>
+    <div class="two">
+      <div class="box reveal">
+        <h3><span lang="en">Memory map</span><span lang="ja">メモリマップ</span></h3>
+        <table>
+          <tr><th>ADDRESS</th><th><span lang="en">CONTENTS</span><span lang="ja">内容</span></th></tr>
+          <tr><td>$0000–$7FFF</td><td>RAM 32 KB</td></tr>
+          <tr><td>$A000 / $A001</td><td><span lang="en">UART status · data (6850-style)</span><span lang="ja">UART 状態・データ(6850 風)</span></td></tr>
+          <tr><td>$C000–$EFFF</td><td>Microsoft BASIC</td></tr>
+          <tr><td>$F000–$FFFF</td><td><span lang="en">Monitor ROM, vectors</span><span lang="ja">モニタ ROM、ベクタ</span></td></tr>
+        </table>
+      </div>
+      <div class="box reveal">
+        <h3><span lang="en">Two ways to show the bus</span><span lang="ja">バスの 2 つの見せ方</span></h3>
+        <p><span lang="en"><b>1 kHz and below</b> — every bus cycle is shown one at a time. While an instruction plays, the register LEDs keep their values from before it.</span><span lang="ja"><b>1kHz 以下</b> — バスサイクルを 1 つずつ表示します。命令の再生中、レジスタ LED は命令の実行前の値を保ちます。</span></p>
+        <p><span lang="en"><b>100 kHz and above</b> — each LED's brightness is the share of cycles in which its bit was 1, so busy lines glow and idle lines go dark.</span><span lang="ja"><b>100kHz 以上</b> — 各 LED の明るさは、そのビットが 1 だったサイクルの割合です。よく動く線は明るく、静かな線は暗くなります。</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="kicker reveal"><span lang="en">Get started</span><span lang="ja">使い方</span></div>
+    <h2 class="reveal"><span lang="en">From clone to BASIC in a few commands.</span><span lang="ja">clone から BASIC まで、わずかなコマンドで。</span></h2>
+    <p class="sub reveal"><span lang="en">Needs macOS 14+, Xcode, and cc65 (<code>brew install cc65</code>) to build the ROMs.</span><span lang="ja">macOS 14 以降、Xcode、ROM のビルド用に cc65(<code>brew install cc65</code>)が必要です。</span></p>
+    <div class="reveal" style="margin-top:30px">
+<pre id="code"><button class="btn copy" type="button" id="copyBtn">COPY</button><span class="c"># clone</span>
+git clone https://github.com/Masakai/Glow65.git &amp;&amp; cd Glow65
+
+<span class="c"># build the ROMs</span>
+brew install cc65
+Tools/build_monitor.sh &amp;&amp; Tools/build_basic.sh
+
+<span class="c"># run the front panel app</span>
+swift run Glow65App</pre>
+    </div>
+    <ol class="steps reveal">
+      <li><span lang="en">Click the terminal, then flip the <b>POWER</b> switch up. The monitor starts.</span><span lang="ja">端末をクリックして、<b>POWER</b> スイッチを上げます。モニタが起動します。</span></li>
+      <li><span lang="en">Type <code>B</code> and press Return to start BASIC. Press Return for the two prompts.</span><span lang="ja"><code>B</code> と入力して Return。BASIC が起動します。2 つの質問は Return で既定値になります。</span></li>
+      <li><span lang="en">Type a program, <code>RUN</code> it, and slow the SPEED switch down to watch it run.</span><span lang="ja">プログラムを入力して <code>RUN</code>。SPEED を下げると、実行の様子が見えます。</span></li>
+    </ol>
+  </div>
+</section>
+
+<section id="credits">
+  <div class="wrap">
+    <div class="honest reveal">
+      <div class="kicker"><span lang="en">Credits</span><span lang="ja">クレジット</span></div>
+      <h2><span lang="en">Not all of it is original — here is what is.</span><span lang="ja">全部が自作ではありません。内訳はこうです。</span></h2>
+      <table>
+        <tr><td><span lang="en">Original</span><span lang="ja">自作</span></td><td><span lang="en">6502 CPU core, board, monitor ROM, front panel, app, BASIC conversion script (MIT License)</span><span lang="ja">6502 CPU コア、ボード、モニタ ROM、フロントパネル、アプリ、BASIC 変換スクリプト(MIT License)</span></td></tr>
+        <tr><td><span lang="en">Included</span><span lang="ja">同梱</span></td><td>Microsoft BASIC for 6502 v1.1 — © Microsoft Corporation, MIT License · <a href="https://github.com/microsoft/BASIC-M6502">microsoft/BASIC-M6502</a></td></tr>
+        <tr><td><span lang="en">Built with</span><span lang="ja">ビルドに使用</span></td><td>cc65 (zlib License) · Swift · SwiftUI</td></tr>
+        <tr><td><span lang="en">Verified by</span><span lang="ja">検証に使用</span></td><td><span lang="en">Klaus Dormann's 6502 functional test (GPLv3, not included)</span><span lang="ja">Klaus Dormann の 6502 機能テスト(GPLv3、同梱しない)</span></td></tr>
+      </table>
+      <p style="color:var(--mute);margin:16px 0 0;font-size:14px"><span lang="en">No Altair or IMSAI names, logos or photos are used. The panel design is original.</span><span lang="ja">Altair、IMSAI の名称、ロゴ、写真は使っていません。パネルの意匠は自作です。</span></p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 masanorisakai · MIT License</div>
+    <div><a href="https://github.com/Masakai/Glow65">GitHub</a> · <a href="https://github.com/Masakai/Glow65/blob/main/NOTICE.md">NOTICE</a> · <a href="https://github.com/Masakai/Glow65/blob/main/README.md">README</a></div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  /* ---------- 言語切り替え ---------- */
+  const root = document.documentElement;
+  const saved = (() => { try { return localStorage.getItem("lang"); } catch { return null; } })();
+  const initial = (navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
+  const setLang = (l) => {
+    root.dataset.lang = l; root.lang = l;
+    try { localStorage.setItem("lang", l); } catch {}
+    document.title = l === "ja" ? "Glow65 — 6502 が考える様子を、LED で見る" : "Glow65 — See the 6502 think";
+  };
+  setLang(saved || initial);
+  document.getElementById("langBtn").addEventListener("click", () => setLang(root.dataset.lang === "ja" ? "en" : "ja"));
+
+  /* ---------- スクロール表示 ---------- */
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }), { threshold: .12 }) : null;
+  document.querySelectorAll(".reveal").forEach(el => io ? io.observe(el) : el.classList.add("in"));
+
+  /* ---------- コピー ---------- */
+  const copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", async () => {
+    const text = [...document.getElementById("code").childNodes].filter(n => n !== copyBtn)
+      .map(n => n.textContent).join("").replace(/^# .*\n/gm, "").replace(/\n{2,}/g, "\n").trim();
+    try { await navigator.clipboard.writeText(text); copyBtn.textContent = "COPIED"; }
+    catch { copyBtn.textContent = "SELECT & COPY"; }
+    setTimeout(() => copyBtn.textContent = "COPY", 1600);
+  });
+
+  /* ---------- ライブパネル: 小さな 6502 ---------- */
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hex = (n, w) => n.toString(16).toUpperCase().padStart(w, "0");
+
+  // プログラム($0200)。各行: [アドレス, バイト列, 表示]
+  const PROGRAM = [
+    [0x0200, [0xA2, 0x00], "LDX #$00"],
+    [0x0202, [0xE8], "INX"],
+    [0x0203, [0x8E, 0x00, 0x03], "STX $0300"],
+    [0x0206, [0x8A], "TXA"],
+    [0x0207, [0x18], "CLC"],
+    [0x0208, [0x69, 0x07], "ADC #$07"],
+    [0x020A, [0x8D, 0x01, 0x03], "STA $0301"],
+    [0x020D, [0xE0, 0x10], "CPX #$10"],
+    [0x020F, [0xD0, 0xF1], "BNE $0202"],
+    [0x0211, [0x4C, 0x00, 0x02], "JMP $0200"],
+  ];
+  const mem = new Uint8Array(65536);
+  PROGRAM.forEach(([a, bytes]) => bytes.forEach((b, i) => mem[a + i] = b));
+
+  const N = 0x80, V = 0x40, Z = 0x02, C = 0x01;
+  const cpu = { a: 0, x: 0, pc: 0x0200, p: 0x24 };
+  let out = null;            // 現在の命令のバスアクセス(再生用)
+  let glow = null;           // 高速時の積算
+  let syncNext = false;
+
+  const touch = (addr, data, w, s) => {
+    if (out) out.push({ a: addr, d: data, w, s });
+    if (glow) {
+      glow.n++; if (w) glow.w++; if (s) glow.s++;
+      for (let i = 0; i < 16; i++) if (addr >> i & 1) glow.addr[i]++;
+      for (let i = 0; i < 8; i++) if (data >> i & 1) glow.data[i]++;
+    }
+  };
+  const rd = (a) => { a &= 0xFFFF; const v = mem[a]; touch(a, v, 0, syncNext); syncNext = false; return v; };
+  const wr = (a, v) => { a &= 0xFFFF; mem[a] = v; touch(a, v, 1, 0); };
+  const nz = (v) => { cpu.p = (cpu.p & ~(N | Z)) | (v & 0x80) | (v === 0 ? Z : 0); return v; };
+
+  function execute() {   // 1 命令を実行し、バスアクセスを記録する。消費サイクル数を返す
+    syncNext = true;
+    const op = rd(cpu.pc++); cpu.pc &= 0xFFFF;
+    const imm = () => rd(cpu.pc++ & 0xFFFF);
+    const dummy = () => rd(cpu.pc);
+    const abs = () => { const lo = imm(); const hi = imm(); return lo | hi << 8; };
+    switch (op) {
+      case 0xA2: cpu.x = nz(imm()); break;
+      case 0xE8: dummy(); cpu.x = nz((cpu.x + 1) & 255); break;
+      case 0x8E: wr(abs(), cpu.x); break;
+      case 0x8D: wr(abs(), cpu.a); break;
+      case 0x8A: dummy(); cpu.a = nz(cpu.x); break;
+      case 0x18: dummy(); cpu.p &= ~C; break;
+      case 0x69: {
+        const m = imm(), s = cpu.a + m + (cpu.p & C), r = s & 255;
+        cpu.p = (cpu.p & ~(N | V | Z | C)) | (r & 0x80) | (r === 0 ? Z : 0) | (s > 255 ? C : 0)
+              | ((~(cpu.a ^ m) & (cpu.a ^ r) & 0x80) ? V : 0);
+        cpu.a = r; break;
+      }
+      case 0xE0: {
+        const m = imm(), r = (cpu.x - m) & 255;
+        cpu.p = (cpu.p & ~(N | Z | C)) | (r & 0x80) | (r === 0 ? Z : 0) | (cpu.x >= m ? C : 0); break;
+      }
+      case 0xD0: {
+        const off = imm();
+        if (!(cpu.p & Z)) {
+          dummy();
+          const t = (cpu.pc + (off << 24 >> 24)) & 0xFFFF;
+          if ((t ^ cpu.pc) & 0xFF00) rd((cpu.pc & 0xFF00) | (t & 0xFF));
+          cpu.pc = t;
+        }
+        break;
+      }
+      case 0x4C: cpu.pc = abs(); break;
+      default: dummy(); break;
+    }
+    return out ? out.length : 0;
+  }
+
+  /* ---------- 画面 ---------- */
+  const mk = (id, bits, groups, labels, cls = "") => {
+    const el = document.getElementById(id); const leds = [];
+    for (let g = 0; g < bits / groups; g++) {
+      const grp = document.createElement("div"); grp.className = "grp";
+      for (let k = 0; k < groups; k++) {
+        const bit = bits - 1 - (g * groups + k);
+        const cell = document.createElement("div"); cell.className = "cell";
+        const led = document.createElement("i"); led.className = "led " + cls; led.style.setProperty("--l", 0);
+        const t = document.createElement("span"); t.textContent = labels ? labels[bit] : bit;
+        cell.append(led, t); grp.append(cell); leds[bit] = led;
+      }
+      el.append(grp);
+    }
+    return leds;
+  };
+  const addrL = mk("addr", 16, 4), dataL = mk("data", 8, 4), pcL = mk("pc", 16, 4);
+  const aL = mk("ra", 8, 4), xL = mk("rx", 8, 4);
+  const fL = mk("flags", 8, 4, ["C", "Z", "I", "D", "B", "-", "V", "N"], "amber");
+  const sigEl = document.getElementById("sig"); const sig = {};
+  [["sync", "SYNC", ""], ["read", "READ", ""], ["write", "WRITE", ""], ["run", "RUN", "green"]].forEach(([k, label, cls]) => {
+    const cell = document.createElement("div"); cell.className = "cell";
+    const led = document.createElement("i"); led.className = "led " + cls; led.style.setProperty("--l", 0);
+    const t = document.createElement("span"); t.textContent = label; cell.append(led, t); sigEl.append(cell); sig[k] = led;
+  });
+  const cycEl = document.getElementById("cyc");
+
+  const progEl = document.getElementById("prog");
+  const progLines = PROGRAM.map(([a, b, txt]) => {
+    const s = document.createElement("span");
+    s.textContent = `${hex(a, 4)}  ${b.map(x => hex(x, 2)).join(" ").padEnd(8)}  ${txt}`;
+    progEl.append(s); return s;
+  });
+  const markLine = (pc) => {
+    progLines.forEach((s, i) => s.classList.toggle("cur", PROGRAM[i][0] === pc));
+  };
+
+  const SPEEDS = [
+    { label: "2 Hz", hz: 2 }, { label: "8 Hz", hz: 8 }, { label: "30 Hz", hz: 30 },
+    { label: "1 kHz", hz: 1000 }, { label: "100 kHz", hz: 100000 }, { label: "1 MHz", hz: 1000000 },
+  ];
+  let speed = reduceMotion ? 0 : 1;
+  let running = !reduceMotion;
+  const speedsEl = document.getElementById("speeds");
+  SPEEDS.forEach((s, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = s.label;
+    b.setAttribute("role", "radio"); b.addEventListener("click", () => { speed = i; credit = 0; refreshUI(); });
+    speedsEl.append(b);
+  });
+
+  const shown = new Float32Array(16 + 8);   // 残光付きの表示値(アドレス, データ)
+  const sh = { sync: 0, read: 0, write: 0 };
+  let pending = null, credit = 0, regsShown = { a: 0, x: 0, pc: 0x0200, p: 0x24 };
+
+  const modeEl = document.getElementById("mode");
+  const lang = () => root.dataset.lang;
+  function refreshUI() {
+    document.getElementById("run").setAttribute("aria-pressed", String(running));
+    document.getElementById("run").textContent = running ? "RUN" : "STOP";
+    [...speedsEl.children].forEach((b, i) => b.setAttribute("aria-checked", String(i === speed)));
+    const replay = SPEEDS[speed].hz <= 30;
+    const en = replay ? "Showing every bus cycle, one at a time." : "Fast: each LED's brightness is how often its bit was 1.";
+    const ja = replay ? "バスサイクルを 1 つずつ表示しています。" : "高速: 各 LED の明るさは、そのビットが 1 だった割合です。";
+    modeEl.textContent = lang() === "ja" ? ja : en;
+  }
+  new MutationObserver(refreshUI).observe(root, { attributes: true, attributeFilter: ["data-lang"] });
+
+  function resetCPU() {
+    cpu.a = 0; cpu.x = 0; cpu.pc = 0x0200; cpu.p = 0x24; stepCycles = 0; cycEl.textContent = '0';
+    mem[0x300] = 0; mem[0x301] = 0; pending = null; credit = 0;
+    regsShown = { a: 0, x: 0, pc: 0x0200, p: 0x24 };
+  }
+  document.getElementById("run").addEventListener("click", () => { running = !running; credit = 0; refreshUI(); });
+  document.getElementById("reset").addEventListener("click", resetCPU);
+  document.getElementById("step").addEventListener("click", () => {
+    if (running) { running = false; refreshUI(); return; }
+    advanceOneCycle();
+  });
+
+  function advanceOneCycle() {
+    if (!pending) {
+      const before = { a: cpu.a, x: cpu.x, pc: cpu.pc, p: cpu.p };
+      out = []; glow = null; execute(); const acc = out; out = null;
+      pending = { acc, i: 0, before };
+    }
+    const acc = pending.acc[pending.i];
+    paintAccess(acc); regsShown = pending.before;
+    cycEl.textContent = (++stepCycles).toLocaleString();
+    pending.i++;
+    if (pending.i >= pending.acc.length) {
+      regsShown = { a: cpu.a, x: cpu.x, pc: cpu.pc, p: cpu.p }; pending = null;
+    }
+  }
+  let stepCycles = 0;
+
+  const target = { addr: new Float32Array(16), data: new Float32Array(8), read: 0, write: 0, sync: 0 };
+  function paintAccess(acc) {
+    for (let i = 0; i < 16; i++) target.addr[i] = acc.a >> i & 1;
+    for (let i = 0; i < 8; i++) target.data[i] = acc.d >> i & 1;
+    target.write = acc.w ? 1 : 0; target.read = acc.w ? 0 : 1; target.sync = acc.s ? 1 : 0;
+  }
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min((now - last) / 1000, 0.1); last = now;
+    const hz = SPEEDS[speed].hz;
+    if (running) {
+      credit += dt * hz;
+      if (hz <= 30) {                       // 1 サイクルずつ再生
+        while (credit >= 1) { credit -= 1; advanceOneCycle(); }
+      } else {                              // 高速: 平均輝度
+        glow = { n: 0, w: 0, s: 0, addr: new Uint32Array(16), data: new Uint32Array(8) };
+        let used = 0;
+        const budget = Math.min(Math.floor(credit), 40000);
+        while (used < budget) {
+          // 高速時は out が null なので、バスアクセスの数でサイクルを数える
+          const n0 = glow.n; execute(); used += glow.n - n0;
+        }
+        credit -= used; stepCycles += used;
+        if (glow.n) {
+          for (let i = 0; i < 16; i++) target.addr[i] = glow.addr[i] / glow.n;
+          for (let i = 0; i < 8; i++) target.data[i] = glow.data[i] / glow.n;
+          target.write = glow.w / glow.n; target.read = 1 - target.write; target.sync = glow.s / glow.n;
+        }
+        regsShown = { a: cpu.a, x: cpu.x, pc: cpu.pc, p: cpu.p };
+        glow = null; cycEl.textContent = stepCycles.toLocaleString();
+      }
+    }
+    // 残光: 点灯は即座に、消灯はゆるやかに
+    const k = Math.exp(-dt / 0.06);
+    const up = (arr, leds, off, tgt) => leds.forEach((led, i) => {
+      const t = tgt[i]; let v = shown[off + i]; v = t >= v ? t : Math.max(t, v * k); shown[off + i] = v;
+      led.style.setProperty("--l", v.toFixed(3));
+    });
+    up(null, addrL, 0, target.addr); up(null, dataL, 16, target.data);
+    for (const key of ["sync", "read", "write"]) {
+      const t = target[key]; sh[key] = t >= sh[key] ? t : Math.max(t, sh[key] * k);
+      sig[key].style.setProperty("--l", sh[key].toFixed(3));
+    }
+    sig.run.style.setProperty("--l", running ? 1 : 0);
+    const bitsOf = (v, n) => Array.from({ length: n }, (_, i) => v >> i & 1);
+    pcL.forEach((l, i) => l.style.setProperty("--l", regsShown.pc >> i & 1));
+    aL.forEach((l, i) => l.style.setProperty("--l", regsShown.a >> i & 1));
+    xL.forEach((l, i) => l.style.setProperty("--l", regsShown.x >> i & 1));
+    fL.forEach((l, i) => l.style.setProperty("--l", (regsShown.p | 0x20) >> i & 1));
+    markLine(regsShown.pc);
+    requestAnimationFrame(frame);
+  }
+  refreshUI();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
