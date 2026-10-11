@@ -9,7 +9,7 @@
 <meta property="og:description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://masakai.github.io/Glow65/">
-<meta property="og:image" content="https://masakai.github.io/Glow65/assets/splash.png">
+<meta property="og:image" content="https://masakai.github.io/Glow65/assets/frontpanel.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#07080c">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307080c'/%3E%3Ccircle cx='9' cy='16' r='3.4' fill='%23ff2a1a'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23ff2a1a' opacity='.55'/%3E%3Ccircle cx='23' cy='16' r='3.4' fill='%23ff2a1a' opacity='.25'/%3E%3C/svg%3E">
@@ -79,7 +79,7 @@ h2{font:800 clamp(28px,4.6vw,44px)/1.15 var(--sans);margin:12px 0 14px;letter-sp
 .card .ico{font:800 13px var(--mono);color:var(--led);letter-spacing:.1em;margin-bottom:12px;text-shadow:0 0 12px rgba(255,42,26,.6)}
 .card h3{margin:0 0 8px;font:700 19px var(--sans)}
 .card p{margin:0;color:var(--mute);font-size:15px}
-.shots{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;margin-top:42px;align-items:start}
+.shots{display:grid;grid-template-columns:1fr;gap:22px;margin:42px auto 0;max-width:900px}
 .shot{margin:0}
 .shot img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid var(--line);box-shadow:0 30px 80px -30px rgba(0,0,0,.9),0 0 70px -24px rgba(255,42,26,.45)}
 .shot figcaption{font:12px var(--mono);color:var(--dim);margin-top:10px}
@@ -170,7 +170,6 @@ footer a{color:var(--mute)}
 
     <div class="shots">
       <figure class="shot reveal"><img src="assets/frontpanel.png" alt="The Glow65 front panel with LEDs and a terminal running Microsoft BASIC" loading="lazy"><figcaption><span lang="en">The app: front panel on top, terminal below.</span><span lang="ja">アプリ画面: 上にフロントパネル、下に端末。</span></figcaption></figure>
-      <figure class="shot reveal"><img src="assets/splash.png" alt="The Glow65 startup banner with credits" loading="lazy"><figcaption><span lang="en">The startup banner lists what is original and what is not.</span><span lang="ja">起動バナー。自作の部分とそうでない部分を表示します。</span></figcaption></figure>
     </div>
   </div>
 </section>
