@@ -22,7 +22,11 @@ public final class UART {
     public private(set) var transmitCount: UInt64 = 0
     public private(set) var receiveCount: UInt64 = 0
 
+    /// 受信キューの先頭の位置と、未読の最大バイト数。先頭を進めるだけで取り出すので、
+    /// 大量の貼り付けでも遅くならない。上限を超えた分は捨てる(実機の ACIA の取りこぼしに近い)。
+    public static let receiveQueueLimit = 65_536
     private var queue: [UInt8] = []
+    private var head = 0
     private var control: UInt8 = 0
     private let lock = NSLock()
 
@@ -31,7 +35,9 @@ public final class UART {
     /// ホストから CPU へ1バイト送る。どのスレッドからでも呼べる。
     public func receive(_ byte: UInt8) {
         lock.lock()
-        queue.append(byte)
+        if queue.count - head < Self.receiveQueueLimit {
+            queue.append(byte)
+        }
         lock.unlock()
     }
 
@@ -39,19 +45,19 @@ public final class UART {
     public var pendingReceiveCount: Int {
         lock.lock()
         defer { lock.unlock() }
-        return queue.count
+        return queue.count - head
     }
 
     /// IRQ 線の状態。受信割り込みが許可されていて、未読の受信データがある間 true。
     public var interruptRequest: Bool {
         lock.lock()
         defer { lock.unlock() }
-        return control & Self.controlReceiveInterruptEnable != 0 && !queue.isEmpty
+        return control & Self.controlReceiveInterruptEnable != 0 && head < queue.count
     }
 
     func readStatus() -> UInt8 {
         lock.lock()
-        let hasData = !queue.isEmpty
+        let hasData = head < queue.count
         let irq = hasData && control & Self.controlReceiveInterruptEnable != 0
         lock.unlock()
         return (hasData ? Self.statusReceiveReady : 0) | Self.statusTransmitEmpty
@@ -61,15 +67,23 @@ public final class UART {
     func readData() -> UInt8 {
         lock.lock()
         defer { lock.unlock() }
-        guard !queue.isEmpty else { return 0 }
+        guard head < queue.count else { return 0 }
         receiveCount &+= 1
-        return queue.removeFirst()
+        let byte = queue[head]
+        head += 1
+        // 読み終えた部分が大きくなったら、詰め直す
+        if head >= 4096 && head * 2 >= queue.count {
+            queue.removeFirst(head)
+            head = 0
+        }
+        return byte
     }
 
     func writeControl(_ value: UInt8) {
         lock.lock()
         if value & 0x03 == 0x03 {
             queue.removeAll()
+            head = 0
             control = 0
         } else {
             control = value
@@ -86,6 +100,7 @@ public final class UART {
     public func reset() {
         lock.lock()
         queue.removeAll()
+        head = 0
         control = 0
         lock.unlock()
     }

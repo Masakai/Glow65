@@ -7,29 +7,31 @@ import Glow65
 // --load は電源投入後に RAM へ生のバイナリを書き込む(例: --load tutorial/counter.bin@0300)。
 // 既定では ROM/monitor.bin を $F000、ROM/basic/build/basic.bin(あれば)を $C000 に読み込む。終了は Ctrl-\。
 
-var romSpecs: [(path: String, address: UInt16)] = []
+var romSpecs: [String] = []
 var loadSpecs: [String] = []
 var megahertz = 1.0
 var cpuModel = CPUModel.nmos6502
 
 let usage = "使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02]"
 
+/// 使い方の誤りを表示して、終了コード 2 で終わる。
+func fail(_ message: String) -> Never {
+    FileHandle.standardError.write(Data("\(message)\n\(usage)\n".utf8))
+    exit(2)
+}
+
 var args = CommandLine.arguments.dropFirst()
 while let arg = args.popFirst() {
     switch arg {
     case "--rom":
-        guard let spec = args.popFirst() else { fatalError("--rom にはファイル@アドレスを指定する") }
-        let parts = spec.split(separator: "@", maxSplits: 1).map(String.init)
-        guard parts.count == 2, let address = UInt16(parts[1], radix: 16) else {
-            fatalError("--rom の書式は ファイル@16進アドレス: \(spec)")
-        }
-        romSpecs.append((parts[0], address))
+        guard let spec = args.popFirst() else { fail("--rom にはファイル@アドレスを指定する") }
+        romSpecs.append(spec)
     case "--load":
-        guard let spec = args.popFirst() else { fatalError("--load にはファイル@アドレスを指定する") }
+        guard let spec = args.popFirst() else { fail("--load にはファイル@アドレスを指定する") }
         loadSpecs.append(spec)
     case "--mhz":
         guard let value = args.popFirst(), let mhz = Double(value), mhz > 0 else {
-            fatalError("--mhz には正の数を指定する")
+            fail("--mhz には正の数を指定する")
         }
         megahertz = mhz
     case "--cpu":
@@ -39,23 +41,30 @@ while let arg = args.popFirst() {
         }
         cpuModel = model
     default:
-        fatalError("不明なオプション: \(arg)")
+        fail("不明なオプション: \(arg)")
     }
 }
 if romSpecs.isEmpty {
-    romSpecs.append(("ROM/monitor.bin", 0xF000))
+    romSpecs.append("ROM/monitor.bin@F000")
     if FileManager.default.fileExists(atPath: "ROM/basic/build/basic.bin") {
-        romSpecs.append(("ROM/basic/build/basic.bin", 0xC000))
+        romSpecs.append("ROM/basic/build/basic.bin@C000")
     }
 }
 
 let machine = Machine(cpuModel: cpuModel)
 for spec in romSpecs {
-    guard let data = FileManager.default.contents(atPath: spec.path) else {
-        FileHandle.standardError.write(Data("ROM を読めない: \(spec.path)\n".utf8))
+    do {
+        let image = try ProgramImage.load(spec: spec)
+        // ROM 領域($C000-$FFFF)に収まらないイメージは、クラッシュさせずに断る
+        guard image.address >= MemoryMap.romBase, Int(image.address) + image.bytes.count <= 0x10000 else {
+            FileHandle.standardError.write(Data("ROM 領域($C000-$FFFF)に収まらない: \(spec)\n".utf8))
+            exit(1)
+        }
+        machine.bus.loadROM(image.bytes, at: image.address)
+    } catch {
+        FileHandle.standardError.write(Data("ROM を読めない: \(error)\n".utf8))
         exit(1)
     }
-    machine.bus.loadROM([UInt8](data), at: spec.address)
 }
 
 // 端末を raw モードにする
@@ -71,19 +80,34 @@ func restoreTerminal() {
 }
 atexit { restoreTerminal() }
 
-var quit = false
+/// 入力スレッドとメインスレッドの間で共有する終了フラグ(ロックで保護する)。
+final class QuitFlag {
+    private let lock = NSLock()
+    private var value = false
+    var isSet: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+    func set() {
+        lock.lock()
+        value = true
+        lock.unlock()
+    }
+}
+let quit = QuitFlag()
 
 // 入力スレッド: 端末から UART へ。Ctrl-\ (0x1C) で終了。
 let inputThread = Thread {
     var byte: UInt8 = 0
     while read(STDIN_FILENO, &byte, 1) == 1 {
         if byte == 0x1C {
-            quit = true
+            quit.set()
             return
         }
         machine.uart.receive(byte)
     }
-    quit = true
+    quit.set()
 }
 inputThread.start()
 
@@ -108,7 +132,7 @@ for spec in loadSpecs {
 let sliceSeconds = 0.01
 let cyclesPerSlice = Int(megahertz * 1_000_000 * sliceSeconds)
 var deadline = Date().timeIntervalSinceReferenceDate
-while !quit {
+while !quit.isSet {
     machine.run(cycles: cyclesPerSlice)
     deadline += sliceSeconds
     let wait = deadline - Date().timeIntervalSinceReferenceDate

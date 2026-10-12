@@ -172,7 +172,10 @@ final class PanelModel: ObservableObject {
     }
 
     private static func findROM(_ relativePath: String) -> URL? {
-        var candidates: [URL] = [URL(fileURLWithPath: FileManager.default.currentDirectoryPath)]
+        // 探す順: アプリに同梱した資源、実行ファイルの親(開発時はリポジトリのルートが見つかる)、
+        // 最後にカレントディレクトリ。起動した場所に置かれた ROM が、先に使われないようにする。
+        var candidates: [URL] = []
+        if let resources = Bundle.main.resourceURL { candidates.append(resources) }
         var dir = Bundle.main.executableURL?.deletingLastPathComponent()
         for _ in 0..<6 {
             if let d = dir {
@@ -180,6 +183,7 @@ final class PanelModel: ObservableObject {
                 dir = d.deletingLastPathComponent()
             }
         }
+        candidates.append(URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
         for base in candidates {
             let url = base.appendingPathComponent(relativePath)
             if FileManager.default.fileExists(atPath: url.path) { return url }
