@@ -19,7 +19,7 @@ struct Glow65App: App {
     var body: some Scene {
         WindowGroup("Glow65") {
             ContentView(model: model)
-                .frame(minWidth: 940, minHeight: 760)
+                .frame(minWidth: 1040, minHeight: 760)
         }
         .windowResizability(.contentMinSize)
         .commands {

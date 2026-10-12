@@ -60,7 +60,10 @@ Tools/build_monitor.sh     # builds ROM/monitor.bin
 Tools/build_basic.sh       # converts and builds ROM/basic/build/basic.bin
 
 swift run Glow65App         # front panel app
+Tools/build_app.sh          # builds dist/Glow65.app (with the ROMs, sample programs and icon)
 ```
+
+`dist/Glow65.app` is signed ad hoc (no developer ID) and is not notarized. Build it on your own Mac and open it from there. If you pass the app to another Mac, macOS asks for permission on the first launch.
 
 1. Click the terminal area, then flip the **POWER** switch up. The monitor starts.
 2. Type `B` and press Return to start BASIC.

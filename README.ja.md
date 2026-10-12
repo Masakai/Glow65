@@ -60,7 +60,10 @@ Tools/build_monitor.sh     # ROM/monitor.bin を生成
 Tools/build_basic.sh       # 変換して ROM/basic/build/basic.bin を生成
 
 swift run Glow65App         # フロントパネルのアプリ
+Tools/build_app.sh          # dist/Glow65.app を生成(ROM、サンプルプログラム、アイコン入り)
 ```
+
+`dist/Glow65.app` は ad hoc 署名(開発者 ID なし)で、公証はしていません。自分の Mac でビルドして、そこから開いてください。別の Mac へ渡すと、初回の起動で macOS が許可を求めます。
 
 1. 端末の領域をクリックして、**POWER** スイッチを上げます。モニタが起動します。
 2. `B` と入力して Return を押すと、BASIC が起動します。
