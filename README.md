@@ -23,7 +23,7 @@ The startup banner (click the (i) button on the panel to show it again) lists wh
 
 <p align="center"><img src="documents/images/splash.png" alt="The Glow65 startup banner with credits" width="560"></p>
 
-## What is original and what is not
+## Related resources
 
 Glow65 is **not** entirely original work.
 

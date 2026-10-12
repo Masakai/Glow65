@@ -23,7 +23,7 @@ Glow65 は、架空の 6502 ボードをエミュレートします。構成は 
 
 <p align="center"><img src="documents/images/splash.png" alt="クレジット付きの Glow65 起動バナー" width="560"></p>
 
-## 自作の部分と、そうでない部分
+## 関連リソース
 
 Glow65 は**全体が独自実装ではありません**。
 
