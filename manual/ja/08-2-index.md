@@ -144,6 +144,9 @@
 
 | 図 | タイトル | 画像 | 節 |
 |---|---|---|---|
+| 図 1-1 | フロントパネル(BASIC の実行中) | [frontpanel.png](../../docs/assets/frontpanel.png) | [1.2 6502 の仕様](01-history.md#12-6502-の仕様) |
+| 図 2-1 | LDA #$A0 のあと | [02-gui-lda-a0.png](images/02-gui-lda-a0.png) | [2.3 16進数](02-basics.md#23-16進数) |
+| 図 2-2 | LDA #$FB のあと | [02-gui-lda-fb.png](images/02-gui-lda-fb.png) | [2.5 負の数と2の補数](02-basics.md#25-負の数と2の補数) |
 | 図 3-1 | リセット直後のパネル | [03-reset.png](images/03-reset.png) | [3.2 レジスタ](03-cpu.md#32-レジスタ) |
 | 図 3-2 | STEP 1 回目(SEI のオペコード) | [03-cycle-1.png](images/03-cycle-1.png) | [3.4 フェッチと実行](03-cpu.md#34-フェッチと実行) |
 | 図 3-3 | STEP 3 回目(LDX のオペコード) | [03-cycle-3.png](images/03-cycle-3.png) | [3.4 フェッチと実行](03-cpu.md#34-フェッチと実行) |
@@ -164,12 +167,17 @@
 | 図 4-11 | インデックスト・インダイレクト(`LDA ($20,X)`) | [04-indexed-indirect.svg](images/04-indexed-indirect.svg) | [4.7 インデックスト・インダイレクト(Indexed Indirect)](04-addressing.md#47-インデックストインダイレクトindexed-indirect) |
 | 図 4-12 | インダイレクト・インデックスト(`LDA ($30),Y`) | [04-indirect-indexed.svg](images/04-indirect-indexed.svg) | [4.8 インダイレクト・インデックスト(Indirect Indexed)](04-addressing.md#48-インダイレクトインデックストindirect-indexed) |
 | 図 4-13 | リラティブ(`BNE`) | [04-relative.svg](images/04-relative.svg) | [4.9 リラティブ(Relative)](04-addressing.md#49-リラティブrelative) |
+| 図 4-14 | LDA $0410,X のあと | [04-gui-absolute-x.png](images/04-gui-absolute-x.png) | [4.5 アブソリュート系のモード](04-addressing.md#45-アブソリュート系のモード) |
+| 図 4-15 | LDA $10 のあと | [04-gui-zeropage.png](images/04-gui-zeropage.png) | [4.5 アブソリュート系のモード](04-addressing.md#45-アブソリュート系のモード) |
+| 図 4-16 | LDA #$10 のあと | [04-gui-immediate.png](images/04-gui-immediate.png) | [4.5 アブソリュート系のモード](04-addressing.md#45-アブソリュート系のモード) |
 | 図 5-1 | ASL、LSR、ROL、ROR のビットの動き | [05-shift.svg](images/05-shift.svg) | [5.4 論理演算とシフト](05-4-logic-shift.md#54-論理演算とシフト) |
 | 図 5-2 | BIT が N、V、Z を決める流れ | [05-bit.svg](images/05-bit.svg) | [5.4 論理演算とシフト](05-4-logic-shift.md#54-論理演算とシフト) |
 | 図 5-3 | 分岐の飛び先 | [05-branch.svg](images/05-branch.svg) | [5.5 分岐とジャンプ](05-5-branch-jump.md#55-分岐とジャンプ) |
 | 図 5-4 | JSR と RTS | [05-jsr-rts.svg](images/05-jsr-rts.svg) | [5.5 分岐とジャンプ](05-5-branch-jump.md#55-分岐とジャンプ) |
 | 図 5-5 | BRK と RTI | [05-brk-rti.svg](images/05-brk-rti.svg) | [5.5 分岐とジャンプ](05-5-branch-jump.md#55-分岐とジャンプ) |
 | 図 5-6 | PHA と PLA | [05-stack.svg](images/05-stack.svg) | [5.6 スタックとフラグ操作](05-6-stack-flags.md#56-スタックとフラグ操作) |
+| 図 5-7 | CLC のあと(V は消灯) | [05-gui-adc-before.png](images/05-gui-adc-before.png) | [5.3 算術演算と比較](05-3-arithmetic.md#53-算術演算と比較) |
+| 図 5-8 | ADC #$50 のあと(N と V が点灯) | [05-gui-adc-after.png](images/05-gui-adc-after.png) | [5.3 算術演算と比較](05-3-arithmetic.md#53-算術演算と比較) |
 | 図 6-1 | P レジスタの 8 ビット | [06-flags.svg](images/06-flags.svg) | [6.1 フラグ(P レジスタ)](06-flags-stack-interrupts.md#61-フラグp-レジスタ) |
 | 図 6-2 | CMP のあとのフラグと分岐 | [06-compare.svg](images/06-compare.svg) | [6.1.8 比較(CMP)のあと](06-flags-stack-interrupts.md#618-比較cmpのあと) |
 | 図 6-3 | JSR を 2 回重ねたときのスタック | [06-stack-nested.svg](images/06-stack-nested.svg) | [6.2.3 JSR を重ねたとき](06-flags-stack-interrupts.md#623-jsr-を重ねたとき) |

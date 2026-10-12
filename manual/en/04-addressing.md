@@ -311,6 +311,39 @@ Figure 4-9 Absolute,Y (`LDA $0420,Y`).
 > 03F0: 3C 00 00 00 00 00 00 00 24 F4 24 F4 00 00 00 00
 > ```
 
+> **What you can try in Glow65**
+>
+> The effective address appears on the panel as the address on the bus. Use this program:
+>
+> ```
+> *E 0410 00 00 00 00 00 C3
+> *E 0010 42
+> *E 0300 A2 05 BD 10 04 A5 10 A9 10 4C 00 03
+> *G 0300
+> ```
+>
+> It repeats `LDX #$05`, `LDA $0410,X`, `LDA $10`, `LDA #$10`, and `JMP $0300`. Set **RUN/STOP** to STOP and **STEP MODE** to INSTR, then press STEP once at a time. After each instruction, its last bus access stays on the ADDRESS BUS and DATA BUS.
+>
+> | Instruction run | ADDRESS BUS | DATA BUS | A |
+> |---|---|---|---|
+> | `LDA $0410,X` (X = `$05`) | `$0415` | `$C3` | `$C3` |
+> | `LDA $10` | `$0010` | `$42` | `$42` |
+> | `LDA #$10` | `$0308` | `$10` | `$10` |
+>
+> The absolute,X instruction `LDA $0410,X` reads `$0415`, the operand `$0410` plus the `$05` in X (Figure 4-14). The zero page instruction `LDA $10` reads `$0010` (Figure 4-15). The immediate instruction `LDA #$10` reads the byte right after the instruction, at `$0308` (Figure 4-16).
+>
+> ![The panel after LDA 0410,X. The address bus is 0415, the data bus is C3, A is C3, and X is 05](../ja/images/04-gui-absolute-x.png)
+>
+> Figure 4-14 After `LDA $0410,X`. The ADDRESS BUS shows the effective address `$0415`, the DATA BUS and A show `$C3`, and X is `$05`
+>
+> ![The panel after LDA 10. The address bus is 0010, the data bus is 42, and A is 42](../ja/images/04-gui-zeropage.png)
+>
+> Figure 4-15 After `LDA $10`. The ADDRESS BUS is `$0010`, and the DATA BUS and A are `$42`
+>
+> ![The panel after LDA #10. The address bus is 0308, the data bus is 10, and A is 10](../ja/images/04-gui-immediate.png)
+>
+> Figure 4-16 After `LDA #$10`. The ADDRESS BUS is `$0308`, just after the instruction, and the DATA BUS and A are `$10`
+
 ## 4.6 Indirect
 
 The 2 bytes stored at the address in the operand are used as the jump target. Only `JMP` has this mode.

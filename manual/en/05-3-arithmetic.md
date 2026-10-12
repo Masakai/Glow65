@@ -83,6 +83,20 @@ This is a 16-bit addition. It adds `$12FF + $0001`, starting from the low byte. 
 
 <a id="sbc"></a>
 
+> **What you can try in Glow65**
+>
+> The panel shows the V flag changing. Enter `E 0300 B8 A9 50 18 69 50 4C 00 03`, run `G 0300`, then set **RUN/STOP** to STOP and **STEP MODE** to INSTR. The program repeats `CLV`, `LDA #$50`, `CLC`, `ADC #$50`, and `JMP $0300`.
+>
+> Right after `CLC`, A is `$50` (A6 and A4 are lit), and N and V are off (Figure 5-7). After `ADC #$50`, A is `$A0` (A7 and A5), and N and V are lit (Figure 5-8). As signed numbers, the sum of two positive numbers (80 + 80) became a negative number (-96), so V is 1. C stays 0.
+>
+> ![The panel after CLC. A is 50, and N and V are off](../ja/images/05-gui-adc-before.png)
+>
+> Figure 5-7 After `CLC`. A is `$50` and V is off
+>
+> ![The panel after ADC #50. A is A0, and N and V are lit](../ja/images/05-gui-adc-after.png)
+>
+> Figure 5-8 After `ADC #$50`. A is `$A0`, and N and V are lit
+
 ### SBC (Subtract with Carry)
 
 Subtracts the memory value and the borrow from A, and puts the result in A. The borrow is the inverse of C: if C is 1 there is no borrow, and if C is 0 there is a borrow. Set C to 1 with SEC before a subtraction.

@@ -37,6 +37,10 @@ The specifications of the 6502 are as follows [1].
 > **What you can try in Glow65**
 >
 > The panel LEDs show the 16-bit address bus (A0 to A15) and the 8-bit data bus (D0 to D7). There are also LEDs for PC, SP, A, X, Y, and the status flags. The monitor command `D 0000 00FF` displays the whole zero page. `L 0300 0308` reads the contents of memory as instructions. The steps are in [Tutorial Chapter 1](../../tutorial/README.md).
+>
+> ![The Glow65 front panel and terminal. The top has the address bus, data bus, PC, SP, A, X, Y, and status LEDs; the bottom is the terminal](../../docs/assets/frontpanel.png)
+>
+> Figure 1-1 The Glow65 front panel while BASIC is running. The top section has the LEDs for the address bus, data bus, PC, SP, A, X, Y, and the status flags
 
 ## 1.3 Apple I and Apple II
 

@@ -144,6 +144,9 @@ Alphabetical order. Each link goes to the heading of the instruction in Chapter 
 
 | Figure | Title | Image | Section |
 |---|---|---|---|
+| Figure 1-1 | The front panel while BASIC is running | [frontpanel.png](../../docs/assets/frontpanel.png) | [1.2 Specifications of the 6502](01-history.md#12-specifications-of-the-6502) |
+| Figure 2-1 | After LDA #$A0 | [02-gui-lda-a0.png](../ja/images/02-gui-lda-a0.png) | [2.3 Hexadecimal](02-basics.md#23-hexadecimal) |
+| Figure 2-2 | After LDA #$FB | [02-gui-lda-fb.png](../ja/images/02-gui-lda-fb.png) | [2.5 Negative Numbers and Two's Complement](02-basics.md#25-negative-numbers-and-twos-complement) |
 | Figure 3-1 | The panel right after reset | [03-reset.png](../ja/images/03-reset.png) | [3.2 Registers](03-cpu.md#32-registers) |
 | Figure 3-2 | 1st STEP (opcode of SEI) | [03-cycle-1.png](../ja/images/03-cycle-1.png) | [3.4 Fetch and Execute](03-cpu.md#34-fetch-and-execute) |
 | Figure 3-3 | 3rd STEP (opcode of LDX) | [03-cycle-3.png](../ja/images/03-cycle-3.png) | [3.4 Fetch and Execute](03-cpu.md#34-fetch-and-execute) |
@@ -164,12 +167,17 @@ Alphabetical order. Each link goes to the heading of the instruction in Chapter 
 | Figure 4-11 | Indexed indirect (`LDA ($20,X)`) | [04-indexed-indirect.svg](images/04-indexed-indirect.svg) | [4.7 Indexed Indirect](04-addressing.md#47-indexed-indirect) |
 | Figure 4-12 | Indirect indexed (`LDA ($30),Y`) | [04-indirect-indexed.svg](images/04-indirect-indexed.svg) | [4.8 Indirect Indexed](04-addressing.md#48-indirect-indexed) |
 | Figure 4-13 | Relative (`BNE`) | [04-relative.svg](images/04-relative.svg) | [4.9 Relative](04-addressing.md#49-relative) |
+| Figure 4-14 | After LDA $0410,X | [04-gui-absolute-x.png](../ja/images/04-gui-absolute-x.png) | [4.5 Absolute Modes](04-addressing.md#45-absolute-modes) |
+| Figure 4-15 | After LDA $10 | [04-gui-zeropage.png](../ja/images/04-gui-zeropage.png) | [4.5 Absolute Modes](04-addressing.md#45-absolute-modes) |
+| Figure 4-16 | After LDA #$10 | [04-gui-immediate.png](../ja/images/04-gui-immediate.png) | [4.5 Absolute Modes](04-addressing.md#45-absolute-modes) |
 | Figure 5-1 | How the bits move in ASL, LSR, ROL, and ROR | [05-shift.svg](images/05-shift.svg) | [5.4 Logic, Shift, and Bit Test](05-4-logic-shift.md#54-logic-shift-and-bit-test) |
 | Figure 5-2 | How BIT sets N, V, and Z | [05-bit.svg](images/05-bit.svg) | [5.4 Logic, Shift, and Bit Test](05-4-logic-shift.md#54-logic-shift-and-bit-test) |
 | Figure 5-3 | The target of a branch | [05-branch.svg](images/05-branch.svg) | [5.5 Branch and Jump](05-5-branch-jump.md#55-branch-and-jump) |
 | Figure 5-4 | JSR and RTS | [05-jsr-rts.svg](images/05-jsr-rts.svg) | [5.5 Branch and Jump](05-5-branch-jump.md#55-branch-and-jump) |
 | Figure 5-5 | BRK and RTI | [05-brk-rti.svg](images/05-brk-rti.svg) | [5.5 Branch and Jump](05-5-branch-jump.md#55-branch-and-jump) |
 | Figure 5-6 | PHA and PLA | [05-stack.svg](images/05-stack.svg) | [5.6 Stack and Flag Operations](05-6-stack-flags.md#56-stack-and-flag-operations) |
+| Figure 5-7 | After CLC (V is off) | [05-gui-adc-before.png](../ja/images/05-gui-adc-before.png) | [5.3 Arithmetic and Comparison](05-3-arithmetic.md#53-arithmetic-and-comparison) |
+| Figure 5-8 | After ADC #$50 (N and V are lit) | [05-gui-adc-after.png](../ja/images/05-gui-adc-after.png) | [5.3 Arithmetic and Comparison](05-3-arithmetic.md#53-arithmetic-and-comparison) |
 | Figure 6-1 | The 8 bits of the P register | [06-flags.svg](images/06-flags.svg) | [6.1 Flags (the P Register)](06-flags-stack-interrupts.md#61-flags-the-p-register) |
 | Figure 6-2 | Flags and branches after CMP | [06-compare.svg](images/06-compare.svg) | [6.1.8 After a Comparison (CMP)](06-flags-stack-interrupts.md#618-after-a-comparison-cmp) |
 | Figure 6-3 | The stack with two nested JSR calls | [06-stack-nested.svg](images/06-stack-nested.svg) | [6.2.3 Nested JSR](06-flags-stack-interrupts.md#623-nested-jsr) |

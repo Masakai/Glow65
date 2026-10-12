@@ -76,7 +76,19 @@ A 16-bit value is written with 4 hexadecimal digits. Think of `$1234` as the upp
 
 > **What you can try in Glow65**
 >
-> The data bus LEDs on the panel are 8 LEDs, D7 to D0. An LED lights when the corresponding bit of the value on the bus is 1. When the value is `$A0` (`%10100000`), two LEDs light, D7 and D5. The address bus has 16 LEDs, A15 to A0. Observing with the LEDs is covered in [Tutorial Chapter 1](../../tutorial/README.md).
+> The data bus LEDs on the panel are 8 LEDs, D7 to D0. An LED lights when the corresponding bit of the value on the bus is 1. When the value is `$A0` (`%10100000`), two LEDs light, D7 and D5. The address bus has 16 LEDs, A15 to A0. 
+>
+> To see `$A0` on the LEDs, run `LDA #$A0` and read the A register LEDs.
+>
+> 1. In the monitor, enter `E 0300 A9 A0 8D F0 03 4C 00 03` and run `G 0300`. The program repeats `LDA #$A0`, `STA $03F0`, and `JMP $0300`.
+> 2. Set **RUN/STOP** to STOP to stop the CPU. Set **STEP MODE** to INSTR.
+> 3. Press **STEP** until INSTRUCTION AT PC shows `LDA #$A0`, then press it once more.
+>
+> Right after `LDA #$A0` runs, A7 and A5 are lit on the A register LEDs (Figure 2-1). On the DATA BUS, D7 and D5 are lit too, because the operand just read was `$A0`. The ADDRESS BUS shows `$0301`, the address the operand was read from. The most significant bit is 1, so the N flag LED is lit as well.
+>
+> ![The panel after LDA #A0. A is A0, the data bus is A0, and N is lit](../ja/images/02-gui-lda-a0.png)
+>
+> Figure 2-1 After `LDA #$A0`. The A LEDs are A7 and A5, the DATA BUS is D7 and D5, and the ADDRESS BUS is `$0301`
 
 ## 2.4 Range of Numbers
 
@@ -127,6 +139,12 @@ Two's complement has the advantage that signed numbers can be calculated with th
 > ```
 >
 > `BNE` is a 2-byte instruction, so the next instruction is at `$0302`. The distance `$FB` is -5. Going back 5 from 0302 gives `$02FD`. With `D0 7F` (distance +127) the display is `BNE $0381`, and with `D0 F0` (distance -16) it is `BNE $02F2`.
+>
+> You can also check two's complement on the A LEDs. With the same steps as in 2.3, enter `E 0300 A9 FB 8D F0 03 4C 00 03`, run it, and stop after `LDA #$FB`. On the A LEDs, only A2 is off, so the pattern is `%11111011` (`$FB`, -5) (Figure 2-2). The most significant bit is 1, so the N flag is lit too. The CPU can read this value as unsigned 251 or as signed -5.
+>
+> ![The panel after LDA #FB. A is FB and N is lit](../ja/images/02-gui-lda-fb.png)
+>
+> Figure 2-2 After `LDA #$FB`. Every A LED except A2 is lit
 
 ## 2.6 Character Codes (ASCII)
 
