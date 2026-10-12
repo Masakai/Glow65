@@ -448,6 +448,4 @@ RESET スイッチは、RAM の内容を保ちます。POWER を入れ直すと�
 
 1. MOS Technology, "MCS6500 Microcomputer Family Hardware Manual", 1976年1月版: https://www.commodore.ca/wp-content/uploads/2018/11/kim1_hardware.txt
 
-## 次の章
-
-第7章「メモリマップと I/O」は準備中です。
+次の章: [7. メモリマップと I/O →](07-memory-io.md)

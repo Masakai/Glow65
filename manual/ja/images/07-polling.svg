@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" role="img" aria-labelledby="t d">
+<title id="t">ポーリングの流れ</title>
+<desc id="d">状態レジスタのビットを調べて、送信と受信を行う流れ。</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="439" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ポーリングの流れ</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="60" y="64" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">送信(1 バイトを送る)</text>
+<rect x="70.0" y="84" width="240" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="190" y="111" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LDA $A000</text>
+<polygon points="190,165.0 310.0,210 190,255.0 70.0,210" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+<text x="190" y="206.5" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">TDRE(ビット 1)</text>
+<text x="190" y="223.5" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">が 1 か</text>
+<rect x="70.0" y="306" width="240" height="44" rx="6" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="190" y="333" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">STA $A001</text>
+<path d="M 190 128 L 190 165" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 190 255 L 190 306" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<text x="200" y="284" font-size="12" font-weight="normal" text-anchor="start" fill="#bc4c00" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">はい(1)</text>
+<path d="M 70 210 L 40 210 L 40 106 L 70 106" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="42" y="232" font-size="12" font-weight="normal" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">いいえ(0)</text>
+<text x="400" y="64" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">受信(1 バイトを受け取る)</text>
+<rect x="410.0" y="84" width="240" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="530" y="111" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LDA $A000</text>
+<polygon points="530,165.0 650.0,210 530,255.0 410.0,210" fill="#ffffff" stroke="#0969da" stroke-width="2"/>
+<text x="530" y="206.5" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">RDRF(ビット 0)</text>
+<text x="530" y="223.5" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">が 1 か</text>
+<rect x="410.0" y="306" width="240" height="44" rx="6" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="530" y="333" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LDA $A001</text>
+<path d="M 530 128 L 530 165" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 530 255 L 530 306" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<text x="540" y="284" font-size="12" font-weight="normal" text-anchor="start" fill="#bc4c00" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">はい(1)</text>
+<path d="M 410 210 L 380 210 L 380 106 L 410 106" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="382" y="232" font-size="12" font-weight="normal" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">いいえ(0)</text>
+<text x="30" y="384" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">状態レジスタの該当ビットを AND で取り出し、0 の間は読み直す。1 になったら、データレジスタに触る。</text>
+<text x="30" y="406" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">送信は TDRE が 1 のとき書く。受信は RDRF が 1 のとき読む。読むと、受信した 1 バイトがキューから消える。</text>
+</svg>

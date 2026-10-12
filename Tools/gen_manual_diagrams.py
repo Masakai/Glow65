@@ -870,6 +870,141 @@ REF6 = [
     ("nmi-irq", "NMI と IRQ の違い", "NMI がエッジで 1 回、IRQ がレベルで、要因が消えるまで繰り返し受け付けられること。", "", f6_nmi_irq),
 ]
 
+# ---- 第7章(メモリマップと I/O)の図 ----
+
+def dashed_rect(sc, x, y, w, h):
+    sc.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="4" fill="#ffffff" stroke="{LINE}" '
+                    f'stroke-width="1.4" stroke-dasharray="5 4"/>')
+
+
+def band(sc, x, y, w, h, kind, l1, l2=None):
+    if kind == "ram":
+        sc.rect(x, y, w, h, fill=BLUE_BG, stroke=BLUE, sw=2, rx=3)
+    elif kind == "rom":
+        sc.rect(x, y, w, h, fill=ORANGE_BG, stroke=ORANGE, sw=2, rx=3)
+    elif kind == "io":
+        sc.rect(x, y, w, h, fill="#d8dee4", stroke=INK, sw=2, rx=3)
+    else:
+        dashed_rect(sc, x, y, w, h)
+    tc = MUTED if kind == "none" else INK
+    if l2 is None:
+        sc.text(x + w / 2, y + h / 2 + 5, l1, size=12, anchor="middle", fill=tc, mono=True)
+    else:
+        sc.text(x + w / 2, y + h / 2 - 2, l1, size=12, anchor="middle", fill=tc, mono=True)
+        sc.text(x + w / 2, y + h / 2 + 15, l2, size=12, anchor="middle", fill=tc)
+
+
+def f7_map(sc):
+    x0, w0 = 30, 230
+    y = 62
+    mains = [("rom", "$F000-$FFFF", "モニタの ROM とベクタ", 56),
+             ("rom", "$C000-$EFFF", "BASIC の ROM", 72),
+             ("none", "$A100-$BFFF", "何もつながっていない", 50),
+             ("io", "$A000-$A0FF", "UART", 40),
+             ("none", "$8000-$9FFF", "何もつながっていない", 50),
+             ("ram", "$0000-$7FFF", "RAM(32KB)", 228)]
+    ram_top = ram_bot = 0
+    for kind, a, n, h in mains:
+        band(sc, x0, y, w0, h, kind, a, n)
+        if a.startswith("$0000"):
+            ram_top, ram_bot = y, y + h
+        y += h
+    subs = [("$0400-$7FFF", "BASIC のプログラムと変数", 62),
+            ("$03F8-$03FB", "割り込みベクタ(RAM)", 30),
+            ("$0300-$03F7", "ユーザープログラム用", 38),
+            ("$0200-$027F", "モニタの行入力バッファ", 38),
+            ("$0100-$01FF", "スタック", 30),
+            ("$0000-$00FF", "ゼロページ", 30)]
+    xs, ws = 410, 280
+    ys = ram_top
+    sc.text(xs, ram_top - 8, "RAM の主な使い道", size=12, weight="bold")
+    for a, n, h in subs:
+        sc.rect(xs, ys, ws, h, fill=BLUE_BG, stroke=BLUE, sw=2, rx=3)
+        sc.text(xs + 10, ys + h / 2 + 5, a, size=12, mono=True)
+        sc.text(xs + 112, ys + h / 2 + 5, n, size=12)
+        ys += h
+    sc.parts.append(f'<line x1="{x0 + w0}" y1="{ram_top}" x2="{xs}" y2="{ram_top}" stroke="{BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>')
+    sc.parts.append(f'<line x1="{x0 + w0}" y1="{ram_bot}" x2="{xs}" y2="{ys}" stroke="{BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>')
+    # 凡例
+    ly = max(ram_bot, ys) + 26
+    for i, (kind, text) in enumerate([("ram", "RAM"), ("rom", "ROM"), ("io", "I/O"), ("none", "未接続")]):
+        lx = 30 + i * 120
+        if kind == "none":
+            dashed_rect(sc, lx, ly - 12, 22, 16)
+        else:
+            band(sc, lx, ly - 12, 22, 16, kind, "")
+        sc.text(lx + 30, ly + 1, text, size=12)
+    sc.text(30, ly + 28, "未接続のアドレスを読むと $FF が返り、書き込みは無視される。ROM への書き込みも無視される。", size=12, fill=MUTED)
+    sc.h = ly + 46
+
+
+def f7_uart(sc):
+    sc.text(30, 62, "MC6850 風の最小構成", size=13)
+    def regrow(y, title, cells, notes=None):
+        sc.text(30, y, title, size=13, weight="bold")
+        for i in range(8):
+            x = 30 + i * 84
+            sc.label(x + 38, y + 18, f"ビット {7 - i}", anchor="middle")
+        for i, (name, desc, hl) in enumerate(cells):
+            x = 30 + i * 84
+            hlc = {"b": "blue", "o": "orange"}.get(hl)
+            bitbox(sc, x, y + 24, name, w=76, h=34, hl=hlc, size=14)
+            sc.text(x + 38, y + 76, desc[0], size=11, anchor="middle")
+            if len(desc) > 1:
+                sc.text(x + 38, y + 91, desc[1], size=11, anchor="middle", fill=MUTED)
+    regrow(100, "状態レジスタ($A000 を読む)", [
+        ("IRQ", ("割り込み", "要求中"), "o"), ("0", ("未使用",), None), ("0", ("未使用",), None), ("0", ("未使用",), None),
+        ("0", ("未使用",), None), ("0", ("未使用",), None), ("TDRE", ("送信可",), "b"), ("RDRF", ("受信あり",), "b")])
+    regrow(250, "制御レジスタ($A000 に書く)", [
+        ("RIE", ("受信割り込みの", "許可"), "o"), ("-", ("使わない",), None), ("-", ("使わない",), None), ("-", ("使わない",), None),
+        ("-", ("使わない",), None), ("-", ("使わない",), None), ("1", ("11 で",), "b"), ("1", ("マスタリセット",), "b")])
+    sc.text(30, 410, "データレジスタ($A001)", size=13, weight="bold")
+    sc.rect(30, 420, 330, 42, fill=BLUE_BG, stroke=BLUE, sw=2)
+    sc.text(195, 446, "読むと: 受信した 1 バイト", size=13, anchor="middle")
+    sc.rect(372, 420, 330, 42, fill=ORANGE_BG, stroke=ORANGE, sw=2)
+    sc.text(537, 446, "書くと: 送信する 1 バイト", size=13, anchor="middle")
+    sc.h = 490
+
+
+def diamond(sc, cx, cy, w, h, lines):
+    pts = f"{cx},{cy - h / 2} {cx + w / 2},{cy} {cx},{cy + h / 2} {cx - w / 2},{cy}"
+    sc.parts.append(f'<polygon points="{pts}" fill="#ffffff" stroke="{BLUE}" stroke-width="2"/>')
+    n = len(lines)
+    for i, t in enumerate(lines):
+        sc.text(cx, cy + (i - (n - 1) / 2) * 17 + 5, t, size=12, anchor="middle")
+
+
+def flow_panel(sc, cx, title, first, test, last, bit):
+    sc.text(cx - 130, 64, title, size=14, weight="bold")
+    bw = 240
+    sc.rect(cx - bw / 2, 84, bw, 44, fill=BOX, stroke=LINE, sw=1.4, rx=6)
+    sc.text(cx, 111, first, size=13, anchor="middle", mono=True)
+    diamond(sc, cx, 210, 240, 90, test)
+    sc.rect(cx - bw / 2, 306, bw, 44, fill=ORANGE_BG, stroke=ORANGE, sw=2, rx=6)
+    sc.text(cx, 333, last, size=13, anchor="middle", mono=True)
+    sc.arrow([(cx, 128), (cx, 165)], None)
+    sc.arrow([(cx, 255), (cx, 306)], None, color=ORANGE)
+    sc.text(cx + 10, 284, "はい(1)", size=12, fill=ORANGE)
+    sc.arrow([(cx - 120, 210), (cx - 150, 210), (cx - 150, 106), (cx - 120, 106)], None)
+    sc.text(cx - 148, 232, "いいえ(0)", size=12, fill=BLUE)
+
+
+def f7_polling(sc):
+    flow_panel(sc, 190, "送信(1 バイトを送る)", "LDA $A000", ["TDRE(ビット 1)", "が 1 か"], "STA $A001", 1)
+    flow_panel(sc, 530, "受信(1 バイトを受け取る)", "LDA $A000", ["RDRF(ビット 0)", "が 1 か"], "LDA $A001", 0)
+    sc.steps(384, [
+        "状態レジスタの該当ビットを AND で取り出し、0 の間は読み直す。1 になったら、データレジスタに触る。",
+        "送信は TDRE が 1 のとき書く。受信は RDRF が 1 のとき読む。読むと、受信した 1 バイトがキューから消える。",
+    ])
+    sc.h = 440
+
+
+REF7 = [
+    ("memory-map", "メモリマップ全体", "Glow65 の 64KB のアドレス空間の割り振りと、RAM の主な使い道。", "", f7_map),
+    ("uart", "UART のレジスタ", "UART の状態レジスタ、制御レジスタ、データレジスタのビットの意味。", "", f7_uart),
+    ("polling", "ポーリングの流れ", "状態レジスタのビットを調べて、送信と受信を行う流れ。", "", f7_polling),
+]
+
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     for name, title, desc, asm, fn in MODES:
@@ -880,6 +1015,9 @@ def main():
         print(os.path.normpath(p))
     for name, title, desc, asm, fn in REF6:
         p = build(name, title, desc, asm, fn, prefix="06")
+        print(os.path.normpath(p))
+    for name, title, desc, asm, fn in REF7:
+        p = build(name, title, desc, asm, fn, prefix="07")
         print(os.path.normpath(p))
 
 

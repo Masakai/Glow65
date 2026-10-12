@@ -135,7 +135,7 @@ For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on a
 | `$C000-$EFFF` | Microsoft BASIC (about 8.6 KB used) |
 | `$F000-$FFFF` | Monitor ROM and vectors |
 
-The UART is a minimal MC6850-style device. Anything not listed reads as `$FF`.
+The UART is a minimal MC6850-style device. It answers on all of `$A000-$A0FF`: even addresses are the status/control register and odd addresses are the data register. Other addresses that nothing is connected to (for example `$8000-$9FFF`) read as `$FF`, and writes are ignored.
 
 The monitor has a fixed jump table that BASIC and your programs can call:
 
