@@ -15,4 +15,4 @@
 | 5 | [命令リファレンス](05-reference.md)(公式151命令) | 公開 |
 | 6 | [フラグ、スタック、割り込み](06-flags-stack-interrupts.md) | 公開 |
 | 7 | [メモリマップと I/O](07-memory-io.md) | 公開 |
-| 8 | 用語集と索引 | 準備中 |
+| 8 | [用語集と索引](08-glossary-index.md) | 公開 |
