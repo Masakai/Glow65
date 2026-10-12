@@ -111,7 +111,7 @@ Press **RESET** to stop the loop and get the monitor back, then type:
 D 03F0 03FF
 ```
 
-The first byte of the line is the last value the program wrote to `$03F0`. The line holds 16 bytes; the four non-zero bytes in the middle (`$03F8-$03FB`, `CE F3 CE F3`) are the monitor's interrupt vectors, which chapter 6 explains.
+The first byte of the line is the last value the program wrote to `$03F0`. The line holds 16 bytes; the four non-zero bytes in the middle (`$03F8-$03FB`, `24 F4 24 F4`) are the monitor's interrupt vectors, which chapter 6 explains.
 
 ## 6. Experiments
 

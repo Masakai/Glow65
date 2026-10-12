@@ -83,10 +83,10 @@ Set the SPEED to 1 Hz or 10 Hz and STEP MODE to CYCLE, or stop the CPU with RUN/
 | 1 | `$01FD` | `03` | write | PC high byte pushed |
 | 2 | `$01FC` | `0F` | write | PC low byte pushed |
 | 3 | `$01FB` | `26` | write | P pushed (bit 5 is always 1 on the stack) |
-| 4 | `$FFFA` | `C8` | read | NMI vector, low byte |
-| 5 | `$FFFB` | `F3` | read | NMI vector, high byte |
+| 4 | `$FFFA` | `1E` | read | NMI vector, low byte |
+| 5 | `$FFFB` | `F4` | read | NMI vector, high byte |
 
-The values are from a run of `nmi_count`: the stack pointer was `$FD` (the monitor's `G` command had already pushed its return address) and the PC `$030F` (the `jmp loop`). After step 5 the PC is `$F3C8`, the monitor's `jmp (NMIVEC)`; the next steps read `$03F8/$03F9`, and the CPU lands in your `handler` at `$0312`. The first access is not marked SYNC: an interrupt entry does not fetch an opcode. A real 6502 spends 7 cycles here, with two extra dummy reads that Glow65 does not reproduce, so you see five accesses.
+The values are from a run of `nmi_count`: the stack pointer was `$FD` (the monitor's `G` command had already pushed its return address) and the PC `$030F` (the `jmp loop`). After step 5 the PC is `$F41E`, the monitor's `jmp (NMIVEC)`; the next steps read `$03F8/$03F9`, and the CPU lands in your `handler` at `$0312`. The first access is not marked SYNC: an interrupt entry does not fetch an opcode. A real 6502 spends 7 cycles here, with two extra dummy reads that Glow65 does not reproduce, so you see five accesses.
 
 After `rti` the P LEDs and the PC LEDs return to what they were, and the stack pointer is back at `$FD`.
 

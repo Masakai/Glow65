@@ -1,3 +1,4 @@
+import Core6502
 import Glow65
 import SwiftUI
 
@@ -243,6 +244,14 @@ struct FrontPanelView: View {
                 ToggleSwitch(
                     title: "POWER", upLabel: "ON", downLabel: "OFF",
                     isOn: Binding(get: { model.isPowerOn }, set: { model.setPower($0) }))
+                // CPU の種類。電源が OFF のときだけ切り替えられる
+                ToggleSwitch(
+                    title: "CPU \(model.cpuModel.displayName)", upLabel: "65C02", downLabel: "6502",
+                    isOn: Binding(
+                        get: { model.cpuModel == .cmos65C02 },
+                        set: { model.setCPUModel($0 ? .cmos65C02 : .nmos6502) }))
+                    .opacity(model.isPowerOn ? 0.45 : 1)
+                    .allowsHitTesting(!model.isPowerOn)
                 MomentarySwitch(title: "RESET") { model.pressReset() }
                 MomentarySwitch(title: "NMI") { model.pressNMI() }
                 ToggleSwitch(

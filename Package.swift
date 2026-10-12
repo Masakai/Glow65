@@ -13,8 +13,8 @@ let package = Package(
     targets: [
         .target(name: "Core6502"),
         .target(name: "Glow65", dependencies: ["Core6502"]),
-        .executableTarget(name: "glow65-cli", dependencies: ["Glow65"]),
-        .executableTarget(name: "Glow65App", dependencies: ["Glow65"]),
+        .executableTarget(name: "glow65-cli", dependencies: ["Glow65", "Core6502"]),
+        .executableTarget(name: "Glow65App", dependencies: ["Glow65", "Core6502"]),
         .testTarget(name: "Core6502Tests", dependencies: ["Core6502"]),
         .testTarget(name: "Glow65Tests", dependencies: ["Glow65", "Core6502"]),
     ]

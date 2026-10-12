@@ -84,9 +84,18 @@ swift run glow65-cli                    # run from the repository root
 swift run glow65-cli --mhz 2            # change the clock
 swift run glow65-cli --rom file.bin@C000
 swift run glow65-cli --load tutorial/counter.bin@0300   # a program for RAM, loaded after power-on
+swift run glow65-cli --cpu 65c02        # run as a 65C02 (default: 6502)
 ```
 
 `--rom` replaces the default ROMs, so list every ROM you need (for example both `ROM/monitor.bin@F000` and `ROM/basic/build/basic.bin@C000`). Quit with Ctrl-\\. Ctrl-C is passed to the program (BASIC uses it to break).
+
+### CPU type: 6502 or 65C02
+
+The board runs an NMOS 6502 by default. Pass `--cpu 65c02` to `glow65-cli` or `Glow65App` to run it as a 65C02 (equivalent to the WDC W65C02S: the base 65C02 instructions, the Rockwell/WDC extensions BBR/BBS/RMB/SMB, and WAI/STP). `--cpu 6502` is the default. `glow65-cli` prints its usage and exits on any other value, and `Glow65App` ignores it.
+
+In the app, the **CPU** switch on the panel chooses between them. It works only while POWER is off, and it shows the selected CPU name. The monitor's `L` command detects the CPU at run time (it executes `INC A` and checks the result) and lists the 65C02 instructions only on a 65C02, for example `BBR0  $10,$0305` or `LDA   ($12)`. On a 6502 the same bytes are listed as `.BYTE`.
+
+Assembly for the 65C02 can be written with `.setcpu "65C02"` at the top of the source for `Tools/assemble.sh` (checked with ca65 V2.18: STZ, BRA, BBR0, RMB7, SMB3, WAI, STP and others assemble).
 
 ## Front panel
 
@@ -99,10 +108,13 @@ swift run glow65-cli --load tutorial/counter.bin@0300   # a program for RAM, loa
 | STEP | While stopped, runs one instruction (INSTR) or one bus access (CYCLE) |
 | STEP MODE | Chooses between INSTR and CYCLE stepping |
 | SPEED | 1 Hz, 10 Hz, 100 Hz, 1 kHz, 100 kHz, 1 MHz |
+| CPU | Chooses 6502 (down) or 65C02 (up). Works only while POWER is off. The label shows the selected CPU |
 | (i) button | Shows the credits |
 | INSTRUCTION AT PC | Not a switch: the instruction at the PC, for example `0302  8D F0 03  STA $03F0`. While an instruction is replayed access by access, it shows the instruction being replayed |
 
 While an instruction is shown access by access, the register LEDs show the values from before the instruction.
+
+The HALT LED is on while the RUN/STOP switch is at STOP. On a 65C02 it is also on while the CPU waits after `WAI` (until an interrupt) or stops after `STP` (until RESET). In those states the RUN LED stays on, because it follows the switch. A waiting or stopped CPU uses one cycle per step and makes no bus accesses.
 
 To load your own program, use **File → Load Program…** (⌘O) after turning POWER on, or the launch option `--load file.bin@0300`. Build a binary from assembly with `Tools/assemble.sh` (needs cc65).
 
@@ -166,6 +178,8 @@ swift test -c release -Xswiftc -enable-testing --filter KlausFunctionalTests
 
 The CPU core passes it (96,241,367 cycles, decimal mode included).
 
+The 65C02 mode uses Klaus Dormann's 65C02 extended opcodes test the same way. Download `65C02_extended_opcodes_test.bin` and `65C02_extended_opcodes_test.lst` (the listing is read for the start and success addresses) from the same repository and place both in `Tests/Fixtures/klaus/`. It is skipped when they are missing. The CPU core passes it (66,907,084 cycles, BBR/BBS/RMB/SMB and decimal mode included). The test ignores the V flag in decimal mode, so the V rule in `CPU6502.adc` for the 65C02 is not verified by it. WAI and STP are not part of this test (they belong to Klaus's interrupt test, which is not used here), and are covered by unit tests only.
+
 ## Project layout
 
 ```
@@ -183,7 +197,8 @@ documents/designs/    Design document (Japanese)
 
 ## Limitations
 
-- NMOS 6502 only. Official instructions are implemented; undefined opcodes run as a 2-cycle NOP.
+- The CPU is an NMOS 6502 (default) or a 65C02 equivalent to the WDC W65C02S. On the 6502 only the official instructions are implemented, and undefined opcodes run as a 2-cycle NOP. On the 65C02 every opcode is defined (undefined ones are NOPs of the documented length and cycles). Other variants (for example the 65C02 without the Rockwell extensions, or the 65816) are not available.
+- On the 65C02, dummy reads and writes are not reproduced either, as on the 6502. The decimal-mode V flag on the 65C02 follows the NMOS rule and matches Bruce Clark's published description for the 65C02 but is not verified against real hardware.
 - Dummy reads and writes (for example the extra read when an index crosses a page) are not reproduced, so the cycle-by-cycle bus view differs slightly from real hardware.
 - The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
 - BASIC `SAVE` and `LOAD` are not available.

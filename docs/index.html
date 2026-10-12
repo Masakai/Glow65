@@ -153,7 +153,7 @@ footer a{color:var(--mute)}
       <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="ja">使ってみる</span></a>
       <a class="btn" href="https://github.com/Masakai/Glow65"><span lang="en">View on GitHub</span><span lang="ja">GitHub で見る</span> ↗</a>
     </div>
-    <div class="badges"><span>macOS 14+</span><span>Swift</span><span>MIT License</span><span>NMOS 6502</span></div>
+    <div class="badges"><span>macOS 14+</span><span>Swift</span><span>MIT License</span><span>6502 / 65C02</span></div>
 
   </div>
 </header>
@@ -186,7 +186,7 @@ footer a{color:var(--mute)}
       <div class="card reveal"><div class="ico">02 / STEP</div><h3><span lang="en">Step one access at a time</span><span lang="ja">1 アクセスずつ進める</span></h3><p><span lang="en">Stop the CPU, then step by instruction or by single bus access. Speeds from 1 Hz to 1 MHz.</span><span lang="ja">CPU を止めて、1 命令または 1 バスアクセスずつ進められます。速度は 1Hz から 1MHz まで。</span></p></div>
       <div class="card reveal"><div class="ico">03 / GLOW</div><h3><span lang="en">LEDs with afterglow</span><span lang="ja">残光のある LED</span></h3><p><span lang="en">At high speed each LED's brightness is how often its bit was 1, which imitates the glow of an old panel's LEDs.</span><span lang="ja">高速時は、各ビットが 1 だった割合を明るさにします。昔のパネルの LED の光り方を模しています。</span></p></div>
       <div class="card reveal"><div class="ico">04 / BASIC</div><h3><span lang="en">Runs Microsoft BASIC</span><span lang="ja">Microsoft BASIC が動く</span></h3><p><span lang="en">Microsoft's 1978 6502 BASIC, converted from its original assembler source and built for this board.</span><span lang="ja">1978 年の Microsoft 6502 BASIC を、原典のアセンブラソースから変換して、このボード向けにビルドしています。</span></p></div>
-      <div class="card reveal"><div class="ico">05 / TESTED</div><h3><span lang="en">Tested CPU core</span><span lang="ja">テスト済みの CPU コア</span></h3><p><span lang="en">Passes Klaus Dormann's functional test — 96,241,367 cycles, decimal mode included.</span><span lang="ja">Klaus Dormann の機能テストに合格(96,241,367 サイクル、10 進モードを含む)。</span></p></div>
+      <div class="card reveal"><div class="ico">05 / TESTED</div><h3><span lang="en">Tested CPU core</span><span lang="ja">テスト済みの CPU コア</span></h3><p><span lang="en">Passes Klaus Dormann's functional test — 96,241,367 cycles, decimal mode included. The optional 65C02 mode (<code>--cpu 65c02</code>) passes his extended opcodes test too.</span><span lang="ja">Klaus Dormann の機能テストに合格(96,241,367 サイクル、10 進モードを含む)。<code>--cpu 65c02</code> で選べる 65C02 モードも、同じ作者の拡張オペコードテストに合格しています。</span></p></div>
       <div class="card reveal"><div class="ico">06 / OPEN</div><h3><span lang="en">Small and readable</span><span lang="ja">小さく、読みやすい</span></h3><p><span lang="en">Swift, no dependencies. The CPU core has no UI code. MIT licensed.</span><span lang="ja">Swift 製で依存ライブラリはなし。CPU コアは UI を含みません。MIT ライセンス。</span></p></div>
     </div>
 
@@ -255,7 +255,7 @@ swift run Glow65App</pre>
         <tr><td><span lang="en">Original</span><span lang="ja">自作</span></td><td><span lang="en">6502 CPU core, board, monitor ROM, front panel, app, BASIC conversion script (MIT License)</span><span lang="ja">6502 CPU コア、ボード、モニタ ROM、フロントパネル、アプリ、BASIC 変換スクリプト(MIT License)</span></td></tr>
         <tr><td><span lang="en">Included</span><span lang="ja">同梱</span></td><td>Microsoft BASIC for 6502 v1.1 — © Microsoft Corporation, MIT License · <a href="https://github.com/microsoft/BASIC-M6502">microsoft/BASIC-M6502</a></td></tr>
         <tr><td><span lang="en">Built with</span><span lang="ja">ビルドに使用</span></td><td>cc65 (zlib License) · Swift · SwiftUI</td></tr>
-        <tr><td><span lang="en">Verified by</span><span lang="ja">検証に使用</span></td><td><span lang="en">Klaus Dormann's 6502 functional test (GPLv3, not included)</span><span lang="ja">Klaus Dormann の 6502 機能テスト(GPLv3、同梱しない)</span></td></tr>
+        <tr><td><span lang="en">Verified by</span><span lang="ja">検証に使用</span></td><td><span lang="en">Klaus Dormann's 6502 functional test and 65C02 extended opcodes test (GPLv3, not included)</span><span lang="ja">Klaus Dormann の 6502 機能テストと 65C02 拡張オペコードテスト(GPLv3、同梱しない)</span></td></tr>
       </table>
     </div>
   </div>

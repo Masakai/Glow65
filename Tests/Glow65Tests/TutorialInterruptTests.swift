@@ -103,6 +103,14 @@ final class TutorialInterruptTests: XCTestCase {
         XCTAssertEqual(writes.map(\.address), [0x0100 | UInt16(spBefore), 0x0100 | UInt16(spBefore &- 1), 0x0100 | UInt16(spBefore &- 2)])
         XCTAssertEqual(writes[0].data, UInt8(pcBefore >> 8))
         XCTAssertEqual(writes[1].data, UInt8(pcBefore & 0xFF))
+        // 手順書の表の値が、モニタ ROM の実際のベクタと一致すること(ROM の配置が動くと値が変わる)
+        let lo = try XCTUnwrap(a.first { $0.address == 0xFFFA && !$0.isWrite }).data
+        let hi = try XCTUnwrap(a.first { $0.address == 0xFFFB && !$0.isWrite }).data
+        for chapter in ["tutorial/06-interrupts.md", "tutorial/06-interrupts.ja.md"] {
+            let text = try String(contentsOf: root.appendingPathComponent(chapter), encoding: .utf8)
+            XCTAssertTrue(text.contains(String(format: "| `$FFFA` | `%02X` |", lo)), "\(chapter): $FFFA")
+            XCTAssertTrue(text.contains(String(format: "| `$FFFB` | `%02X` |", hi)), "\(chapter): $FFFB")
+        }
         XCTAssertTrue(a.contains { $0.address == 0xFFFA && !$0.isWrite })
         XCTAssertTrue(a.contains { $0.address == 0xFFFB && !$0.isWrite })
         XCTAssertFalse(a.contains { $0.isSync && $0.address < 0x0300 && $0.address >= 0x0100 })

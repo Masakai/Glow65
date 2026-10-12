@@ -5,7 +5,7 @@
 ; コマンド:
 ;   D aaaa [bbbb]    メモリダンプ(省略時は128バイト)
 ;   E aaaa bb bb ..  メモリ書き込み
-;   L aaaa [bbbb]    逆アセンブル(終了アドレス省略時は16命令)
+;   L aaaa [bbbb]    逆アセンブル(終了アドレス省略時は16命令。65C02 なら追加の命令も表示)
 ;   G aaaa           JSR で実行(RTS で戻るとモニタに戻る)
 ;   B                BASIC をコールドスタート($C000)
 ;   ?                ヘルプ
@@ -402,11 +402,18 @@ DISASM_ONE:
         lda (PTR),y
         sta DOP
         tax
+        jsr ISCMOS              ; 65C02 なら C=1(命令ごとに判定する。状態を持たなくてよい)
+        bcs @cmos
         lda OPMN,x
         sta DMN
         lda OPMODE,x
         sta DMODE
-        lda DMN
+        jmp @got
+@cmos:  lda OPMN65,x
+        sta DMN
+        lda OPMODE65,x
+        sta DMODE
+@got:   lda DMN
         cmp #$FF
         bne @legal
         lda #3                  ; 未定義命令は「.BYTE $xx」(1バイト)として表示する
@@ -463,6 +470,14 @@ DISASM_ONE:
         sta PTR+1
         rts                     ; C = $FFFF を越えたか
 
+; CPU が 65C02 なら C=1、NMOS 6502 なら C=0 で戻る(A だけ壊す)。
+; $1A は 65C02 では INC A、NMOS では 1 バイトの未定義 NOP(A は変わらない)。
+ISCMOS:
+        lda #0
+        .byte $1A
+        cmp #1
+        rts
+
 ; ニーモニックを 6 文字の欄に表示する
 DIS_MNEMONIC:
         lda DMN
@@ -490,7 +505,21 @@ DIS_MNEMONIC:
         jsr CHROUT
         lda MNEM+2,x
         jsr CHROUT
+        lda DMN
+        cmp #BITOP_FIRST
+        bcc @plain
+        lda DOP                 ; RMB/SMB/BBR/BBS は、ビット番号(オペコードの bit4-6)を続けて表示
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        and #$07
+        ora #'0'
+        jsr CHROUT
         lda #' '
+        jsr CHROUT
+        jmp CHROUT
+@plain: lda #' '
         jsr CHROUT
         jsr CHROUT
         jmp CHROUT
@@ -507,6 +536,8 @@ DIS_OPERAND:
         lda #'$'
         jsr CHROUT
         pla
+        cmp #4
+        beq @zprel
         cmp #3
         beq @rel
         cmp #2
@@ -517,25 +548,18 @@ DIS_OPERAND:
         jsr PRHEX
         jmp @suffix
 @rel:   lda DB1                 ; 分岐先 = この命令のアドレス + 2 + 符号付きオフセット
-        clc
-        adc PTR
-        sta VAL
-        lda #0
-        ldx DB1
-        bpl @pos
-        lda #$FF
-@pos:   adc PTR+1
-        sta VAL+1
-        clc
-        lda VAL
-        adc #2
-        sta VAL
-        bcc @nc
-        inc VAL+1
-@nc:    lda VAL+1
+        ldx #2
+        jsr PRTARGET
+        jmp @suffix
+@zprel: lda DB1                 ; BBR/BBS: ゼロページのアドレス、続けて分岐先(命令のアドレス + 3 + オフセット)
         jsr PRHEX
-        lda VAL
-        jsr PRHEX
+        lda #','
+        jsr CHROUT
+        lda #'$'
+        jsr CHROUT
+        lda DB2
+        ldx #3
+        jsr PRTARGET
 @suffix:
         lda DMODE               ; 添字 = モード番号 x 3
         asl a
@@ -550,6 +574,32 @@ DIS_OPERAND:
         dey
         bne @sl
 @end:   rts
+
+; 分岐先を4桁の16進で表示する。A=符号付きオフセット、X=命令の長さ。
+; 分岐先 = PTR + X + オフセット
+PRTARGET:
+        tay
+        txa
+        clc
+        adc PTR
+        sta VAL
+        lda #0
+        adc PTR+1
+        sta VAL+1
+        ldx #0                  ; オフセットの符号拡張(上位バイト)
+        cpy #$80
+        bcc @pos
+        dex
+@pos:   tya
+        clc
+        adc VAL
+        sta VAL
+        txa
+        adc VAL+1
+        sta VAL+1
+        jsr PRHEX               ; A = 上位バイト
+        lda VAL
+        jmp PRHEX
 
 ; NMI/IRQ は RAM のベクタ経由でユーザーのハンドラへ飛ぶ
 NMI_ISR:
@@ -570,18 +620,18 @@ HelpText:
         .byte "B              BASIC", $0D, $0A, 0
 
 ; ---- 逆アセンブラの表 ----
-; MNEM、OPMN、OPMODE は Tools/gen_disasm_tables.py が CPU コアの表から生成する。
+; MNEM、OPMN、OPMODE、OPMN65、OPMODE65 は Tools/gen_disasm_tables.py が CPU コアの表から生成する。
         .include "disasm_tables.inc"
 
 ; モード番号 → 命令の長さ
 MODELEN:
-        .byte 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2
+        .byte 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3
 ; モード番号 → オペランドの前に付ける文字(0 = なし)
 MPRE:
-        .byte 0, 'A', '#', 0, 0, 0, 0, 0, 0, '(', '(', '(', 0
-; モード番号 → オペランドの桁数(0 = なし、1 = 2桁、2 = 4桁、3 = 相対分岐)
+        .byte 0, 'A', '#', 0, 0, 0, 0, 0, 0, '(', '(', '(', 0, '(', '(', 0
+; モード番号 → オペランドの桁数(0 = なし、1 = 2桁、2 = 4桁、3 = 相対分岐、4 = ゼロページ + 相対分岐)
 MSIZE:
-        .byte 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 3
+        .byte 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 3, 1, 2, 4
 ; モード番号 → オペランドの後ろに付ける文字(3 文字ずつ、0 で終わり)
 MSUF:
         .byte 0, 0, 0               ; 0 implied
@@ -597,6 +647,9 @@ MSUF:
         .byte ",X)"                 ; 10 indexedIndirect
         .byte "),Y"                 ; 11 indirectIndexed
         .byte 0, 0, 0               ; 12 relative
+        .byte ")", 0, 0             ; 13 zeroPageIndirect
+        .byte ",X)"                 ; 14 absoluteIndexedIndirect
+        .byte 0, 0, 0               ; 15 zeroPageRelative
 
         .segment "VECTORS"
         .word NMI_ISR

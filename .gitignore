@@ -9,3 +9,4 @@ ROM/basic/build/
 ROM/monitor.lst
 ROM/monitor.map
 brag-output*/
+.claude/

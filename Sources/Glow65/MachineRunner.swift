@@ -41,6 +41,10 @@ public final class MachineRunner {
         machine.bus.probe = probe
     }
 
+    public convenience init(cpuModel: CPUModel) {
+        self.init(machine: Machine(cpuModel: cpuModel))
+    }
+
     /// 実行ループを開始する。
     public func start() {
         queue.async { [self] in
@@ -77,6 +81,14 @@ public final class MachineRunner {
             isRunning = true
             resetTiming()
             instantAccess = probe.lastAccess
+            publish()
+        }
+    }
+
+    /// CPU の種類を切り替える。電源が入っているときは何もしない。
+    public func setCPUModel(_ model: CPUModel) {
+        queue.async { [self] in
+            guard machine.setCPUModel(model) else { return }
             publish()
         }
     }
@@ -300,6 +312,7 @@ public final class MachineRunner {
         s.isPoweredOn = machine.isPoweredOn
         s.isRunning = isRunning
         s.speed = speed
+        s.cpuModel = machine.cpuModel
         guard machine.isPoweredOn else {
             lock.lock()
             published = s
@@ -313,7 +326,9 @@ public final class MachineRunner {
         s.y = regs.y
         s.sp = regs.sp
         s.pc = regs.pc
-        s.instruction = Disassembler.disassemble(at: regs.pc, read: machine.bus.peek)
+        s.instruction = Disassembler.disassemble(at: regs.pc, model: machine.cpuModel, read: machine.bus.peek)
+        s.isWaiting = machine.cpu.isWaiting
+        s.isStopped = machine.cpu.isStopped
         s.status = regs.p
         s.irqLine = machine.cpu.irqLine
         s.nmiPending = machine.cpu.nmiPending

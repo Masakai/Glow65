@@ -1,4 +1,5 @@
 import AppKit
+import Core6502
 import Foundation
 import Glow65
 import SwiftUI
@@ -38,6 +39,8 @@ final class PanelModel: ObservableObject {
     @Published var isRunSwitchOn = true
     @Published var stepsByCycle = false
     @Published var speed = SpeedSetting.mhz1
+    /// 載せている CPU。電源が OFF のときだけ変えられる。
+    @Published private(set) var cpuModel: CPUModel
     @Published private(set) var romError: String?
     /// プログラムの読み込み結果など、短い案内。
     @Published private(set) var statusMessage: String?
@@ -50,7 +53,9 @@ final class PanelModel: ObservableObject {
     private var lastFrame = Date()
 
     init() {
-        runner = MachineRunner()
+        let model = Self.launchCPUModel()
+        cpuModel = model
+        runner = MachineRunner(cpuModel: model)
         runner.machine.uart.onTransmit = { [terminal] byte in terminal.enqueue(byte) }
         loadROM()
         runner.start()
@@ -60,6 +65,13 @@ final class PanelModel: ObservableObject {
         applyLaunchArguments()
     }
 
+    /// `--cpu` の値から CPU の種類を決める。指定がない、または不正なときは NMOS 6502。
+    private static func launchCPUModel() -> CPUModel {
+        let args = CommandLine.arguments
+        guard let i = args.firstIndex(of: "--cpu"), i + 1 < args.count else { return .nmos6502 }
+        return CPUModel(argument: args[i + 1]) ?? .nmos6502
+    }
+
     /// 動作確認と画面収録用の起動オプション。
     ///
     /// - `--power-on`: 起動直後に電源を入れる。
@@ -67,6 +79,7 @@ final class PanelModel: ObservableObject {
     /// - `--input <文字列>`: 文字列を入力する(`\r` は CR)。既定では起動の 1 秒後に一括で送る。
     /// - `--input-after <秒>`: 入力を始めるまでの秒数。
     /// - `--type-delay <秒>`: 1 文字ごとの間隔(指定すると打鍵のように 1 文字ずつ送る)。
+    /// - `--cpu <6502|65c02>`: 載せる CPU(既定は 6502。不正な値は無視する)。
     /// - `--script <台本>`: 操作を時刻どおりに自動実行する(下の `runScript` を参照)。
     private func applyLaunchArguments() {
         let args = CommandLine.arguments
@@ -187,6 +200,13 @@ final class PanelModel: ObservableObject {
         } else {
             runner.powerOff()
         }
+    }
+
+    /// CPU を切り替える。電源が ON の間は受け付けない。
+    func setCPUModel(_ model: CPUModel) {
+        guard !isPowerOn else { return }
+        cpuModel = model
+        runner.setCPUModel(model)
     }
 
     // MARK: プログラムの読み込み
@@ -332,7 +352,8 @@ final class PanelModel: ObservableObject {
         writeLED = glow(writeLED, s.writeLevel, decay: decay)
         syncLED = glow(syncLED, s.syncLevel, decay: decay)
         runLED = glow(runLED, s.isRunning ? 1 : 0, decay: decay)
-        haltLED = glow(haltLED, s.isRunning ? 0 : 1, decay: decay)
+        // STOP スイッチのほか、65C02 の WAI/STP で待機しているときも点く
+        haltLED = glow(haltLED, s.isHalted ? 1 : 0, decay: decay)
         irqLED = glow(irqLED, s.irqLine ? 1 : 0, decay: decay)
         nmiLED = glow(nmiLED, s.nmiPending ? 1 : 0, decay: decay)
         let tx = s.uartTransmitCount

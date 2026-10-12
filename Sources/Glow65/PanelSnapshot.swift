@@ -37,6 +37,11 @@ public struct PanelSnapshot: Sendable {
     /// RUN スイッチの状態。false のとき CPU は停止している。
     public var isRunning = false
     public var speed = SpeedSetting.mhz1
+    public var cpuModel = CPUModel.nmos6502
+    /// 65C02 の WAI で割り込みを待っている。
+    public var isWaiting = false
+    /// 65C02 の STP で停止している。
+    public var isStopped = false
 
     /// アドレス LED(A0...A15 の順)と データ LED(D0...D7)の明るさ(0...1)。
     public var address = [Double](repeating: 0, count: 16)
@@ -51,6 +56,8 @@ public struct PanelSnapshot: Sendable {
     public var sp: UInt8 = 0
     public var pc: UInt16 = 0
     public var status: UInt8 = 0
+    /// CPU が命令を実行していない(RUN/STOP スイッチが STOP、または WAI/STP の待機中)。HALT LED の元。
+    public var isHalted: Bool { !isRunning || isWaiting || isStopped }
     public var irqLine = false
     public var nmiPending = false
 

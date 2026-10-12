@@ -3,13 +3,25 @@ import Core6502
 /// 本ボード全体(CPU、バス、UART)。
 public final class Machine {
     public let bus: SBCBus
-    public internal(set) var cpu = CPU6502()
+    public internal(set) var cpu: CPU6502
     public private(set) var isPoweredOn = false
 
     public var uart: UART { bus.uart }
 
-    public init(bus: SBCBus = SBCBus()) {
+    public init(bus: SBCBus = SBCBus(), cpuModel: CPUModel = .nmos6502) {
         self.bus = bus
+        cpu = CPU6502(model: cpuModel)
+    }
+
+    /// 載せている CPU の種類。
+    public var cpuModel: CPUModel { cpu.model }
+
+    /// CPU の種類を切り替える。電源が入っているときは受け付けず、false を返す。
+    @discardableResult
+    public func setCPUModel(_ model: CPUModel) -> Bool {
+        guard !isPoweredOn else { return false }
+        cpu = CPU6502(model: model)
+        return true
     }
 
     /// 電源 ON。RAM を消去してリセットから始める。
@@ -25,7 +37,7 @@ public final class Machine {
         isPoweredOn = false
         bus.clearRAM()
         uart.reset()
-        cpu = CPU6502()
+        cpu = CPU6502(model: cpu.model)
     }
 
     /// リセットボタン。RAM は保持し、リセットベクタから再開する。

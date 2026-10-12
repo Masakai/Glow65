@@ -1,14 +1,24 @@
-// 自動生成ではなく手で保守するオペコード表。公式151命令を定義する。
+// 自動生成ではなく手で保守するオペコード表。NMOS 6502 の公式151命令(`table`)と、
+// 65C02(WDC W65C02S 相当)の全256命令(`table65C02`)を定義する。
 
 /// 命令の種類。
 public enum Operation: UInt8 {
     case adc, and, asl, bcc, bcs, beq, bit, bmi, bne, bpl, brk, bvc, bvs, clc, cld, cli, clv, cmp, cpx, cpy, dec, dex, dey, eor, inc, inx, iny, jmp, jsr, lda, ldx, ldy, lsr, nop, ora, pha, php, pla, plp, rol, ror, rti, rts, sbc, sec, sed, sei, sta, stx, sty, tax, tay, tsx, txa, txs, tya
+    // 65C02 で追加された命令(rmb、smb、bbr、bbs は末尾に並べる。モニタの逆アセンブラが添字で判定する)
+    case bra, phx, phy, plx, ply, stz, trb, tsb, wai, stp, rmb, smb, bbr, bbs
     case illegal
 
     /// ページ跨ぎで1サイクル加算される読み出し命令かどうか。
     var addsCycleOnPageCross: Bool {
         switch self {
-        case .adc, .and, .cmp, .eor, .lda, .ldx, .ldy, .ora, .sbc: return true
+        case .adc, .and, .bit, .cmp, .eor, .lda, .ldx, .ldy, .ora, .sbc: return true
+        default: return false
+        }
+    }
+
+    var isShift: Bool {
+        switch self {
+        case .asl, .lsr, .rol, .ror: return true
         default: return false
         }
     }
@@ -18,6 +28,8 @@ public enum Operation: UInt8 {
 public enum AddressingMode: UInt8 {
     case implied, accumulator, immediate, zeroPage, zeroPageX, zeroPageY
     case absolute, absoluteX, absoluteY, indirect, indexedIndirect, indirectIndexed, relative
+    // 65C02 で追加されたモード(モニタの表は番号で引くので、末尾に追加する)
+    case zeroPageIndirect, absoluteIndexedIndirect, zeroPageRelative
 }
 
 /// 1オペコード分のデコード情報。
@@ -182,6 +194,131 @@ extension CPU6502 {
         t[0xF9] = Instruction(op: .sbc, mode: .absoluteY, cycles: 4)
         t[0xFD] = Instruction(op: .sbc, mode: .absoluteX, cycles: 4)
         t[0xFE] = Instruction(op: .inc, mode: .absoluteX, cycles: 7)
+        return t
+    }()
+}
+
+extension CPU6502 {
+    /// 65C02(WDC W65C02S 相当)の命令表。NMOS の表を複製し、追加・差し替えた全256命令。
+    /// 未定義のオペコードは存在せず、すべて NOP として定義する(下の NOP の節)。
+    static let table65C02: [Instruction] = {
+        var t = table
+        // 追加された命令
+        t[0x04] = Instruction(op: .tsb, mode: .zeroPage, cycles: 5)
+        t[0x0C] = Instruction(op: .tsb, mode: .absolute, cycles: 6)
+        t[0x14] = Instruction(op: .trb, mode: .zeroPage, cycles: 5)
+        t[0x1C] = Instruction(op: .trb, mode: .absolute, cycles: 6)
+        t[0x12] = Instruction(op: .ora, mode: .zeroPageIndirect, cycles: 5)
+        t[0x32] = Instruction(op: .and, mode: .zeroPageIndirect, cycles: 5)
+        t[0x52] = Instruction(op: .eor, mode: .zeroPageIndirect, cycles: 5)
+        t[0x72] = Instruction(op: .adc, mode: .zeroPageIndirect, cycles: 5)
+        t[0x92] = Instruction(op: .sta, mode: .zeroPageIndirect, cycles: 5)
+        t[0xB2] = Instruction(op: .lda, mode: .zeroPageIndirect, cycles: 5)
+        t[0xD2] = Instruction(op: .cmp, mode: .zeroPageIndirect, cycles: 5)
+        t[0xF2] = Instruction(op: .sbc, mode: .zeroPageIndirect, cycles: 5)
+        t[0x1A] = Instruction(op: .inc, mode: .accumulator, cycles: 2)
+        t[0x3A] = Instruction(op: .dec, mode: .accumulator, cycles: 2)
+        t[0x34] = Instruction(op: .bit, mode: .zeroPageX, cycles: 4)
+        t[0x3C] = Instruction(op: .bit, mode: .absoluteX, cycles: 4)
+        t[0x89] = Instruction(op: .bit, mode: .immediate, cycles: 2)
+        t[0x6C] = Instruction(op: .jmp, mode: .indirect, cycles: 6)
+        t[0x7C] = Instruction(op: .jmp, mode: .absoluteIndexedIndirect, cycles: 6)
+        t[0x80] = Instruction(op: .bra, mode: .relative, cycles: 2)
+        t[0x5A] = Instruction(op: .phy, mode: .implied, cycles: 3)
+        t[0x7A] = Instruction(op: .ply, mode: .implied, cycles: 4)
+        t[0xDA] = Instruction(op: .phx, mode: .implied, cycles: 3)
+        t[0xFA] = Instruction(op: .plx, mode: .implied, cycles: 4)
+        t[0x64] = Instruction(op: .stz, mode: .zeroPage, cycles: 3)
+        t[0x74] = Instruction(op: .stz, mode: .zeroPageX, cycles: 4)
+        t[0x9C] = Instruction(op: .stz, mode: .absolute, cycles: 4)
+        t[0x9E] = Instruction(op: .stz, mode: .absoluteX, cycles: 5)
+        // シフト/ローテート abs,X は 6 サイクル(ページ跨ぎで +1)
+        t[0x1E] = Instruction(op: .asl, mode: .absoluteX, cycles: 6)
+        t[0x3E] = Instruction(op: .rol, mode: .absoluteX, cycles: 6)
+        t[0x5E] = Instruction(op: .lsr, mode: .absoluteX, cycles: 6)
+        t[0x7E] = Instruction(op: .ror, mode: .absoluteX, cycles: 6)
+        // Rockwell/WDC 拡張: RMBn、SMBn、BBRn、BBSn(n = オペコードの bit4-6)
+        t[0x07] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x17] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x27] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x37] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x47] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x57] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x67] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x77] = Instruction(op: .rmb, mode: .zeroPage, cycles: 5)
+        t[0x87] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0x97] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0xA7] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0xB7] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0xC7] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0xD7] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0xE7] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0xF7] = Instruction(op: .smb, mode: .zeroPage, cycles: 5)
+        t[0x0F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x1F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x2F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x3F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x4F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x5F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x6F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x7F] = Instruction(op: .bbr, mode: .zeroPageRelative, cycles: 5)
+        t[0x8F] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0x9F] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0xAF] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0xBF] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0xCF] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0xDF] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0xEF] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        t[0xFF] = Instruction(op: .bbs, mode: .zeroPageRelative, cycles: 5)
+        // WDC 拡張: WAI、STP
+        t[0xCB] = Instruction(op: .wai, mode: .implied, cycles: 3)
+        t[0xDB] = Instruction(op: .stp, mode: .implied, cycles: 3)
+        // NOP: x3 と xB(WAI/STP 以外)は 1 バイト 1 サイクル
+        t[0x03] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x13] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x23] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x33] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x43] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x53] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x63] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x73] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x83] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x93] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xA3] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xB3] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xC3] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xD3] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xE3] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xF3] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x0B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x1B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x2B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x3B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x4B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x5B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x6B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x7B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x8B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0x9B] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xAB] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xBB] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xEB] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        t[0xFB] = Instruction(op: .nop, mode: .implied, cycles: 1)
+        // NOP: オペランドを読み飛ばす形(メモリは読まない)
+        t[0x02] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0x22] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0x42] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0x62] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0x82] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0xC2] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0xE2] = Instruction(op: .nop, mode: .immediate, cycles: 2)
+        t[0x44] = Instruction(op: .nop, mode: .zeroPage, cycles: 3)
+        t[0x54] = Instruction(op: .nop, mode: .zeroPageX, cycles: 4)
+        t[0xD4] = Instruction(op: .nop, mode: .zeroPageX, cycles: 4)
+        t[0xF4] = Instruction(op: .nop, mode: .zeroPageX, cycles: 4)
+        t[0x5C] = Instruction(op: .nop, mode: .absolute, cycles: 8)
+        t[0xDC] = Instruction(op: .nop, mode: .absoluteX, cycles: 4)
+        t[0xFC] = Instruction(op: .nop, mode: .absoluteX, cycles: 4)
         return t
     }()
 }

@@ -1,14 +1,18 @@
 import Darwin
 import Foundation
+import Core6502
 import Glow65
 
-// 使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N]
+// 使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02]
 // --load は電源投入後に RAM へ生のバイナリを書き込む(例: --load tutorial/counter.bin@0300)。
 // 既定では ROM/monitor.bin を $F000、ROM/basic/build/basic.bin(あれば)を $C000 に読み込む。終了は Ctrl-\。
 
 var romSpecs: [(path: String, address: UInt16)] = []
 var loadSpecs: [String] = []
 var megahertz = 1.0
+var cpuModel = CPUModel.nmos6502
+
+let usage = "使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02]"
 
 var args = CommandLine.arguments.dropFirst()
 while let arg = args.popFirst() {
@@ -28,6 +32,12 @@ while let arg = args.popFirst() {
             fatalError("--mhz には正の数を指定する")
         }
         megahertz = mhz
+    case "--cpu":
+        guard let value = args.popFirst(), let model = CPUModel(argument: value) else {
+            FileHandle.standardError.write(Data("--cpu には 6502 または 65c02 を指定する\n\(usage)\n".utf8))
+            exit(2)
+        }
+        cpuModel = model
     default:
         fatalError("不明なオプション: \(arg)")
     }
@@ -39,7 +49,7 @@ if romSpecs.isEmpty {
     }
 }
 
-let machine = Machine()
+let machine = Machine(cpuModel: cpuModel)
 for spec in romSpecs {
     guard let data = FileManager.default.contents(atPath: spec.path) else {
         FileHandle.standardError.write(Data("ROM を読めない: \(spec.path)\n".utf8))
