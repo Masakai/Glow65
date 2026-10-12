@@ -50,7 +50,7 @@ final class TutorialChapterTests: XCTestCase {
         try which.run()
         which.waitUntilExit()
         guard which.terminationStatus == 0 else { throw XCTSkip("ca65 がない") }
-        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper"] {
+        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper", "usr_double", "usr_hello"] {
             let out = FileManager.default.temporaryDirectory.appendingPathComponent("glow65-\(name)-\(UUID().uuidString).bin")
             defer { try? FileManager.default.removeItem(at: out) }
             let p = Process()

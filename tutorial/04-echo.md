@@ -1,6 +1,6 @@
 # Tutorial 4: reading the keyboard, an echo program
 
-[English](04-echo.md) | [日本語](04-echo.ja.md) &nbsp;·&nbsp; [← 3. The UART](03-uart.md)
+[English](04-echo.md) | [日本語](04-echo.ja.md) &nbsp;·&nbsp; [← 3. The UART](03-uart.md) &nbsp;·&nbsp; [5. USR →](05-usr.md)
 
 Chapter 3 sent characters out through the UART. This chapter reads them in. The program waits for a key, reads it, and sends it back, so what you type appears on the screen. Everything below was run on Glow65 and checked by `Tests/Glow65Tests/TutorialChapterTests.swift`.
 
@@ -122,5 +122,7 @@ Press RESET first. A program loaded in RAM is still there.
 
    In ASCII, `a`-`z` are `$61`-`$7A` and `A`-`Z` are `$41`-`$5A`. They differ only in bit 5 (`$20`), so `and #$DF` turns a lower-case letter into a capital. `cmp` sets the carry flag when A is greater than or equal to the operand, which is what `bcc` and `bcs` test. Load `echo_upper.bin`, run it, and type `Hello, World 123`.
 3. **Count the keys.** Keep a counter in a spare memory cell (for example `$03F0`) and add 1 to it every time a character is read. After you press Enter, look at the count with `D 03F0 03FF`.
+
+Next: [5. Calling machine code from BASIC →](05-usr.md)
 
 [← 3. The UART](03-uart.md)

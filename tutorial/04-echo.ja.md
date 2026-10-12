@@ -1,6 +1,6 @@
 # チュートリアル 4: キーボードを読む、エコーのプログラム
 
-[English](04-echo.md) | [日本語](04-echo.ja.md) &nbsp;·&nbsp; [← 3. UART](03-uart.ja.md)
+[English](04-echo.md) | [日本語](04-echo.ja.md) &nbsp;·&nbsp; [← 3. UART](03-uart.ja.md) &nbsp;·&nbsp; [5. USR →](05-usr.ja.md)
 
 第3章では、UART から文字を送り出しました。この章では、UART から文字を読み込みます。プログラムはキーを待ち、読み取って、そのまま送り返します。打った文字が、画面に出るようになります。以下の内容はすべて Glow65 で実行し、`Tests/Glow65Tests/TutorialChapterTests.swift` で確認しています。
 
@@ -122,5 +122,7 @@ Enter を押す前に、**SPEED** を 1 MHz に戻してください。モニタ
 
    ASCII では、`a`〜`z` が `$61`〜`$7A`、`A`〜`Z` が `$41`〜`$5A` です。違いは bit5(`$20`)だけなので、`and #$DF` で、小文字が大文字になります。`cmp` は、A がオペランド以上のときにキャリーフラグを立てます。`bcc` と `bcs` は、それを調べています。`echo_upper.bin` を読み込んで実行し、`Hello, World 123` と打ってみてください。
 3. **打ったキーの数を数える。** 空いているメモリ(例: `$03F0`)に数を置き、文字を読むたびに 1 を足します。Enter を押したあと、`D 03F0 03FF` で数を見ます。
+
+次の章: [5. BASIC から機械語を呼ぶ →](05-usr.ja.md)
 
 [← 3. UART](03-uart.ja.md)
