@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 読み取り専用。書き込み権限は与えない。
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      # アクションはコミット SHA で固定する(v4.2.2)
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: cc65 を入れる
+        run: brew install cc65
+
+      - name: ROM を作り直し、コミット済みのものと一致することを確認する
+        run: |
+          python3 Tools/gen_disasm_tables.py
+          Tools/build_monitor.sh
+          git diff --exit-code -- ROM/monitor.bin ROM/disasm_tables.inc
+          Tools/build_basic.sh
+
+      - name: ビルド
+        run: swift build
+
+      # Klaus Dormann のテスト(GPLv3)はリポジトリに含めないため、ここではスキップされる
+      - name: テスト
+        run: swift test
