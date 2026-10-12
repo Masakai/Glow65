@@ -45,7 +45,7 @@ Glow65 は**全体が独自実装ではありません**。
 
 ## 自作プログラムを動かす
 
-Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)は3章あります。[LED カウンタ](tutorial/README.ja.md)(アセンブルして、またはバイトを手入力して読み込み、実行し、CPU を遅くしてバスアクセスを1つずつ辿る)、[16 ビットの足し算とキャリーフラグ](tutorial/02-addition.ja.md)、[UART で文字を出す](tutorial/03-uart.ja.md)です。
+Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)は4章あります。[LED カウンタ](tutorial/README.ja.md)(アセンブルして、またはバイトを手入力して読み込み、実行し、CPU を遅くしてバスアクセスを1つずつ辿る)、[16 ビットの足し算とキャリーフラグ](tutorial/02-addition.ja.md)、[UART で文字を出す](tutorial/03-uart.ja.md)、[キーボードを読むエコー](tutorial/04-echo.ja.md)です。
 
 ## クイックスタート
 
@@ -173,7 +173,7 @@ Sources/Glow65App/     SwiftUI アプリ: フロントパネル、端末、起�
 ROM/monitor.s         モニタ ROM のソース(ca65)
 ROM/basic/            BASIC: 原典、マクロ、リンカ設定
 Tools/                ビルドと変換のスクリプト(assemble.sh は自作プログラムのビルド用)
-tutorial/             チュートリアル: 3章(LED カウンタ、足し算、UART)とサンプルプログラム
+tutorial/             チュートリアル: 4章(LED カウンタ、足し算、UART、エコー)とサンプルプログラム
 Tests/                単体テストと結合テスト
 documents/designs/    設計書(日本語)
 ```

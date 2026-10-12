@@ -2,7 +2,7 @@
 
 **English** | [日本語](README.ja.md)
 
-Chapters: **1. LED counter** · [2. Addition and the carry flag](02-addition.md) · [3. The UART](03-uart.md)
+Chapters: **1. LED counter** · [2. Addition and the carry flag](02-addition.md) · [3. The UART](03-uart.md) · [4. Reading the keyboard](04-echo.md)
 
 You will write a five-line 6502 program, load it into Glow65, and watch it count in binary on the LEDs. Everything below was run on Glow65 and checked by the tests in `Tests/Glow65Tests/TutorialTests.swift`.
 

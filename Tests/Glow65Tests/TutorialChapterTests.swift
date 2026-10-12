@@ -50,7 +50,7 @@ final class TutorialChapterTests: XCTestCase {
         try which.run()
         which.waitUntilExit()
         guard which.terminationStatus == 0 else { throw XCTSkip("ca65 がない") }
-        for name in ["counter", "add", "hello", "hello_monitor"] {
+        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper"] {
             let out = FileManager.default.temporaryDirectory.appendingPathComponent("glow65-\(name)-\(UUID().uuidString).bin")
             defer { try? FileManager.default.removeItem(at: out) }
             let p = Process()
@@ -186,6 +186,95 @@ final class TutorialChapterTests: XCTestCase {
         XCTAssertEqual(write.data, 0x48)
         // 状態レジスタ($A000)を読む LDA が、その前にある
         XCTAssertTrue(probe.accesses.contains { $0.address == 0xA000 && !$0.isWrite })
+    }
+
+    // MARK: 第 4 章 エコー
+
+    func testEchoListingAndSizes() throws {
+        XCTAssertEqual(try program("echo").count, 40)
+        XCTAssertEqual(try program("echo_upper").count, 50)
+        let c = try Console(root: root)
+        try c.machine.bus.loadRAM(try program("echo"), at: 0x0300)
+        XCTAssertEqual(c.type("l 0300 0327\r").filter { $0.hasPrefix("03") }, [
+            "0300  AD 00 A0  LDA   $A000",
+            "0303  29 01     AND   #$01",
+            "0305  F0 F9     BEQ   $0300",
+            "0307  AD 01 A0  LDA   $A001",
+            "030A  C9 0D     CMP   #$0D",
+            "030C  F0 0F     BEQ   $031D",
+            "030E  A8        TAY",
+            "030F  AD 00 A0  LDA   $A000",
+            "0312  29 02     AND   #$02",
+            "0314  F0 F9     BEQ   $030F",
+            "0316  98        TYA",
+            "0317  8D 01 A0  STA   $A001",
+            "031A  4C 00 03  JMP   $0300",
+            "031D  A9 0D     LDA   #$0D",
+            "031F  20 03 F0  JSR   $F003",
+            "0322  A9 0A     LDA   #$0A",
+            "0324  20 03 F0  JSR   $F003",
+            "0327  60        RTS",
+        ])
+    }
+
+    func testEchoSendsKeysBackAndReturnsOnEnter() throws {
+        let c = try Console(root: root)
+        try c.machine.bus.loadRAM(try program("echo"), at: 0x0300)
+        c.type("g 0300\r")
+        // 文字を打つと、プログラムが送り返す。Enter で改行を送って戻り、プロンプトが出る。
+        let lines = c.type("hello\r")
+        XCTAssertEqual(lines, ["hello", "*"])
+    }
+
+    func testEchoTypeTypedByTheTutorialBytes() throws {
+        // 手順書の `E 0300 ...` の 1 行をそのまま入力しても、同じプログラムになる
+        let c = try Console(root: root)
+        _ = c.type("e 0300 ad 00 a0 29 01 f0 f9 ad 01 a0 c9 0d f0 0f a8 ad 00 a0 29 02 f0 f9 98 8d 01 a0 4c 00 03 a9 0d 20 03 f0 a9 0a 20 03 f0 60\r", cycles: 600_000)
+        XCTAssertEqual(Array(c.machine.bus.ram[0x300..<0x328]), try program("echo"))
+    }
+
+    func testEchoExerciseFinishWithAPeriod() throws {
+        let c = try Console(root: root)
+        try c.machine.bus.loadRAM(try program("echo"), at: 0x0300)
+        c.type("e 030b 2e\rg 0300\r")
+        // Enter は終わりの印ではなくなり、ほかのキーと同じようにエコーされる(CR は行頭に戻すだけ)
+        let lines = c.type("a\rb.")
+        XCTAssertEqual(lines, ["ab", "*"])
+    }
+
+    func testEchoUpperMakesCapitals() throws {
+        let c = try Console(root: root)
+        try c.machine.bus.loadRAM(try program("echo_upper"), at: 0x0300)
+        c.type("g 0300\r")
+        let lines = c.type("Hello, World 123 `[{\r")
+        XCTAssertEqual(lines, ["HELLO, WORLD 123 `[{", "*"])
+    }
+
+    /// 手順書: 文字を読むときのバス(`$A001`、データバスは文字の ASCII コード)、送るときも同じ
+    func testEchoBusAccessesForOneKey() throws {
+        let machine = Machine()
+        machine.powerOn()
+        try machine.bus.loadRAM(try program("echo"), at: 0x0300)
+        machine.cpu.pc = 0x0300
+        let probe = PanelProbe()
+        probe.recordsAccesses = true
+        machine.bus.probe = probe
+        var sent: [UInt8] = []
+        machine.uart.onTransmit = { sent.append($0) }
+        for _ in 0..<3 { machine.step() }                           // 文字が来る前: 状態を読むループ
+        XCTAssertTrue(probe.accesses.contains { $0.address == 0xA000 && !$0.isWrite })
+        XCTAssertFalse(probe.accesses.contains { $0.address == 0xA001 })
+        machine.uart.receive(0x68)                                  // 'h'
+        let receivedBefore = machine.uart.receiveCount
+        for _ in 0..<30 where sent.isEmpty { machine.step() }
+        XCTAssertEqual(sent, [0x68])
+        XCTAssertEqual(machine.uart.receiveCount, receivedBefore + 1)   // RX の LED
+        XCTAssertEqual(machine.uart.transmitCount, 1)                   // TX の LED
+        let read = try XCTUnwrap(probe.accesses.first { $0.address == 0xA001 && !$0.isWrite })
+        XCTAssertEqual(read.data, 0x68)
+        let write = try XCTUnwrap(probe.accesses.last { $0.address == 0xA001 && $0.isWrite })
+        XCTAssertEqual(write.data, 0x68)
+        XCTAssertEqual(0x68, 0b0110_1000)                           // D6、D5、D3
     }
 
     func testHelloChangeTheMessage() throws {

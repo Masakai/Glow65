@@ -1,6 +1,6 @@
 # Tutorial 3: talking to the UART
 
-[English](03-uart.md) | [日本語](03-uart.ja.md) &nbsp;·&nbsp; [← 2. Addition](02-addition.md)
+[English](03-uart.md) | [日本語](03-uart.ja.md) &nbsp;·&nbsp; [← 2. Addition](02-addition.md) &nbsp;·&nbsp; [4. Reading the keyboard →](04-echo.md)
 
 So far your programs only changed memory. In this chapter a program prints text in the terminal, by writing to the UART directly. Everything below was run on Glow65 and checked by `Tests/Glow65Tests/TutorialChapterTests.swift`.
 
@@ -126,5 +126,7 @@ It prints the same text. BASIC's output goes through the same `CHROUT`.
 1. **Your own message.** Press RESET, then `E 0318 47 4F 4F 44 0D 0A 00` (GOOD, a line break, and the end marker), and `G 0300`. Leave out `0D 0A` and the next prompt appears right after the text. Keep the message short: it must not run into `$03F0`.
 2. **Another ASCII code.** `E 0318 41 42 43 0D 0A 00` prints `ABC`. Letters go up one code at a time, so you can print `DEF` by adding 3 to each byte.
 3. **Receiving.** Bit 0 of the status says that a character has arrived, and reading `$A001` returns it. A program that waits for bit 0, reads the character and sends it back is an echo. Try writing it with the same pieces.
+
+Next: [4. Reading the keyboard →](04-echo.md)
 
 [← 2. Addition](02-addition.md)

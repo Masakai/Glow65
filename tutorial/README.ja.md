@@ -2,7 +2,7 @@
 
 [English](README.md) | **日本語**
 
-章: **1. LED カウンタ** · [2. 足し算とキャリーフラグ](02-addition.ja.md) · [3. UART](03-uart.ja.md)
+章: **1. LED カウンタ** · [2. 足し算とキャリーフラグ](02-addition.ja.md) · [3. UART](03-uart.ja.md) · [4. キーボードを読む](04-echo.ja.md)
 
 5行の 6502 プログラムを書いて Glow65 に読み込み、LED に 2 進数で数える様子を観察します。以下の内容はすべて Glow65 で実行し、`Tests/Glow65Tests/TutorialTests.swift` のテストで確認しています。
 
