@@ -55,6 +55,26 @@ final class BasicTests: XCTestCase {
         XCTAssertFalse(out.text.contains("OSI"), out.text)
     }
 
+    /// 小文字で打った予約語と変数名は大文字になり、引用符・REM・DATA の中はそのまま残る。
+    func testLowercaseInputIsUppercased() throws {
+        let (m, out) = try bootBasic()
+        for line in ["10 for i=1 to 2: print i; \"hello\"", "20 next i", "30 rem lower stays", "40 data abc", "50 read a$: print a$"] {
+            send(m, line + "\r", cycles: 300_000)
+        }
+        out.bytes.removeAll()
+        send(m, "run\r", cycles: 2_000_000)
+        XCTAssertTrue(out.text.contains(" 1 hello"), out.text)
+        XCTAssertTrue(out.text.contains(" 2 hello"), out.text)
+        XCTAssertTrue(out.text.contains("abc"), out.text)
+        XCTAssertFalse(out.text.contains("SYNTAX"), out.text)
+        out.bytes.removeAll()
+        send(m, "list\r", cycles: 2_000_000)
+        XCTAssertTrue(out.text.contains("10 FOR I=1 TO 2: PRINT I; \"hello\""), out.text)
+        XCTAssertTrue(out.text.contains("30 REM lower stays"), out.text)
+        XCTAssertTrue(out.text.contains("40 DATA abc"), out.text)
+        XCTAssertTrue(out.text.contains("50 READ A$: PRINT A$"), out.text)
+    }
+
     func testPrintArithmetic() throws {
         let (m, out) = try bootBasic()
         out.bytes.removeAll()

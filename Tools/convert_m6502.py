@@ -35,6 +35,34 @@ PATCHES = {
     "LDA^O176001": f"LDA {UART_DATA}",  # OSI の ACIA データレジスタ
 }
 
+# --- 変換後のアセンブリへの追加(原典にない動作)。キーは変換後の文、値は差し替え後 ---
+# 行の入力を、予約語に変換する前に大文字にする。引用符の中、REM、DATA は、この手前で
+# 取り除かれるので、文字列の中の小文字は、そのまま残る。
+POST_PATCHES = {
+    "MUSTCR:\n    sty BUFPTR\n": (
+        "MUSTCR:\n"
+        "    cmp #'a'\n"
+        "    bcc @upper_done\n"
+        "    cmp #'z'+1\n"
+        "    bcs @upper_done\n"
+        "    and #$DF\n"
+        "    sta BUFOFS,X\n"
+        "@upper_done:\n"
+        "    sty BUFPTR\n"
+    ),
+    # 予約語の2文字目以降も、比べるときだけ大文字にする(バッファは書き換えない)
+    "RESCON:\n    lda BUFOFS,X\n": (
+        "RESCON:\n"
+        "    lda BUFOFS,X\n"
+        "    cmp #'a'\n"
+        "    bcc @compare_upper\n"
+        "    cmp #'z'+1\n"
+        "    bcs @compare_upper\n"
+        "    and #$DF\n"
+        "@compare_upper:\n"
+    ),
+}
+
 MNEMONICS = set(
     "ADC AND ASL BCC BCS BEQ BIT BMI BNE BPL BRK BVC BVS CLC CLD CLI CLV CMP CPX CPY "
     "DEC DEX DEY EOR INC INX INY JMP JSR LDA LDX LDY LSR NOP ORA PHA PHP PLA PLP ROL "
@@ -438,7 +466,12 @@ def main():
     ]
     conv_nodes(nodes, ctx, out)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text("\n".join(out) + "\n", encoding="utf-8")
+    body = "\n".join(out) + "\n"
+    for old, new in POST_PATCHES.items():
+        if body.count(old) != 1:
+            raise SystemExit("追加の差し替え先が見つからない: %r" % old)
+        body = body.replace(old, new)
+    OUT.write_text(body, encoding="utf-8")
     print("出力: %s (%d 行、未変換 %d 件)" % (OUT, len(out), ctx.unconverted))
 
 

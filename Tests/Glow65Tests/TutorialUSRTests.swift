@@ -68,10 +68,10 @@ final class TutorialUSRTests: XCTestCase {
     func testTheVectorsInPageZero() throws {
         let s = try BasicSession(root: root, loading: [])
         let out = s.send("PRINT PEEK(10);PEEK(11);PEEK(12)\r")
-        XCTAssertTrue(out.contains(" 76  219  207"), out)            // JMP $CFDB(FCERR)
-        // 6-9 番地は、AYINT($CF52)と GIVAYF($D125)のアドレス
+        XCTAssertTrue(out.contains(" 76  241  207"), out)            // JMP $CFF1(FCERR)
+        // 6-9 番地は、AYINT($CF68)と GIVAYF($D13B)のアドレス
         let v = s.send("PRINT PEEK(6);PEEK(7);PEEK(8);PEEK(9)\r")
-        XCTAssertTrue(v.contains(" 82  207  37  209"), v)
+        XCTAssertTrue(v.contains(" 104  207  59  209"), v)
     }
 
     func testUSRBeforeSettingTheVectorIsAnError() throws {

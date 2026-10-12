@@ -16,10 +16,10 @@ You can look at the vector yourself. Right after BASIC starts:
 
 ```
 PRINT PEEK(10);PEEK(11);PEEK(12)
- 76  219  207
+ 76  241  207
 ```
 
-76 is `$4C`, the opcode of `JMP`. 219 and 207 are the low and high bytes of `$CFDB`, an error routine inside BASIC. That is why `PRINT USR(21)` at this point prints `?ILLEGAL QUANTITY ERROR`. To use your own routine, **POKE its address into 11 (low byte) and 12 (high byte)**.
+76 is `$4C`, the opcode of `JMP`. 241 and 207 are the low and high bytes of `$CFF1`, an error routine inside BASIC. That is why `PRINT USR(21)` at this point prints `?ILLEGAL QUANTITY ERROR`. To use your own routine, **POKE its address into 11 (low byte) and 12 (high byte)**.
 
 The FAC holds a floating-point number, which is awkward to work with in machine code. BASIC offers two helper routines, reached through vectors in page zero:
 
