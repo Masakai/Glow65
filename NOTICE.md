@@ -34,7 +34,3 @@ Glow65 は、自作の部分と第三者の成果物を含む。全体が独自�
 - cc65(ca65/ld65): ROM のビルドに使うツール。zlib License。リポジトリには含めない。
 - Klaus Dormann の 6502 機能テスト: CPU コアの検証に使う。GPLv3。
   `Tests/Fixtures/klaus/` に各自が取得して置く。リポジトリには含めない(`.gitignore` 対象)。
-
-## 商標について
-
-Altair、IMSAI などの名称、ロゴ、実機の写真は使っていない。フロントパネルは自作の意匠である。
