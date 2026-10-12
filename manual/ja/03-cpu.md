@@ -385,6 +385,4 @@ Glow65 では、ベクタはモニタの ROM にあります(第2章の `D FFF0 
 
 1. MOS Technology, "MCS6500 Microcomputer Family Hardware Manual", 1976年1月版: https://www.commodore.ca/wp-content/uploads/2018/11/kim1_hardware.txt
 
-## 次の章
-
-第4章「アドレッシングモード」は準備中です。
+次の章: [4. アドレッシングモード →](04-addressing.md)

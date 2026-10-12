@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="478" viewBox="0 0 720 478" role="img" aria-labelledby="t d">
+<title id="t">インデックスト・インダイレクト(Indexed Indirect)</title>
+<desc id="d">ゼロページの表から、X 番目の 2 バイトの番地を取り出す。例は LDA ($20,X)。</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="477" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">インデックスト・インダイレクト(Indexed Indirect)</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LDA ($20,X)</text>
+<text x="62" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">オペコード</text>
+<rect x="30" y="66" width="64" height="32" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="62" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">A1</text>
+<text x="162" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">オペランド</text>
+<rect x="130" y="66" width="64" height="32" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="162" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">20</text>
+<text x="30" y="140" font-size="11" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">レジスタ</text>
+<text x="396" y="112" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ゼロページ</text>
+<text x="586" y="112" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">メモリ</text>
+<rect x="30" y="151.0" width="110" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="40" y="173.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">X</text>
+<text x="130" y="173.0" font-size="14" font-weight="bold" text-anchor="end" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$04</text>
+<rect x="160" y="140" width="130" height="56" rx="6" fill="#ffffff" stroke="#0969da" stroke-width="1.6"/>
+<text x="225.0" y="164.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$20 + X($04)</text>
+<text x="225.0" y="182.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">= $24</text>
+<path d="M 162 98 L 162 120 L 225 120 L 225.0 140" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="162" cy="112" r="10" fill="#0969da"/>
+<text x="162" y="116.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">1</text>
+<path d="M 140 168 L 160 168" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="150" cy="168" r="10" fill="#0969da"/>
+<text x="150" y="172.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">2</text>
+<rect x="330" y="154.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="402" y="154.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="366.0" y="173.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0024</text>
+<text x="432.0" y="173.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$00</text>
+<rect x="330" y="188.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="402" y="188.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="366.0" y="207.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0025</text>
+<text x="432.0" y="207.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$06</text>
+<path d="M 290 168.0 L 330 168" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="310" cy="168" r="10" fill="#0969da"/>
+<text x="310" y="172.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">3</text>
+<rect x="520" y="256.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="592" y="256.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="556.0" y="275.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0600</text>
+<text x="622.0" y="275.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$6E</text>
+<path d="M 462 202 L 491 202 L 491 270 L 520 270" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="491" cy="236" r="10" fill="#0969da"/>
+<text x="491" y="240.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">4</text>
+<rect x="30" y="293.0" width="110" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="40" y="315.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">A</text>
+<text x="130" y="315.0" font-size="14" font-weight="bold" text-anchor="end" fill="#bc4c00" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$6E</text>
+<path d="M 652 270 L 685 270 L 685 310 L 140 310" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<circle cx="685" cy="292" r="10" fill="#bc4c00"/>
+<text x="685" y="296.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">5</text>
+<text x="30" y="360" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">① オペコード $A1(LDA)と、オペランド $20 を読む。</text>
+<text x="30" y="382" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">② オペランドに X の値 $04 を足して、ゼロページの場所 $24 を得る(256 バイトで折り返す)。</text>
+<text x="30" y="404" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">③ $0024 の $00 を下位、$0025 の $06 を上位として読む。</text>
+<text x="30" y="426" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">④ 2 バイトを合わせた $0600 が実効アドレスになる。</text>
+<text x="30" y="448" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">⑤ $0600 の内容 $6E を読んで、A に入れる。</text>
+</svg>
