@@ -17,9 +17,10 @@ final class TutorialChapterTests: XCTestCase {
     }
 
     final class Console {
-        let machine = Machine()
+        let machine: Machine
         var bytes: [UInt8] = []
-        init(root: URL) throws {
+        init(root: URL, cpuModel: CPUModel = .nmos6502) throws {
+            machine = Machine(cpuModel: cpuModel)
             let monitor = try XCTUnwrap(try? Data(contentsOf: root.appendingPathComponent("ROM/monitor.bin")))
             machine.bus.loadROM([UInt8](monitor), at: 0xF000)
             machine.uart.onTransmit = { [unowned self] in self.bytes.append($0) }
@@ -50,7 +51,7 @@ final class TutorialChapterTests: XCTestCase {
         try which.run()
         which.waitUntilExit()
         guard which.terminationStatus == 0 else { throw XCTSkip("ca65 がない") }
-        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper", "usr_double", "usr_hello", "nmi_count", "irq_echo"] {
+        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper", "usr_double", "usr_hello", "nmi_count", "irq_echo", "clear_6502", "clear_65c02"] {
             let out = FileManager.default.temporaryDirectory.appendingPathComponent("glow65-\(name)-\(UUID().uuidString).bin")
             defer { try? FileManager.default.removeItem(at: out) }
             let p = Process()

@@ -162,4 +162,6 @@ The line `lda UART_DATA` matters. IRQ is level-triggered: the UART keeps the lin
 - A level-triggered IRQ must be acknowledged at the source (here: read `$A001`).
 - The monitor's warm start switches the UART interrupt off, so returning to the monitor with `rts` is safe even if your program left it on.
 
+Next: [7. Switching to the 65C02 →](07-65c02.md)
+
 [← 5. USR](05-usr.md)
