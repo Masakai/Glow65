@@ -34,7 +34,7 @@ Glow65 は**全体が独自実装ではありません**。
 | cc65(アセンブラとリンカ) | ROM のビルドに使用。zlib License。同梱しない |
 | Klaus Dormann の 6502 機能テスト | CPU の検証に使用。GPLv3。同梱しない |
 
-詳細は [NOTICE.md](NOTICE.md) を参照してください。Altair や IMSAI の名称、ロゴ、写真は使っていません。パネルの意匠は自作です。
+詳細は [NOTICE.md](NOTICE.md) を参照してください。
 
 ## 必要なもの
 

@@ -34,7 +34,7 @@ Glow65 is **not** entirely original work.
 | cc65 (assembler and linker) | Used to build the ROMs. zlib License. Not included |
 | Klaus Dormann's 6502 functional test | Used to verify the CPU. GPLv3. Not included |
 
-See [NOTICE.md](NOTICE.md) for details. No Altair or IMSAI names, logos, or photos are used; the panel design is original.
+See [NOTICE.md](NOTICE.md) for details.
 
 ## Requirements
 
