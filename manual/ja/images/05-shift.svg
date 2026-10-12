@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="610" viewBox="0 0 720 610" role="img" aria-labelledby="t d">
+<title id="t">ビットの動き(ASL、LSR、ROL、ROR)</title>
+<desc id="d">ASL、LSR、ROL、ROR が、A の 8 ビットとキャリーをどう動かすか。</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="609" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ビットの動き(ASL、LSR、ROL、ROR)</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="212" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b7</text>
+<text x="260" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b6</text>
+<text x="308" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b5</text>
+<text x="356" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b4</text>
+<text x="404" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b3</text>
+<text x="452" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b2</text>
+<text x="500" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b1</text>
+<text x="548" y="90" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b0</text>
+<text x="30" y="56" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">実行前: A = %10110001($B1)。ROL と ROR は、実行前の C が 1 の場合</text>
+<text x="30" y="154" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ASL</text>
+<rect x="110" y="130" width="52" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="136.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">C</text>
+<rect x="190" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="212.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="238" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="260.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="286" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="308.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="334" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="356.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="382" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="404.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="430" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="452.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="478" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="500.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="526" y="130" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="548.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<path d="M 212.0 130 L 212.0 116 L 136 116 L 136 130" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<rect x="582" y="130" width="36" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="600.0" y="152.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<path d="M 582 147 L 570 147" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="30" y="200" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">実行後: A = %0110 0010($62)、C = 1</text>
+<text x="30" y="274" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LSR</text>
+<rect x="582" y="250" width="52" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="608.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">C</text>
+<rect x="190" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="212.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="238" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="260.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="286" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="308.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="334" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="356.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="382" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="404.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="430" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="452.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="478" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="500.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="526" y="250" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="548.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<path d="M 548.0 250 L 548.0 236 L 608 236 L 608 250" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<rect x="110" y="250" width="36" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="128.0" y="272.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<path d="M 146 267 L 190 267" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="30" y="320" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">実行後: A = %0101 1000($58)、C = 1</text>
+<text x="30" y="394" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ROL</text>
+<rect x="110" y="370" width="52" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="136.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">C 1</text>
+<rect x="190" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="212.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="238" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="260.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="286" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="308.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="334" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="356.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="382" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="404.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="430" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="452.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="478" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="500.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="526" y="370" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="548.0" y="392.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<path d="M 212.0 370 L 212.0 356 L 136 356 L 136 370" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 136 404 L 136 420 L 548.0 420 L 548.0 404" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="30" y="440" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">実行後: A = %0110 0011($63)、C = 1</text>
+<text x="30" y="514" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ROR</text>
+<rect x="582" y="490" width="52" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="608.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">C 1</text>
+<rect x="190" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="212.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="238" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="260.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="286" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="308.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="334" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="356.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="382" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="404.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="430" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="452.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="478" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="500.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="526" y="490" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="548.0" y="512.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<path d="M 548.0 490 L 548.0 476 L 608 476 L 608 490" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 608 524 L 608 540 L 212.0 540 L 212.0 524" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="30" y="560" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">実行後: A = %1101 1000($D8)、C = 1</text>
+</svg>

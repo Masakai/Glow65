@@ -10,3 +10,4 @@ ROM/monitor.lst
 ROM/monitor.map
 brag-output*/
 .claude/
+__pycache__/

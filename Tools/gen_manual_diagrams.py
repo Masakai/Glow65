@@ -102,8 +102,8 @@ class Scene:
             boxes.append((x, 66, 64, 32))
         return boxes
 
-    def reg(self, name, y_center, value, hl=False, sub=None, w=110):
-        x, h = 30, 34
+    def reg(self, name, y_center, value, hl=False, sub=None, w=110, x=30):
+        h = 34
         y = y_center - h / 2
         fill, stroke = (ORANGE_BG, ORANGE) if hl else (BOX, LINE)
         self.rect(x, y, w, h, fill=fill, stroke=stroke, sw=2 if hl else 1.2)
@@ -172,11 +172,11 @@ def finish(sc, steps_y, steps, y0=None):
     sc.h = int(end + 8)
 
 
-def build(name, title, desc, asm, builder):
+def build(name, title, desc, asm, builder, prefix="04"):
     sc = Scene(title, desc, 600)
     sc.header(title, asm)
     builder(sc)
-    path = os.path.join(OUT_DIR, f"04-{name}.svg")
+    path = os.path.join(OUT_DIR, f"{prefix}-{name}.svg")
     with open(path, "w", encoding="utf-8") as f:
         f.write(sc.svg())
     return path
@@ -432,10 +432,283 @@ MODES = [
 ]
 
 
+# ---- 第5章(命令リファレンス)の図 ----
+
+def bitbox(sc, x, y, text, w=44, h=34, hl=None, size=15):
+    fill, stroke, sw = BOX, LINE, 1.2
+    if hl == "blue":
+        fill, stroke, sw = BLUE_BG, BLUE, 2
+    elif hl == "orange":
+        fill, stroke, sw = ORANGE_BG, ORANGE, 2
+    sc.rect(x, y, w, h, fill=fill, stroke=stroke, sw=sw)
+    sc.text(x + w / 2, y + h / 2 + 5, text, size=size, weight="bold", anchor="middle", mono=True)
+
+
+def shift_row(sc, y0, kind, a, carry_in):
+    """ASL / LSR / ROL / ROR の 1 行。a は実行前の A、carry_in は実行前の C。"""
+    bx0, bw, pitch = 190, 44, 48
+    bits = [(a >> (7 - i)) & 1 for i in range(8)]  # 左から b7..b0
+    xs = [bx0 + i * pitch for i in range(8)]
+    left_c = kind in ("ASL", "ROL")
+    cx = 110 if left_c else 582
+    zx = 582 if kind == "ASL" else 110  # 0 を入れる箱(ASL は右、LSR は左)
+    sc.text(30, y0 + 24, kind, size=18, weight="bold", mono=True, fill=BLUE)
+    # C の箱
+    bitbox(sc, cx, y0, ("C " + str(carry_in)) if kind in ("ROL", "ROR") else "C", w=52)
+    for x, b in zip(xs, bits):
+        bitbox(sc, x, y0, str(b), hl="blue")
+    # 結果の計算
+    if kind == "ASL":
+        r, c = (a << 1) & 0xFF, a >> 7
+    elif kind == "LSR":
+        r, c = a >> 1, a & 1
+    elif kind == "ROL":
+        r, c = ((a << 1) & 0xFF) | carry_in, a >> 7
+    else:
+        r, c = (a >> 1) | (carry_in << 7), a & 1
+    mid = y0 + 17
+    if kind == "ASL":
+        top_x = xs[0] + bw / 2
+        sc.arrow([(top_x, y0), (top_x, y0 - 14), (cx + 26, y0 - 14), (cx + 26, y0)], None, color=BLUE)
+        bitbox(sc, zx, y0, "0", w=36)
+        sc.arrow([(zx, mid), (xs[7] + bw, mid)], None, color=BLUE)
+    elif kind == "LSR":
+        top_x = xs[7] + bw / 2
+        sc.arrow([(top_x, y0), (top_x, y0 - 14), (cx + 26, y0 - 14), (cx + 26, y0)], None, color=BLUE)
+        bitbox(sc, zx, y0, "0", w=36)
+        sc.arrow([(zx + 36, mid), (xs[0], mid)], None, color=BLUE)
+    elif kind == "ROL":
+        top_x = xs[0] + bw / 2
+        sc.arrow([(top_x, y0), (top_x, y0 - 14), (cx + 26, y0 - 14), (cx + 26, y0)], None, color=BLUE)
+        sc.arrow([(cx + 26, y0 + 34), (cx + 26, y0 + 50), (xs[7] + bw / 2, y0 + 50), (xs[7] + bw / 2, y0 + 34)], None, color=BLUE)
+    else:
+        top_x = xs[7] + bw / 2
+        sc.arrow([(top_x, y0), (top_x, y0 - 14), (cx + 26, y0 - 14), (cx + 26, y0)], None, color=BLUE)
+        sc.arrow([(cx + 26, y0 + 34), (cx + 26, y0 + 50), (xs[0] + bw / 2, y0 + 50), (xs[0] + bw / 2, y0 + 34)], None, color=BLUE)
+    rb = format(r, "08b")
+    sc.text(30, y0 + 70, f"実行後: A = %{rb[:4]} {rb[4:]}({h2(r)})、C = {c}", size=13, mono=False)
+    return r, c
+
+
+def f5_shift(sc):
+    a = 0xB1
+    for i in range(8):
+        sc.label(190 + i * 48 + 22, 90, f"b{7 - i}", anchor="middle")
+    sc.text(30, 56, f"実行前: A = %10110001({h2(a)})。ROL と ROR は、実行前の C が 1 の場合", size=13)
+    ys = [130, 250, 370, 490]
+    for y0, kind in zip(ys, ["ASL", "LSR", "ROL", "ROR"]):
+        shift_row(sc, y0, kind, a, 1)
+    sc.h = 610
+
+
+def stack_panel(sc, dy, kind):
+    """PHA / PLA の 1 面。SP = $FD、A = $42 の例。"""
+    sc.text(30, dy + 24, "PHA" if kind == "PHA" else "PLA", size=16, weight="bold", mono=True, fill=BLUE)
+    sc.label(545, dy + 30, "スタック(メモリ)", anchor="middle")
+    ys = {0x1FE: dy + 56, 0x1FD: dy + 92, 0x1FC: dy + 128}
+    cells = {}
+    if kind == "PHA":
+        sc.cell(470, ys[0x1FE], h4(0x1FE), "..", "dim", aw=72, vw=60)
+        cells[0x1FD] = sc.cell(470, ys[0x1FD], h4(0x1FD), "$42", "target", aw=72, vw=60)
+        sc.cell(470, ys[0x1FC], h4(0x1FC), "..", "dim", aw=72, vw=60)
+        sc.reg("A", dy + 92, "$42")
+        sc.reg("SP", dy + 150, "$FD → $FC", hl=True, w=140)
+        sc.arrow([(140, dy + 92), (470, dy + 92)], 1, badge=(300, dy + 92))
+        sc.arrow([(170, dy + 150), (310, dy + 150), (310, dy + 128), (470, dy + 128)], 2, badge=(240, dy + 150), color=ORANGE)
+        sc.steps(dy + 186, [
+            "① SP が指す番地 $01FD(= $0100 + $FD)に、A の値 $42 を書く。",
+            "② SP から 1 を引く。SP は $FD から $FC になり、次の書き込みは $01FC になる。",
+        ])
+    else:
+        sc.cell(470, ys[0x1FE], h4(0x1FE), "..", "dim", aw=72, vw=60)
+        cells[0x1FD] = sc.cell(470, ys[0x1FD], h4(0x1FD), "$42", "target", aw=72, vw=60)
+        sc.cell(470, ys[0x1FC], h4(0x1FC), "..", "dim", aw=72, vw=60)
+        sc.reg("A", dy + 92, "$42", hl=True)
+        sc.reg("SP", dy + 150, "$FC → $FD", hl=True, w=140)
+        sc.arrow([(170, dy + 150), (310, dy + 150), (310, dy + 128), (470, dy + 128)], 1, badge=(240, dy + 150))
+        sc.arrow([(470, dy + 92), (140, dy + 92)], 2, badge=(300, dy + 92), color=ORANGE)
+        sc.steps(dy + 186, [
+            "① SP に 1 を足す。SP は $FC から $FD になる。",
+            "② SP が指す番地 $01FD の内容 $42 を読んで、A に入れる。",
+        ])
+
+
+def f5_stack(sc):
+    stack_panel(sc, 50, "PHA")
+    stack_panel(sc, 290, "PLA")
+    sc.h = 560
+
+
+def f5_jsr_rts(sc):
+    # JSR($0300 にある 3 バイトの命令)
+    boxes = sc.bytes_row([("20", "オペコード"), ("40", "オペランド(下位)"), ("03", "オペランド(上位)")])
+    for i, a in enumerate(["$0300", "$0301", "$0302"]):
+        sc.label(boxes[i][0] + 32, 114, a, anchor="middle")
+    sc.reg("PC", 150, "$0340", hl=True, x=470)
+    sc.arrow([(358, 82), (410, 82), (410, 150), (470, 150)], 4, badge=(410, 110), color=ORANGE)
+    sc.reg("PC", 190, "$0303", sub="3 バイト読み終えた位置")
+    comp = sc.comp(250, 162, 170, ["PC − 1", "= $0302"])
+    sc.arrow([(140, 190), (250, 190)], 1, badge=(195, 190))
+    sc.label(555, 214, "スタック", anchor="middle")
+    sc.cell(470, 240, h4(0x1FD), "$03", "target", aw=72, vw=60)
+    sc.cell(470, 276, h4(0x1FC), "$02", "target", aw=72, vw=60)
+    sc.cell(470, 312, h4(0x1FB), "..", "dim", aw=72, vw=60)
+    sc.arrow([(420, 176), (445, 176), (445, 240), (470, 240)], 2, badge=(432, 176))
+    sc.arrow([(420, 202), (445, 202), (445, 276), (470, 276)], 3, badge=(432, 202))
+    sc.reg("SP", 300, "$FD → $FB", hl=True, w=140)
+    sc.steps(350, [
+        "① 3 バイトを読み終えた PC は $0303。",
+        "② ③ PC から 1 を引いた $0302 を、上位($03)、下位($02)の順に積む。$0302 は、JSR の最後のバイトの番地。",
+        "④ PC はオペランドの $0340 になる。SP は 2 減って $FB になる。",
+    ])
+    # RTS
+    dy = 470
+    sc.text(30, dy + 8, "RTS", size=16, weight="bold", mono=True, fill=BLUE)
+    sc.label(555, dy + 20, "スタック", anchor="middle")
+    sc.cell(470, dy + 40, h4(0x1FD), "$03", "target", aw=72, vw=60)
+    sc.cell(470, dy + 76, h4(0x1FC), "$02", "target", aw=72, vw=60)
+    sc.cell(470, dy + 112, h4(0x1FB), "..", "dim", aw=72, vw=60)
+    sc.reg("SP", dy + 76, "$FB → $FD", hl=True, w=140)
+    sc.comp(250, dy + 48, 170, ["$0302 + 1", "= $0303"])
+    sc.arrow([(470, dy + 76), (445, dy + 76), (445, dy + 90), (420, dy + 90)], 1, badge=(458, dy + 76))
+    sc.arrow([(470, dy + 40), (445, dy + 40), (445, dy + 62), (420, dy + 62)], 2, badge=(458, dy + 40))
+    sc.reg("PC", dy + 140, "$0303", hl=True)
+    sc.arrow([(335, dy + 104), (335, dy + 140), (140, dy + 140)], 3, badge=(250, dy + 140), color=ORANGE)
+    sc.steps(dy + 180, [
+        "① ② SP に 1 ずつ足しながら、下位($02)、上位($03)の順に取り出し、$0302 を作る。",
+        "③ 1 を足した $0303 を PC に入れる。$0303 は、JSR の次の命令の番地。",
+    ])
+    sc.h = dy + 224
+
+
+def f5_brk_rti(sc):
+    # BRK($0302 にある)
+    boxes = sc.bytes_row([("00", "オペコード"), ("99", "署名バイト(使われない)")], hl_from=9)
+    sc.label(boxes[0][0] + 32, 114, "$0302", anchor="middle")
+    sc.label(boxes[1][0] + 32, 114, "$0303", anchor="middle")
+    sc.reg("PC", 168, "$0304")
+    sc.reg("P", 222, "$24")
+    sc.label(555, 130, "スタック", anchor="middle")
+    sc.cell(470, 150, h4(0x1FD), "$03", "target", aw=72, vw=60)
+    sc.cell(470, 186, h4(0x1FC), "$04", "target", aw=72, vw=60)
+    sc.cell(470, 222, h4(0x1FB), "$34", "target", aw=72, vw=60)
+    sc.arrow([(140, 168), (430, 168), (430, 150), (470, 150)], 1, badge=(300, 168))
+    sc.arrow([(430, 168), (430, 186), (470, 186)], None)
+    sc.arrow([(140, 222), (470, 222)], 2, badge=(300, 222))
+    sc.label(555, 266, "割り込みベクタ", anchor="middle")
+    sc.cell(470, 292, h4(0xFFFE), "下位", "normal", aw=72, vw=60)
+    sc.cell(470, 328, h4(0xFFFF), "上位", "normal", aw=72, vw=60)
+    sc.reg("PC", 310, "ベクタの番地", hl=True, w=170)
+    sc.arrow([(470, 310), (200, 310)], 3, badge=(335, 310), color=ORANGE)
+    sc.steps(365, [
+        "① PC の $0304 を、上位($03)、下位($04)の順に積む。署名バイトの次の番地。",
+        "② P を積む。B(ビット 4)とビット 5 は 1 にして積む($24 は $34 になる)。",
+        "③ I を 1 にして、$FFFE(下位)と $FFFF(上位)の番地を PC に入れる。",
+    ])
+    dy = 480
+    sc.text(30, dy + 8, "RTI", size=16, weight="bold", mono=True, fill=BLUE)
+    sc.label(555, dy + 20, "スタック", anchor="middle")
+    sc.cell(470, dy + 40, h4(0x1FD), "$03", "target", aw=72, vw=60)
+    sc.cell(470, dy + 76, h4(0x1FC), "$04", "target", aw=72, vw=60)
+    sc.cell(470, dy + 112, h4(0x1FB), "$34", "target", aw=72, vw=60)
+    sc.reg("P", dy + 112, "$34 → $24", hl=True, w=140)
+    sc.reg("PC", dy + 58, "$0304", hl=True)
+    sc.arrow([(470, dy + 112), (170, dy + 112)], 1, badge=(320, dy + 112), color=ORANGE)
+    sc.arrow([(470, dy + 58), (140, dy + 58)], 2, badge=(300, dy + 58), color=ORANGE)
+    sc.steps(dy + 160, [
+        "① P を取り出す。B は取り込まず、ビット 5 は 1 にする。",
+        "② PC の下位($04)、上位($03)の順に取り出す。RTS と違って、1 を足さない。",
+    ])
+    sc.h = dy + 205
+
+
+def branch_panel(sc, x0, title, rows, bi, ti, offtxt):
+    """rows: [(addr, bytes, asm, kind)]。bi は分岐の行、ti は飛び先の行。"""
+    sc.text(x0, 64, title, size=14, weight="bold")
+    ys = [100 + i * 38 for i in range(len(rows))]
+    for (addr, bs, asm, kind), y in zip(rows, ys):
+        fill, stroke, sw = BOX, LINE, 1.2
+        if kind == "branch":
+            fill, stroke, sw = BLUE_BG, BLUE, 2
+        elif kind == "target":
+            fill, stroke, sw = ORANGE_BG, ORANGE, 2
+        elif kind == "dim":
+            fill, stroke = "#ffffff", "#d0d7de"
+        sc.rect(x0, y - 15, 64, 30, fill=fill, stroke=stroke, sw=sw)
+        sc.rect(x0 + 64, y - 15, 84, 30, fill=fill, stroke=stroke, sw=sw)
+        sc.rect(x0 + 148, y - 15, 112, 30, fill=fill, stroke=stroke, sw=sw)
+        tc = MUTED if kind == "dim" else INK
+        sc.text(x0 + 32, y + 5, addr, size=13, anchor="middle", mono=True, fill=tc)
+        sc.text(x0 + 106, y + 5, bs, size=13, anchor="middle", mono=True, fill=tc)
+        sc.text(x0 + 204, y + 5, asm, size=13, anchor="middle", mono=True, fill=tc, weight="bold")
+    xr = x0 + 260
+    sc.arrow([(xr, ys[bi]), (xr + 24, ys[bi]), (xr + 24, ys[ti]), (xr, ys[ti])], 1, badge=(xr + 24, (ys[bi] + ys[ti]) / 2), color=ORANGE)
+    sc.text(x0, ys[-1] + 34, offtxt, size=13)
+
+
+def f5_branch(sc):
+    branch_panel(sc, 30, "前へ分岐(距離 +2)", [
+        ("$0302", "D0 02", "BNE $0306", "branch"),
+        ("$0304", "A9 EE", "LDA #$EE", "dim"),
+        ("$0306", "8D F0 03", "STA $03F0", "target"),
+    ], 0, 2, "次の命令 $0304 + $02 = $0306")
+    branch_panel(sc, 380, "後ろへ分岐(距離 −3)", [
+        ("$0302", "CA", "DEX", "target"),
+        ("$0303", "D0 FD", "BNE $0302", "branch"),
+        ("$0305", "8E F0 03", "STX $03F0", "dim"),
+    ], 1, 0, "次の命令 $0305 + $FD(−3) = $0302")
+    sc.steps(250, [
+        "距離は、分岐命令の次の命令の番地から測る。$FD は、符号付きの 8 ビットで −3。",
+        "条件が成り立たないとき、PC は次の命令に進む。成り立つときだけ、PC に距離を足す。",
+    ])
+    sc.h = 310
+
+
+def f5_bit(sc):
+    m = 0xC0
+    a = 0x01
+    sc.text(30, 56, f"BIT $0400(メモリの内容 {h2(m)}、A = {h2(a)} の例)", size=14, weight="bold")
+    xs = [30 + i * 48 for i in range(8)]
+    for i, x in enumerate(xs):
+        sc.label(x + 22, 76, f"b{7 - i}", anchor="middle")
+        bitbox(sc, x, 82, str((m >> (7 - i)) & 1), hl="blue" if i < 2 else None)
+    sc.label(30, 134, "メモリ $0400 の内容", anchor="start")
+    bitbox(sc, xs[0], 190, "N = 1", w=44, hl="orange", size=13)
+    bitbox(sc, xs[1], 190, "V = 1", w=44, hl="orange", size=13)
+    sc.arrow([(xs[0] + 22, 116), (xs[0] + 22, 190)], 1, badge=(xs[0] + 22, 160))
+    sc.arrow([(xs[1] + 22, 116), (xs[1] + 22, 190)], 2, badge=(xs[1] + 22, 160))
+    sc.text(xs[0], 250, "ビット 7 → N、ビット 6 → V", size=12, fill=MUTED)
+    sc.reg("A", 99, h2(a), x=500)
+    sc.comp(440, 170, 220, ["A AND M", f"{h2(a)} AND {h2(m)} = $00"])
+    sc.arrow([(414, 99), (470, 99), (470, 170)], 3, badge=(442, 99))
+    sc.arrow([(555, 116), (555, 170)], 4, badge=(555, 143))
+    bitbox(sc, 520, 250, "Z = 1", w=60, hl="orange", size=13)
+    sc.arrow([(550, 226), (550, 250)], 5, badge=(550, 238), color=ORANGE)
+    sc.steps(310, [
+        "① ② メモリの内容のビット 7 が N に、ビット 6 が V に、そのまま写る。",
+        "③ ④ A とメモリの内容を AND する。結果そのものは捨てて、A は変わらない。",
+        "⑤ AND の結果が 0 なら、Z を 1 にする。",
+    ])
+    sc.h = 396
+
+
+REF = [
+    ("shift", "ビットの動き(ASL、LSR、ROL、ROR)", "ASL、LSR、ROL、ROR が、A の 8 ビットとキャリーをどう動かすか。", "", f5_shift),
+    ("stack", "スタック(PHA と PLA)", "PHA が SP の指す番地に A を書いて SP を 1 減らし、PLA が SP を 1 増やして A に読むこと。", "", f5_stack),
+    ("jsr-rts", "JSR と RTS", "JSR が戻り番地(最後のバイトの番地)を積み、RTS が 1 を足して戻ること。", "", f5_jsr_rts),
+    ("brk-rti", "BRK と RTI", "BRK が PC と P を積んでベクタへ飛び、RTI が P と PC を取り出して戻ること。", "", f5_brk_rti),
+    ("branch", "分岐の飛び先", "分岐命令の距離は、次の命令の番地から測ること。前へも後ろへも分岐できること。", "", f5_branch),
+    ("bit", "BIT のフラグ", "BIT がメモリの上位 2 ビットを N と V に写し、A との AND で Z を決めること。", "", f5_bit),
+]
+
+
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     for name, title, desc, asm, fn in MODES:
         p = build(name, title, desc, asm, fn)
+        print(os.path.normpath(p))
+    for name, title, desc, asm, fn in REF:
+        p = build(name, title, desc, asm, fn, prefix="05")
         print(os.path.normpath(p))
 
 

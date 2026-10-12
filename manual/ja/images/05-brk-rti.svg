@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="685" viewBox="0 0 720 685" role="img" aria-labelledby="t d">
+<title id="t">BRK と RTI</title>
+<desc id="d">BRK が PC と P を積んでベクタへ飛び、RTI が P と PC を取り出して戻ること。</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="684" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">BRK と RTI</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="62" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">オペコード</text>
+<rect x="30" y="66" width="64" height="32" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="62" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">00</text>
+<text x="162" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">署名バイト(使われない)</text>
+<rect x="130" y="66" width="64" height="32" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="162" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">99</text>
+<text x="62" y="114" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">$0302</text>
+<text x="162" y="114" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">$0303</text>
+<rect x="30" y="151.0" width="110" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="40" y="173.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">PC</text>
+<text x="130" y="173.0" font-size="14" font-weight="bold" text-anchor="end" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0304</text>
+<rect x="30" y="205.0" width="110" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="40" y="227.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">P</text>
+<text x="130" y="227.0" font-size="14" font-weight="bold" text-anchor="end" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$24</text>
+<text x="555" y="130" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">スタック</text>
+<rect x="470" y="136.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="542" y="136.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="506.0" y="155.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$01FD</text>
+<text x="572.0" y="155.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$03</text>
+<rect x="470" y="172.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="542" y="172.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="506.0" y="191.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$01FC</text>
+<text x="572.0" y="191.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$04</text>
+<rect x="470" y="208.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="542" y="208.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="506.0" y="227.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$01FB</text>
+<text x="572.0" y="227.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$34</text>
+<path d="M 140 168 L 430 168 L 430 150 L 470 150" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="300" cy="168" r="10" fill="#0969da"/>
+<text x="300" y="172.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">1</text>
+<path d="M 430 168 L 430 186 L 470 186" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 140 222 L 470 222" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="300" cy="222" r="10" fill="#0969da"/>
+<text x="300" y="226.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">2</text>
+<text x="555" y="266" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">割り込みベクタ</text>
+<rect x="470" y="278.0" width="72" height="28" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<rect x="542" y="278.0" width="60" height="28" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="506.0" y="297.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$FFFE</text>
+<text x="572.0" y="297.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">下位</text>
+<rect x="470" y="314.0" width="72" height="28" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<rect x="542" y="314.0" width="60" height="28" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="506.0" y="333.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$FFFF</text>
+<text x="572.0" y="333.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">上位</text>
+<rect x="30" y="293.0" width="170" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="40" y="315.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">PC</text>
+<text x="190" y="315.0" font-size="14" font-weight="bold" text-anchor="end" fill="#bc4c00" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ベクタの番地</text>
+<path d="M 470 310 L 200 310" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<circle cx="335" cy="310" r="10" fill="#bc4c00"/>
+<text x="335" y="314.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">3</text>
+<text x="30" y="365" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">① PC の $0304 を、上位($03)、下位($04)の順に積む。署名バイトの次の番地。</text>
+<text x="30" y="387" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">② P を積む。B(ビット 4)とビット 5 は 1 にして積む($24 は $34 になる)。</text>
+<text x="30" y="409" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">③ I を 1 にして、$FFFE(下位)と $FFFF(上位)の番地を PC に入れる。</text>
+<text x="30" y="488" font-size="16" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">RTI</text>
+<text x="555" y="500" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">スタック</text>
+<rect x="470" y="506.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="542" y="506.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="506.0" y="525.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$01FD</text>
+<text x="572.0" y="525.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$03</text>
+<rect x="470" y="542.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="542" y="542.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="506.0" y="561.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$01FC</text>
+<text x="572.0" y="561.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$04</text>
+<rect x="470" y="578.0" width="72" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="542" y="578.0" width="60" height="28" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="506.0" y="597.0" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$01FB</text>
+<text x="572.0" y="597.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$34</text>
+<rect x="30" y="575.0" width="140" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="40" y="597.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">P</text>
+<text x="160" y="597.0" font-size="14" font-weight="bold" text-anchor="end" fill="#bc4c00" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$34 → $24</text>
+<rect x="30" y="521.0" width="110" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="40" y="543.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">PC</text>
+<text x="130" y="543.0" font-size="14" font-weight="bold" text-anchor="end" fill="#bc4c00" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0304</text>
+<path d="M 470 592 L 170 592" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<circle cx="320" cy="592" r="10" fill="#bc4c00"/>
+<text x="320" y="596.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">1</text>
+<path d="M 470 538 L 140 538" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<circle cx="300" cy="538" r="10" fill="#bc4c00"/>
+<text x="300" y="542.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">2</text>
+<text x="30" y="640" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">① P を取り出す。B は取り込まず、ビット 5 は 1 にする。</text>
+<text x="30" y="662" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">② PC の下位($04)、上位($03)の順に取り出す。RTS と違って、1 を足さない。</text>
+</svg>

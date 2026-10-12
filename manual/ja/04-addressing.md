@@ -569,6 +569,4 @@ X は、表の何番目かを選びます。番地は 2 バイトなので、X �
 
 1. MOS Technology, "MCS6500 Microcomputer Family Hardware Manual", 1976年1月版: https://www.commodore.ca/wp-content/uploads/2018/11/kim1_hardware.txt
 
-## 次の章
-
-第5章「命令リファレンス」は準備中です。
+次の章: [5. 命令リファレンス →](05-reference.md)
