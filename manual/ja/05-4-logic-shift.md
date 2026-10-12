@@ -1,5 +1,7 @@
 # 5.4 論理演算とシフト
 
+[日本語](05-4-logic-shift.md) | [English](../en/05-4-logic-shift.md)
+
 [← 5.3 算術演算と比較](05-3-arithmetic.md) &nbsp;·&nbsp; [5.5 分岐とジャンプ →](05-5-branch-jump.md) &nbsp;·&nbsp; [章の入口](05-reference.md)
 
 ビットごとの論理演算(AND、OR、XOR)と、ビットを横にずらすシフト、キャリーを含めて回すローテートを扱う分類です。

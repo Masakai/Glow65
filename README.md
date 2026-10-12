@@ -1,6 +1,6 @@
 # Glow65
 
-**English** | [日本語](README.ja.md) | [Website](https://masakai.github.io/Glow65/) | [Promo video](https://masakai.github.io/Glow65/#video)
+**English** | [日本語](README.ja.md) | [Website](https://masakai.github.io/Glow65/) | [Promo video](https://masakai.github.io/Glow65/#video) | [Manual](manual/en/README.md)
 
 **I built this emulator to learn the 6502.** It has a GUI with LEDs that light up like the front panel of an old computer, so you can see what the CPU is doing.
 
@@ -46,6 +46,8 @@ See [NOTICE.md](NOTICE.md) for details.
 ## Write your own program
 
 Glow65 is for learning, so the first thing to try is your own program. The [tutorial](tutorial/README.md) has six chapters: [an LED counter](tutorial/README.md) (assemble or type the bytes, load, run, then slow the CPU down and step through every bus access), [16-bit addition and the carry flag](tutorial/02-addition.md), [printing text through the UART](tutorial/03-uart.md), [reading the keyboard with an echo program](tutorial/04-echo.md), [calling machine code from BASIC with `USR`](tutorial/05-usr.md), and [interrupts](tutorial/06-interrupts.md) (the NMI button and a UART receive IRQ).
+
+To learn how the 6502 works, read the [manual](manual/en/README.md): the history of the 6502, bits and bytes, the CPU, addressing modes, all 151 instructions, flags, the stack, interrupts, and the memory map. It is also available in [Japanese](manual/ja/README.md).
 
 ## Quick start
 
@@ -190,6 +192,7 @@ Sources/Glow65App/     SwiftUI app: front panel, terminal, startup banner
 ROM/monitor.s         Monitor ROM source (ca65)
 ROM/basic/            BASIC: upstream source, prelude, linker config
 Tools/                Build and conversion scripts (assemble.sh builds your own programs)
+manual/               Manual: eight chapters (English and Japanese), diagram generators
 tutorial/             Tutorial: six chapters (LED counter, addition, UART, echo, USR, interrupts) with sample programs
 Tests/                Unit and integration tests
 documents/designs/    Design document (Japanese)

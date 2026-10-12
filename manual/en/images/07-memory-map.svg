@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="630" viewBox="0 0 720 630" role="img" aria-labelledby="t d">
+<title id="t">Whole memory map</title>
+<desc id="d">How the 64KB address space of Glow65 is allocated, and the main uses of RAM.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="629" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Whole memory map</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<rect x="30" y="62" width="230" height="56" rx="3" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="145.0" y="88.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$F000-$FFFF</text>
+<text x="145.0" y="105.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Monitor ROM and vectors</text>
+<rect x="30" y="118" width="230" height="72" rx="3" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="145.0" y="152.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$C000-$EFFF</text>
+<text x="145.0" y="169.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">BASIC ROM</text>
+<rect x="30" y="190" width="230" height="50" rx="4" fill="#ffffff" stroke="#8c959f" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="145.0" y="213.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$A100-$BFFF</text>
+<text x="145.0" y="230.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Nothing connected</text>
+<rect x="30" y="240" width="230" height="40" rx="3" fill="#d8dee4" stroke="#1f2328" stroke-width="2"/>
+<text x="145.0" y="258.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$A000-$A0FF</text>
+<text x="145.0" y="275.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">UART</text>
+<rect x="30" y="280" width="230" height="50" rx="4" fill="#ffffff" stroke="#8c959f" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="145.0" y="303.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$8000-$9FFF</text>
+<text x="145.0" y="320.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Nothing connected</text>
+<rect x="30" y="330" width="230" height="228" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="145.0" y="442.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0000-$7FFF</text>
+<text x="145.0" y="459.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">RAM (32KB)</text>
+<text x="410" y="322" font-size="12" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Main uses of RAM</text>
+<rect x="410" y="330" width="280" height="62" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="420" y="366.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0400-$7FFF</text>
+<text x="522" y="366.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">BASIC program, variables</text>
+<rect x="410" y="392" width="280" height="30" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="420" y="412.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$03F8-$03FB</text>
+<text x="522" y="412.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Interrupt vectors (RAM)</text>
+<rect x="410" y="422" width="280" height="38" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="420" y="446.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0300-$03F7</text>
+<text x="522" y="446.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">User programs</text>
+<rect x="410" y="460" width="280" height="38" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="420" y="484.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0200-$027F</text>
+<text x="522" y="484.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Monitor line buffer</text>
+<rect x="410" y="498" width="280" height="30" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="420" y="518.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0100-$01FF</text>
+<text x="522" y="518.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Stack</text>
+<rect x="410" y="528" width="280" height="30" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="420" y="548.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0000-$00FF</text>
+<text x="522" y="548.0" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Zero page</text>
+<line x1="260" y1="330" x2="410" y2="330" stroke="#0969da" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="260" y1="558" x2="410" y2="558" stroke="#0969da" stroke-width="1.2" stroke-dasharray="4 3"/>
+<rect x="30" y="572" width="22" height="16" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="41.0" y="585.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="60" y="585" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">RAM</text>
+<rect x="150" y="572" width="22" height="16" rx="3" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="161.0" y="585.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="180" y="585" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">ROM</text>
+<rect x="270" y="572" width="22" height="16" rx="3" fill="#d8dee4" stroke="#1f2328" stroke-width="2"/>
+<text x="281.0" y="585.0" font-size="12" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="300" y="585" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">I/O</text>
+<rect x="390" y="572" width="22" height="16" rx="4" fill="#ffffff" stroke="#8c959f" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="420" y="585" font-size="12" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Not connected</text>
+<text x="30" y="612" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Reading an unconnected address returns $FF, and writing to it is ignored. Writes to ROM are ignored too.</text>
+</svg>

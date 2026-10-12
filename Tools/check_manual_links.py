@@ -94,7 +94,13 @@ def main():
             if m:
                 print(f"{slug(m.group(2))}\t{m.group(2)}")
         return 0
-    files = sorted(os.path.join(MANUAL, f) for f in os.listdir(MANUAL) if f.endswith(".md"))
+    # --lang ja|en で言語を選ぶ。省略すると、存在するすべての言語を検査する
+    langs = [sys.argv[sys.argv.index("--lang") + 1]] if "--lang" in sys.argv else ["ja", "en"]
+    files = []
+    for lang in langs:
+        d = os.path.join(ROOT, "manual", lang)
+        if os.path.isdir(d):
+            files += sorted(os.path.join(d, f) for f in os.listdir(d) if f.endswith(".md"))
     total = 0
     for f in files:
         for no, url, why in check_file(f):

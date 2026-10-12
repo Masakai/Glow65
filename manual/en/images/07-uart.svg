@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="490" viewBox="0 0 720 490" role="img" aria-labelledby="t d">
+<title id="t">UART registers</title>
+<desc id="d">The meaning of the bits in the UART status, control and data registers.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="489" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">UART registers</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="30" y="62" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Minimal MC6850-style layout</text>
+<text x="30" y="100" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Status register (read $A000)</text>
+<text x="68" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 7</text>
+<text x="152" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 6</text>
+<text x="236" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 5</text>
+<text x="320" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 4</text>
+<text x="404" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 3</text>
+<text x="488" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 2</text>
+<text x="572" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 1</text>
+<text x="656" y="118" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 0</text>
+<rect x="30" y="124" width="76" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="68.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">IRQ</text>
+<text x="68" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Interrupt</text>
+<text x="68" y="191" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">pending</text>
+<rect x="114" y="124" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="152.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="152" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="198" y="124" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="236.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="236" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="282" y="124" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="320.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="320" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="366" y="124" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="404.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="404" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="450" y="124" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="488.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="488" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="534" y="124" width="76" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="572.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">TDRE</text>
+<text x="572" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Can send</text>
+<rect x="618" y="124" width="76" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="656.0" y="146.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">RDRF</text>
+<text x="656" y="176" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Byte received</text>
+<text x="30" y="250" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Control register (write $A000)</text>
+<text x="68" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 7</text>
+<text x="152" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 6</text>
+<text x="236" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 5</text>
+<text x="320" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 4</text>
+<text x="404" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 3</text>
+<text x="488" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 2</text>
+<text x="572" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 1</text>
+<text x="656" y="268" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Bit 0</text>
+<rect x="30" y="274" width="76" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="68.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">RIE</text>
+<text x="68" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">RX interrupt</text>
+<text x="68" y="341" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">enable</text>
+<rect x="114" y="274" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="152.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">-</text>
+<text x="152" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="198" y="274" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="236.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">-</text>
+<text x="236" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="282" y="274" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="320.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">-</text>
+<text x="320" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="366" y="274" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="404.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">-</text>
+<text x="404" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="450" y="274" width="76" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="488.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">-</text>
+<text x="488" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Unused</text>
+<rect x="534" y="274" width="76" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="572.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<text x="572" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">11 means</text>
+<rect x="618" y="274" width="76" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="656.0" y="296.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<text x="656" y="326" font-size="11" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">master reset</text>
+<text x="30" y="410" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Data register ($A001)</text>
+<rect x="30" y="420" width="330" height="42" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="195" y="446" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Read: the received byte</text>
+<rect x="372" y="420" width="330" height="42" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="537" y="446" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Write: the byte to send</text>
+</svg>

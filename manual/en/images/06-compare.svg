@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="340" viewBox="0 0 720 340" role="img" aria-labelledby="t d">
+<title id="t">CMP results and flags</title>
+<desc id="d">How to read C, Z and N after CMP, and which branch instruction goes with each result.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="339" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">CMP results and flags</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="30" y="62" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Results of comparing with different values of M when A = $30</text>
+<text x="358" y="90" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">C</text>
+<text x="428" y="90" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Z</text>
+<text x="498" y="90" font-size="14" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">N</text>
+<text x="540" y="90" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Branch to use</text>
+<text x="30" y="128" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">A &lt; M</text>
+<text x="130" y="128" font-size="14" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">CMP #$40</text>
+<rect x="330" y="108" width="56" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="358.0" y="130.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="400" y="108" width="56" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="428.0" y="130.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="470" y="108" width="56" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="498.0" y="130.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<text x="540" y="130" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">BCC (C=0)</text>
+<text x="30" y="184" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">A = M</text>
+<text x="130" y="184" font-size="14" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">CMP #$30</text>
+<rect x="330" y="164" width="56" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="358.0" y="186.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="400" y="164" width="56" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="428.0" y="186.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="470" y="164" width="56" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="498.0" y="186.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="540" y="186" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">BEQ (Z=1)</text>
+<text x="30" y="240" font-size="18" font-weight="bold" text-anchor="start" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">A &gt; M</text>
+<text x="130" y="240" font-size="14" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">CMP #$20</text>
+<rect x="330" y="220" width="56" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="358.0" y="242.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="400" y="220" width="56" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="428.0" y="242.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="470" y="220" width="56" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="498.0" y="242.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="540" y="242" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">BCS (C=1), BNE (Z=0)</text>
+<text x="30" y="296" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">C is 1 when A is greater than or equal to M. Z is 1 when A equals M. N is the top bit of A − M.</text>
+<text x="30" y="318" font-size="13" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">N does not directly show signed order. The comparison treats both values as unsigned.</text>
+</svg>

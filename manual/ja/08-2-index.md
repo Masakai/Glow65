@@ -1,5 +1,7 @@
 # 8.2 索引
 
+[日本語](08-2-index.md) | [English](../en/08-2-index.md)
+
 [← 8.1 用語集](08-1-glossary.md) &nbsp;·&nbsp; [章の入口](08-glossary-index.md)
 
 ## 8.2.1 命令の索引

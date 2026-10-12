@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="310" viewBox="0 0 720 310" role="img" aria-labelledby="t d">
+<title id="t">Branch destination</title>
+<desc id="d">A branch offset is measured from the address of the next instruction. A branch can go forward or backward.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="309" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Branch destination</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<text x="30" y="64" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Branch forward (offset +2)</text>
+<rect x="30" y="85" width="64" height="30" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="94" y="85" width="84" height="30" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="178" y="85" width="112" height="30" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="62" y="105" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0302</text>
+<text x="136" y="105" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">D0 02</text>
+<text x="234" y="105" font-size="13" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">BNE $0306</text>
+<rect x="30" y="123" width="64" height="30" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="94" y="123" width="84" height="30" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="178" y="123" width="112" height="30" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="62" y="143" font-size="13" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0304</text>
+<text x="136" y="143" font-size="13" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">A9 EE</text>
+<text x="234" y="143" font-size="13" font-weight="bold" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LDA #$EE</text>
+<rect x="30" y="161" width="64" height="30" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<rect x="94" y="161" width="84" height="30" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<rect x="178" y="161" width="112" height="30" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="62" y="181" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0306</text>
+<text x="136" y="181" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">8D F0 03</text>
+<text x="234" y="181" font-size="13" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">STA $03F0</text>
+<path d="M 290 100 L 314 100 L 314 176 L 290 176" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<circle cx="314" cy="138.0" r="10" fill="#bc4c00"/>
+<text x="314" y="142.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">1</text>
+<text x="30" y="210" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Next instruction $0304 + $02 = $0306</text>
+<text x="380" y="64" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Branch backward (offset −3)</text>
+<rect x="380" y="85" width="64" height="30" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<rect x="444" y="85" width="84" height="30" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<rect x="528" y="85" width="112" height="30" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="412" y="105" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0302</text>
+<text x="486" y="105" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">CA</text>
+<text x="584" y="105" font-size="13" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">DEX</text>
+<rect x="380" y="123" width="64" height="30" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="444" y="123" width="84" height="30" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<rect x="528" y="123" width="112" height="30" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="412" y="143" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0303</text>
+<text x="486" y="143" font-size="13" font-weight="normal" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">D0 FD</text>
+<text x="584" y="143" font-size="13" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">BNE $0302</text>
+<rect x="380" y="161" width="64" height="30" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="444" y="161" width="84" height="30" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="528" y="161" width="112" height="30" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="412" y="181" font-size="13" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$0305</text>
+<text x="486" y="181" font-size="13" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">8E F0 03</text>
+<text x="584" y="181" font-size="13" font-weight="bold" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">STX $03F0</text>
+<path d="M 640 138 L 664 138 L 664 100 L 640 100" fill="none" stroke="#bc4c00" stroke-width="2" marker-end="url(#ao)"/>
+<circle cx="664" cy="119.0" r="10" fill="#bc4c00"/>
+<text x="664" y="123.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">1</text>
+<text x="380" y="210" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Next instruction $0305 + $FD (−3) = $0302</text>
+<text x="30" y="250" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">The offset is measured from the address of the instruction after the branch. $FD is −3 as a signed 8-bit value.</text>
+<text x="30" y="272" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">If the condition is false, PC goes to the next instruction. Only if true is the offset added.</text>
+</svg>

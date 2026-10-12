@@ -1,5 +1,7 @@
 # 5.2 レジスタ間の転送
 
+[日本語](05-2-transfer.md) | [English](../en/05-2-transfer.md)
+
 [← 5.1 ロードとストア](05-1-load-store.md) &nbsp;·&nbsp; [5.3 算術演算と比較 →](05-3-arithmetic.md) &nbsp;·&nbsp; [章の入口](05-reference.md)
 
 レジスタの値を、別のレジスタにコピーします。コピー元の値は変わりません。TXS を除いて、N と Z がコピーした値で決まります。

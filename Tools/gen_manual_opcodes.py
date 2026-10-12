@@ -2,8 +2,9 @@
 """マニュアル第5章(命令リファレンス)の、オペコード表とフラグ表を生成する。
 
 使い方:
-    python3 Tools/gen_manual_opcodes.py           # manual/ja/05-*.md のマーカー間を書き換える
+    python3 Tools/gen_manual_opcodes.py           # manual/ja/05-*.md と manual/en/05-*.md のマーカー間を書き換える
     python3 Tools/gen_manual_opcodes.py --check   # 書き換えが不要なら 0、差があれば 1 を返す
+    --lang ja|en|all                              # 対象の言語(省略時は all)
 
 元データ: Sources/Core6502/OpcodeTable.swift の `table`(NMOS 6502 の公式 151 命令)。
 マーカー:
@@ -18,7 +19,7 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 SWIFT = os.path.join(ROOT, "Sources", "Core6502", "OpcodeTable.swift")
-MANUAL = os.path.join(ROOT, "manual", "ja")
+MANUAL_DIR = {"ja": os.path.join(ROOT, "manual", "ja"), "en": os.path.join(ROOT, "manual", "en")}
 
 # 分類: キー -> (ファイル名, タイトル)
 GROUPS = {
@@ -126,6 +127,66 @@ MODE_BYTES = {"implied": 1, "accumulator": 1, "immediate": 2, "zeroPage": 2, "ze
 PAGE_CROSS_OPS = {"adc", "and", "bit", "cmp", "eor", "lda", "ldx", "ldy", "ora", "sbc"}
 PAGE_CROSS_MODES = {"absoluteX", "absoluteY", "indirectIndexed"}
 
+# 言語別の設定。ja の出力は従来と同じでなければならない。
+LANG = {
+    "ja": {
+        "group_title": {k: v[1] for k, v in GROUPS.items()},
+        "mode_name": MODE_NAME,
+        "opcode_head": ["アドレッシングモード", "書き方", "オペコード", "バイト数", "サイクル数"],
+        "list_head": ["ニーモニック", "名前", "機能", "影響するフラグ"],
+        "none": "なし",
+        "restored": "復元",
+        "page_cross": "{c}+",
+        "branch": "{c} (+1,+2)",
+    },
+    "en": {
+        "mode_name": {
+            "implied": "Implied", "accumulator": "Accumulator", "immediate": "Immediate",
+            "zeroPage": "Zero page", "zeroPageX": "Zero page,X", "zeroPageY": "Zero page,Y",
+            "absolute": "Absolute", "absoluteX": "Absolute,X", "absoluteY": "Absolute,Y",
+            "indirect": "Indirect", "indexedIndirect": "Indexed indirect `(zp,X)`",
+            "indirectIndexed": "Indirect indexed `(zp),Y`", "relative": "Relative",
+        },
+        "opcode_head": ["Addressing mode", "Syntax", "Opcode", "Bytes", "Cycles"],
+        "list_head": ["Mnemonic", "Name", "Function", "Flags affected"],
+        "none": "None",
+        "restored": "Restored",
+        "page_cross": "{c}+",
+        "branch": "{c} (+1, +2)",
+    },
+}
+
+# 英語版の一覧用の機能説明(INSTR の日本語の説明に対応する)
+FUNC_EN = {
+    "LDA": "Loads a value from memory into A", "LDX": "Loads a value from memory into X",
+    "LDY": "Loads a value from memory into Y", "STA": "Writes the value of A to memory",
+    "STX": "Writes the value of X to memory", "STY": "Writes the value of Y to memory",
+    "TAX": "Copies the value of A to X", "TAY": "Copies the value of A to Y",
+    "TXA": "Copies the value of X to A", "TYA": "Copies the value of Y to A",
+    "TSX": "Copies the value of SP to X", "TXS": "Copies the value of X to SP",
+    "ADC": "Adds the memory value and the carry to A", "SBC": "Subtracts the memory value and the borrow from A",
+    "CMP": "Compares A with a memory value", "CPX": "Compares X with a memory value",
+    "CPY": "Compares Y with a memory value", "INC": "Adds 1 to a memory value",
+    "DEC": "Subtracts 1 from a memory value", "INX": "Adds 1 to X", "INY": "Adds 1 to Y",
+    "DEX": "Subtracts 1 from X", "DEY": "Subtracts 1 from Y",
+    "AND": "Bitwise AND of A and a memory value", "ORA": "Bitwise OR of A and a memory value",
+    "EOR": "Bitwise XOR of A and a memory value",
+    "BIT": "ANDs A with a memory value to set Z, and copies the top 2 bits of the memory value to N and V",
+    "ASL": "Shifts left by 1 bit; the most significant bit goes out to C",
+    "LSR": "Shifts right by 1 bit; the least significant bit goes out to C",
+    "ROL": "Rotates left by 1 bit through C", "ROR": "Rotates right by 1 bit through C",
+    "BCC": "Branches if C is 0", "BCS": "Branches if C is 1", "BEQ": "Branches if Z is 1",
+    "BNE": "Branches if Z is 0", "BMI": "Branches if N is 1", "BPL": "Branches if N is 0",
+    "BVC": "Branches if V is 0", "BVS": "Branches if V is 1", "JMP": "Jumps to the given address",
+    "JSR": "Pushes the return address and jumps to the given address",
+    "RTS": "Pulls the return address and returns", "BRK": "Causes a software interrupt",
+    "RTI": "Pulls P and the return address and returns",
+    "PHA": "Pushes A onto the stack", "PLA": "Pulls A from the stack", "PHP": "Pushes P onto the stack",
+    "PLP": "Pulls P from the stack", "CLC": "Sets C to 0", "SEC": "Sets C to 1",
+    "CLI": "Enables interrupts", "SEI": "Disables interrupts", "CLD": "Leaves decimal mode",
+    "SED": "Enters decimal mode", "CLV": "Sets V to 0", "NOP": "Does nothing",
+}
+
 
 def load_table():
     """OpcodeTable.swift の `table`(NMOS 6502)から {ニーモニック: [(オペコード, モード, サイクル)]} を作る。"""
@@ -140,40 +201,47 @@ def load_table():
     return result
 
 
-def cycles_text(op, mode, cyc):
+def cycles_text(op, mode, cyc, lang="ja"):
+    c = LANG[lang]
     if mode == "relative":
-        return f"{cyc} (+1,+2)"
+        return c["branch"].format(c=cyc)
     if op.lower() in PAGE_CROSS_OPS and mode in PAGE_CROSS_MODES:
-        return f"{cyc}+"
+        return c["page_cross"].format(c=cyc)
     return str(cyc)
 
 
-def opcode_table(mn, table):
+def opcode_table(mn, table, lang="ja"):
+    c = LANG[lang]
     rows = sorted(table[mn], key=lambda r: (MODE_ORDER.index(r[1]), r[0]))
-    out = ["| アドレッシングモード | 書き方 | オペコード | バイト数 | サイクル数 |", "|---|---|---|---|---|"]
+    out = ["| " + " | ".join(c["opcode_head"]) + " |", "|---|---|---|---|---|"]
     for code, mode, cyc in rows:
         syn = MODE_SYNTAX[mode].format(m=mn)
-        out.append(f"| {MODE_NAME[mode]} | `{syn}` | `${code:02X}` | {MODE_BYTES[mode]} | {cycles_text(mn, mode, cyc)} |")
+        out.append(f"| {c['mode_name'][mode]} | `{syn}` | `${code:02X}` | {MODE_BYTES[mode]} | {cycles_text(mn, mode, cyc, lang)} |")
     return "\n".join(out)
 
 
-def flag_table(flags):
+def flag_table(flags, lang="ja"):
     head = "| " + " | ".join(FL) + " |"
     sep = "|" + "---|" * len(FL)
-    row = "| " + " | ".join(flags[f] for f in FL) + " |"
+    row = "| " + " | ".join(flags[f].replace("復元", LANG[lang]["restored"]) for f in FL) + " |"
     return "\n".join([head, sep, row])
 
 
-def flag_summary(flags):
+def flag_summary(flags, lang="ja"):
     ch = [f for f in FL if flags[f] != "-"]
-    return " ".join(ch) if ch else "なし"
+    return " ".join(ch) if ch else LANG[lang]["none"]
 
 
-def list_table():
-    out = ["| ニーモニック | 名前 | 機能 | 影響するフラグ |", "|---|---|---|---|"]
+def list_table(lang="ja"):
+    c = LANG[lang]
+    out = ["| " + " | ".join(c["list_head"]) + " |", "|---|---|---|---|"]
     for mn, group, eng, jp, func, flags in INSTR:
         fname = GROUPS[group][0]
-        out.append(f"| [{mn}]({fname}#{mn.lower()}) | {eng}({jp}) | {func} | {flag_summary(flags)} |")
+        if lang == "ja":
+            out.append(f"| [{mn}]({fname}#{mn.lower()}) | {eng}({jp}) | {func} | {flag_summary(flags)} |")
+        else:
+            slug = f"{mn.lower()}-{eng.lower().replace(' ', '-')}"
+            out.append(f"| [{mn}]({fname}#{slug}) | {eng} | {FUNC_EN[mn]} | {flag_summary(flags, lang)} |")
     return "\n".join(out)
 
 
@@ -185,38 +253,36 @@ def replace_block(text, tag, content):
     return pat.sub(lambda m: m.group(1) + "\n" + content + "\n" + m.group(2), text, count=1)
 
 
-def main():
-    check = "--check" in sys.argv
-    table = load_table()
-    assert sum(len(v) for v in table.values()) == 151, "公式命令は 151 個のはず"
-    assert {i[0] for i in INSTR} == set(table), "ニーモニックの集合が表と一致しない"
+def process(lang, check, table):
+    manual = MANUAL_DIR[lang]
+    ja = lang == "ja"
     problems = []
     files = {}
 
     def get(fname):
         if fname not in files:
-            path = os.path.join(MANUAL, fname)
+            path = os.path.join(manual, fname)
             files[fname] = open(path, encoding="utf-8").read() if os.path.exists(path) else None
         return files[fname]
 
     def apply(fname, tag, content):
         text = get(fname)
         if text is None:
-            problems.append(f"{fname}: ファイルがない")
+            problems.append(f"{lang}/{fname}: ファイルがない")
             return
         new = replace_block(text, tag, content)
         if new is None:
-            problems.append(f"{fname}: マーカー <!-- {tag} --> がない")
+            problems.append(f"{lang}/{fname}: マーカー <!-- {tag} --> がない")
             return
         if new != text:
-            problems.append(f"{fname}: <!-- {tag} --> の内容が表と違う")
+            problems.append(f"{lang}/{fname}: <!-- {tag} --> の内容が表と違う")
             files[fname] = new
 
     for mn, group, eng, jp, func, flags in INSTR:
         fname = GROUPS[group][0]
-        apply(fname, f"opcodes:{mn}", opcode_table(mn, table))
-        apply(fname, f"flags:{mn}", flag_table(flags))
-    apply("05-reference.md", "list", list_table())
+        apply(fname, f"opcodes:{mn}", opcode_table(mn, table, lang))
+        apply(fname, f"flags:{mn}", flag_table(flags, lang))
+    apply("05-reference.md", "list", list_table(lang))
 
     if check:
         for p in problems:
@@ -224,13 +290,31 @@ def main():
         return 1 if problems else 0
     for fname, text in files.items():
         if text is not None:
-            with open(os.path.join(MANUAL, fname), "w", encoding="utf-8") as f:
+            with open(os.path.join(manual, fname), "w", encoding="utf-8") as f:
                 f.write(text)
     hard = [p for p in problems if "がない" in p]
     for p in hard:
         print(p)
-    print(f"{len([p for p in problems if '内容が表と違う' in p])} 個のブロックを更新した")
+    print(f"{lang}: {len([p for p in problems if '内容が表と違う' in p])} 個のブロックを更新した")
     return 1 if hard else 0
+
+
+def main():
+    check = "--check" in sys.argv
+    lang = "all"
+    if "--lang" in sys.argv:
+        lang = sys.argv[sys.argv.index("--lang") + 1]
+    if lang not in ("ja", "en", "all"):
+        print("--lang は ja、en、all のどれか")
+        return 2
+    table = load_table()
+    assert sum(len(v) for v in table.values()) == 151, "公式命令は 151 個のはず"
+    assert {i[0] for i in INSTR} == set(table), "ニーモニックの集合が表と一致しない"
+    assert set(FUNC_EN) == set(table), "FUNC_EN が命令と一致しない"
+    rc = 0
+    for lg in (["ja", "en"] if lang == "all" else [lang]):
+        rc |= process(lg, check, table)
+    return rc
 
 
 if __name__ == "__main__":

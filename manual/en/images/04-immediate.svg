@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="314" viewBox="0 0 720 314" role="img" aria-labelledby="t d">
+<title id="t">Immediate</title>
+<desc id="d">The operand value is used as it is. Example: LDA #$10.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="313" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Immediate</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">LDA #$10</text>
+<text x="62" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Opcode</text>
+<rect x="30" y="66" width="64" height="32" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="62" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">A9</text>
+<text x="162" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Operand (value)</text>
+<rect x="130" y="66" width="64" height="32" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="162" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">10</text>
+<text x="30" y="150" font-size="11" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Registers</text>
+<rect x="30" y="183.0" width="110" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="40" y="205.0" font-size="14" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">A</text>
+<text x="130" y="205.0" font-size="14" font-weight="bold" text-anchor="end" fill="#bc4c00" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">$10</text>
+<path d="M 135 98 L 135 183" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<circle cx="135" cy="140" r="10" fill="#0969da"/>
+<text x="135" y="144.5" font-size="13" font-weight="bold" text-anchor="middle" fill="#ffffff" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">1</text>
+<text x="300" y="160" font-size="13" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">The operand value is used as it is.</text>
+<text x="300" y="182" font-size="13" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">No memory address is used.</text>
+<text x="30" y="262" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">① Read opcode $A9 (LDA #) and operand $10. The operand is the value itself.</text>
+<text x="30" y="284" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">② Put $10 in A.</text>
+</svg>

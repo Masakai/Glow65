@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420" role="img" aria-labelledby="t d">
+<title id="t">Interrupt flow</title>
+<desc id="d">The steps from an interrupt request, through the handler, to the return by RTI.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="419" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Interrupt flow</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<rect x="30" y="80" width="200" height="60" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="42" y="104" font-size="15" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">①</text>
+<text x="64" y="105" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Run the main program</text>
+<text x="64" y="125" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">One instruction at a time</text>
+<rect x="260" y="80" width="200" height="60" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="272" y="104" font-size="15" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">②</text>
+<text x="294" y="105" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Interrupt request</text>
+<text x="294" y="125" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">NMI or IRQ</text>
+<rect x="490" y="80" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="502" y="104" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">③</text>
+<text x="524" y="105" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Finish the instruction</text>
+<text x="524" y="125" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Not taken mid-instruction</text>
+<rect x="490" y="190" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="502" y="214" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">④</text>
+<text x="524" y="215" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Push PC and P</text>
+<text x="524" y="235" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">PCH, PCL, then P</text>
+<rect x="260" y="190" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="272" y="214" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">⑤</text>
+<text x="294" y="215" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Set the I flag to 1</text>
+<text x="294" y="235" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Blocks further IRQs</text>
+<rect x="30" y="190" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="42" y="214" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">⑥</text>
+<text x="64" y="215" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Read vector, jump</text>
+<text x="64" y="235" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">NMI $FFFA, IRQ $FFFE</text>
+<rect x="30" y="300" width="200" height="60" rx="6" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="42" y="324" font-size="15" font-weight="bold" text-anchor="start" fill="#bc4c00" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">⑦</text>
+<text x="64" y="325" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Run the handler</text>
+<text x="64" y="345" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Save registers before use</text>
+<rect x="260" y="300" width="200" height="60" rx="6" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="272" y="324" font-size="15" font-weight="bold" text-anchor="start" fill="#bc4c00" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">⑧</text>
+<text x="294" y="325" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Run RTI</text>
+<text x="294" y="345" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Pull P and PC</text>
+<rect x="490" y="300" width="200" height="60" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="502" y="324" font-size="15" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">⑨</text>
+<text x="524" y="325" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Main program resumes</text>
+<text x="524" y="345" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">From the pushed PC address</text>
+<path d="M 230 110.0 L 260 110.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 460 110.0 L 490 110.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 590.0 140 L 590.0 190" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 490 220.0 L 460 220.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 260 220.0 L 230 220.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 130.0 250 L 130.0 300" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 230 330.0 L 260 330.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 460 330.0 L 490 330.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="30" y="392" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif">Blue boxes: steps the CPU does automatically. Orange boxes: steps the program (handler) does.</text>
+</svg>

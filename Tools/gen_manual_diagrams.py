@@ -1,16 +1,40 @@
 #!/usr/bin/env python3
 """マニュアル第4章(アドレッシングモード)の図を SVG で生成する。
 
-使い方: python3 Tools/gen_manual_diagrams.py
-出力先: manual/ja/images/04-*.svg
+使い方: python3 Tools/gen_manual_diagrams.py [--lang ja|en|all]
+  --lang ja   日本語の図を manual/ja/images/ に出力する
+  --lang en   英語の図を manual/en/images/ に出力する(ファイル名は日本語版と同じ)
+  --lang all  両方を出力する(省略時)
+出力先: manual/<言語>/images/04-*.svg ~ 07-*.svg(27 枚)
 
 図の例の値は、下の EX にまとめている。本文(manual/ja/04-addressing.md)の例と一致させること。
 標準ライブラリのみを使う。
 """
+import argparse
 import os
+import subprocess
+import sys
 from xml.sax.saxutils import escape
 
-OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "manual", "ja", "images")
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+
+
+def _lang_from_argv():
+    p = argparse.ArgumentParser(description="マニュアルの図(SVG)を生成する")
+    p.add_argument("--lang", choices=["ja", "en", "all"], default="all")
+    return p.parse_args().lang
+
+
+# all のときは、言語ごとに自分自身を起動する(文字列を import 時に選ぶため)
+ARG_LANG = _lang_from_argv() if __name__ == "__main__" else "ja"
+LANG = ARG_LANG if ARG_LANG in ("ja", "en") else "ja"
+OUT_DIR = os.path.join(ROOT, "manual", LANG, "images")
+
+
+def L(ja, en):
+    """表示する文字列を言語で切り替える。"""
+    return en if LANG == "en" else ja
+
 
 # 例の値(本文の実行例と一致させる)
 EX = {
@@ -30,7 +54,8 @@ EX = {
 }
 
 W = 720
-FONT = "-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif"
+FONT = L("-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif",
+         "-apple-system, 'Helvetica Neue', Arial, sans-serif")
 MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
 INK = "#1f2328"
 MUTED = "#57606a"
@@ -40,6 +65,16 @@ BLUE = "#0969da"
 BLUE_BG = "#ddf4ff"
 ORANGE = "#bc4c00"
 ORANGE_BG = "#fff1e5"
+
+
+OPC = L("オペコード", "Opcode")
+OPL = L("オペランド(下位)", "Operand (low)")
+OPH = L("オペランド(上位)", "Operand (high)")
+OPD = L("オペランド", "Operand")
+REGS = L("レジスタ", "Registers")
+MEM = L("メモリ", "Memory")
+STK = L("スタック", "Stack")
+ZPG = L("ゼロページ", "Zero page")
 
 
 def h2(v):
@@ -186,37 +221,40 @@ def build(name, title, desc, asm, builder, prefix="04"):
 
 def s_implied(sc):
     e = EX["implied"]
-    b = sc.bytes_row([(f"{e['opcode']:02X}", "オペコード")], hl_from=9)
+    b = sc.bytes_row([(f"{e['opcode']:02X}", OPC)], hl_from=9)
     sc.reg("X", 200, f"{h2(e['x_before'])} → {h2(e['x_after'])}", hl=True, w=190)
     sc.arrow([(62, 98), (62, 183)], 1, badge=(62, 140))
-    sc.text(300, 160, "オペランドはなく、メモリの内容は使わない。", size=13, fill=MUTED)
+    sc.text(300, 160, L("オペランドはなく、メモリの内容は使わない。", "No operand. The contents of memory are not used."), size=13, fill=MUTED)
     finish(sc, 262, [
-        f"① オペコード {h2(e['opcode'])}(INX)を読み、X の値に 1 を足す。X は {h2(e['x_before'])} から {h2(e['x_after'])} になる。",
+        L(f"① オペコード {h2(e['opcode'])}(INX)を読み、X の値に 1 を足す。X は {h2(e['x_before'])} から {h2(e['x_after'])} になる。",
+          f"① Read opcode {h2(e['opcode'])} (INX) and add 1 to X. X goes from {h2(e['x_before'])} to {h2(e['x_after'])}."),
     ])
 
 
 def s_accumulator(sc):
     e = EX["accumulator"]
-    sc.bytes_row([(f"{e['opcode']:02X}", "オペコード")], hl_from=9)
+    sc.bytes_row([(f"{e['opcode']:02X}", OPC)], hl_from=9)
     sc.reg("A", 200, f"{h2(e['a_before'])} → {h2(e['a_after'])}", hl=True, w=190)
     sc.arrow([(62, 98), (62, 183)], 1, badge=(62, 140))
-    sc.text(300, 160, "操作の対象は A そのもの。メモリの内容は使わない。", size=13, fill=MUTED)
+    sc.text(300, 160, L("操作の対象は A そのもの。メモリの内容は使わない。", "The target is A itself. Memory is not used."), size=13, fill=MUTED)
     finish(sc, 262, [
-        f"① オペコード {h2(e['opcode'])}(ASL A)を読み、A の各ビットを 1 つ左にずらす。A は {h2(e['a_before'])} から {h2(e['a_after'])} になる。",
+        L(f"① オペコード {h2(e['opcode'])}(ASL A)を読み、A の各ビットを 1 つ左にずらす。A は {h2(e['a_before'])} から {h2(e['a_after'])} になる。",
+          f"① Read opcode {h2(e['opcode'])} (ASL A) and shift every bit of A one place left. A goes from {h2(e['a_before'])} to {h2(e['a_after'])}."),
     ])
 
 
 def s_immediate(sc):
     e = EX["immediate"]
-    sc.bytes_row([(f"{e['opcode']:02X}", "オペコード"), (f"{e['operand']:02X}", "オペランド(値)")])
-    sc.label(30, 150, "レジスタ")
+    sc.bytes_row([(f"{e['opcode']:02X}", OPC), (f"{e['operand']:02X}", L("オペランド(値)", "Operand (value)"))])
+    sc.label(30, 150, REGS)
     sc.reg("A", 200, h2(e["operand"]), hl=True)
     sc.arrow([(135, 98), (135, 183)], 1, badge=(135, 140))
-    sc.text(300, 160, "オペランドの値が、そのまま使われる。", size=13, fill=MUTED)
-    sc.text(300, 182, "メモリの番地は使わない。", size=13, fill=MUTED)
+    sc.text(300, 160, L("オペランドの値が、そのまま使われる。", "The operand value is used as it is."), size=13, fill=MUTED)
+    sc.text(300, 182, L("メモリの番地は使わない。", "No memory address is used."), size=13, fill=MUTED)
     finish(sc, 262, [
-        f"① オペコード {h2(e['opcode'])}(LDA #)と、オペランド {h2(e['operand'])} を読む。オペランドが値そのもの。",
-        f"② A に {h2(e['operand'])} を入れる。",
+        L(f"① オペコード {h2(e['opcode'])}(LDA #)と、オペランド {h2(e['operand'])} を読む。オペランドが値そのもの。",
+          f"① Read opcode {h2(e['opcode'])} (LDA #) and operand {h2(e['operand'])}. The operand is the value itself."),
+        L(f"② A に {h2(e['operand'])} を入れる。", f"② Put {h2(e['operand'])} in A."),
     ])
 
 
@@ -226,18 +264,18 @@ def direct(sc, key, mode_hex, idx=None, asm_op="LDA", dest="A", two_byte=False, 
     if two_byte:
         addr = e["addr"]
         base = addr
-        items = [(f"{e['opcode']:02X}", "オペコード"), (f"{addr & 0xFF:02X}", "オペランド(下位)"),
-                 (f"{addr >> 8:02X}", "オペランド(上位)")]
+        items = [(f"{e['opcode']:02X}", OPC), (f"{addr & 0xFF:02X}", OPL),
+                 (f"{addr >> 8:02X}", OPH)]
         fmt = h4
     else:
         base = e["zp"]
-        items = [(f"{e['opcode']:02X}", "オペコード"), (f"{base:02X}", "オペランド")]
+        items = [(f"{e['opcode']:02X}", OPC), (f"{base:02X}", OPD)]
         fmt = h2
     boxes = sc.bytes_row(items)
     ox = boxes[1][0]
     ocx = (ox + boxes[-1][0] + 64) / 2
-    sc.label(30, 140, "レジスタ")
-    sc.label(545, 112, "メモリ", anchor="middle")
+    sc.label(30, 140, REGS)
+    sc.label(545, 112, MEM, anchor="middle")
     # 実効アドレス
     if idx:
         iv = e[idx.lower()]
@@ -248,7 +286,7 @@ def direct(sc, key, mode_hex, idx=None, asm_op="LDA", dest="A", two_byte=False, 
         sc.reg(idx, 168, h2(iv))
     else:
         eff = base
-        lines = [f"実効アドレス", f"{h4(eff)}"]
+        lines = [L("実効アドレス", "Effective address"), f"{h4(eff)}"]
     comp = sc.comp(190, 140, 210, lines)
     sc.arrow([(ocx, 98), (ocx, 120), (comp["t"][0], 120), comp["t"]], 1, badge=(ocx, 112))
     n = 2
@@ -270,17 +308,23 @@ def direct(sc, key, mode_hex, idx=None, asm_op="LDA", dest="A", two_byte=False, 
     sc.arrow([(620, 168), (660, 168), (660, 310), (140, 310)], n, badge=(660, 240), color=ORANGE)
     # 手順
     steps = []
-    steps.append(f"① オペコード {h2(e['opcode'])} と、オペランド {fmt(base)} を読む。")
+    steps.append(L(f"① オペコード {h2(e['opcode'])} と、オペランド {fmt(base)} を読む。",
+                   f"① Read opcode {h2(e['opcode'])} and operand {fmt(base)}."))
     if idx:
-        steps.append(f"② {idx} の値 {h2(e[idx.lower()])} を足して、実効アドレス {h4(eff)} を得る。")
+        steps.append(L(f"② {idx} の値 {h2(e[idx.lower()])} を足して、実効アドレス {h4(eff)} を得る。",
+                       f"② Add the value {h2(e[idx.lower()])} of {idx} to get effective address {h4(eff)}."))
         if not two_byte:
-            steps.append("   ゼロページの計算は 256 バイトで折り返す($FF の次は $00)。")
-        steps.append(f"③ {h4(eff)} の内容 {h2(e['value'])} を読む。")
-        steps.append(f"④ {dest} に {h2(e['value'])} を入れる。")
+            steps.append(L("   ゼロページの計算は 256 バイトで折り返す($FF の次は $00)。",
+                           "   Zero page arithmetic wraps around at 256 bytes ($FF is followed by $00)."))
+        steps.append(L(f"③ {h4(eff)} の内容 {h2(e['value'])} を読む。",
+                       f"③ Read the contents of {h4(eff)}: {h2(e['value'])}."))
+        steps.append(L(f"④ {dest} に {h2(e['value'])} を入れる。", f"④ Put {h2(e['value'])} in {dest}."))
     else:
-        steps.append(f"   オペランドが、そのまま実効アドレス {h4(eff)} になる。")
-        steps.append(f"② {h4(eff)} の内容 {h2(e['value'])} を読む。")
-        steps.append(f"③ {dest} に {h2(e['value'])} を入れる。")
+        steps.append(L(f"   オペランドが、そのまま実効アドレス {h4(eff)} になる。",
+                       f"   The operand itself is the effective address {h4(eff)}."))
+        steps.append(L(f"② {h4(eff)} の内容 {h2(e['value'])} を読む。",
+                       f"② Read the contents of {h4(eff)}: {h2(e['value'])}."))
+        steps.append(L(f"③ {dest} に {h2(e['value'])} を入れる。", f"③ Put {h2(e['value'])} in {dest}."))
     finish(sc, 360, steps)
 
 
@@ -311,12 +355,12 @@ def s_absolute_y(sc):
 def s_indirect(sc):
     e = EX["indirect"]
     p = e["ptr"]
-    boxes = sc.bytes_row([(f"{e['opcode']:02X}", "オペコード"), (f"{p & 0xFF:02X}", "オペランド(下位)"),
-                          (f"{p >> 8:02X}", "オペランド(上位)")])
+    boxes = sc.bytes_row([(f"{e['opcode']:02X}", OPC), (f"{p & 0xFF:02X}", OPL),
+                          (f"{p >> 8:02X}", OPH)])
     ocx = (boxes[1][0] + boxes[2][0] + 64) / 2
-    sc.label(30, 140, "レジスタ")
-    sc.label(545, 112, "メモリ", anchor="middle")
-    comp = sc.comp(190, 140, 210, ["ポインタの場所", h4(p)])
+    sc.label(30, 140, REGS)
+    sc.label(545, 112, MEM, anchor="middle")
+    comp = sc.comp(190, 140, 210, [L("ポインタの場所", "Pointer location"), h4(p)])
     sc.arrow([(ocx, 98), (ocx, 120), (comp["t"][0], 120), comp["t"]], 1, badge=(ocx, 112))
     lo = e["target"] & 0xFF
     hi = e["target"] >> 8
@@ -329,9 +373,12 @@ def s_indirect(sc):
     sc.arrow([(620, 202), (660, 202), (660, 310), (140, 310)], 3, badge=(660, 260), color=ORANGE)
     sc.label(140, 330, "")
     finish(sc, 360, [
-        f"① オペコード {h2(e['opcode'])}(JMP)と、オペランド {h4(p)} を読む。{h4(p)} は、飛び先を収めた場所。",
-        f"② {h4(p)} の {h2(lo)} を下位、{h4(p + 1)} の {h2(hi)} を上位として読む。",
-        f"③ 2 バイトを合わせた {h4(e['target'])} が PC に入る。次はこの番地の命令を実行する。",
+        L(f"① オペコード {h2(e['opcode'])}(JMP)と、オペランド {h4(p)} を読む。{h4(p)} は、飛び先を収めた場所。",
+          f"① Read opcode {h2(e['opcode'])} (JMP) and operand {h4(p)}. {h4(p)} is where the jump target is stored."),
+        L(f"② {h4(p)} の {h2(lo)} を下位、{h4(p + 1)} の {h2(hi)} を上位として読む。",
+          f"② Read {h2(lo)} at {h4(p)} as the low byte and {h2(hi)} at {h4(p + 1)} as the high byte."),
+        L(f"③ 2 バイトを合わせた {h4(e['target'])} が PC に入る。次はこの番地の命令を実行する。",
+          f"③ The two bytes together, {h4(e['target'])}, go into PC. The next instruction is run from that address."),
     ])
 
 
@@ -340,10 +387,10 @@ def s_indexed_indirect(sc):
     zp, x = e["zp"], e["x"]
     ptr = (zp + x) & 0xFF
     t = e["target"]
-    sc.bytes_row([(f"{e['opcode']:02X}", "オペコード"), (f"{zp:02X}", "オペランド")])
-    sc.label(30, 140, "レジスタ")
-    sc.label(396, 112, "ゼロページ", anchor="middle")
-    sc.label(586, 112, "メモリ", anchor="middle")
+    sc.bytes_row([(f"{e['opcode']:02X}", OPC), (f"{zp:02X}", OPD)])
+    sc.label(30, 140, REGS)
+    sc.label(396, 112, ZPG, anchor="middle")
+    sc.label(586, 112, MEM, anchor="middle")
     sc.reg("X", 168, h2(x))
     comp = sc.comp(160, 140, 130, [f"{h2(zp)} + X({h2(x)})", f"= {h2(ptr)}"])
     sc.arrow([(162, 98), (162, 120), (225, 120), comp["t"]], 1, badge=(162, 112))
@@ -356,11 +403,16 @@ def s_indexed_indirect(sc):
     sc.reg("A", 310, h2(e["value"]), hl=True)
     sc.arrow([(652, 270), (685, 270), (685, 310), (140, 310)], 5, badge=(685, 292), color=ORANGE)
     finish(sc, 360, [
-        f"① オペコード {h2(e['opcode'])}(LDA)と、オペランド {h2(zp)} を読む。",
-        f"② オペランドに X の値 {h2(x)} を足して、ゼロページの場所 {h2(ptr)} を得る(256 バイトで折り返す)。",
-        f"③ {h4(ptr)} の {h2(t & 0xFF)} を下位、{h4(ptr + 1)} の {h2(t >> 8)} を上位として読む。",
-        f"④ 2 バイトを合わせた {h4(t)} が実効アドレスになる。",
-        f"⑤ {h4(t)} の内容 {h2(e['value'])} を読んで、A に入れる。",
+        L(f"① オペコード {h2(e['opcode'])}(LDA)と、オペランド {h2(zp)} を読む。",
+          f"① Read opcode {h2(e['opcode'])} (LDA) and operand {h2(zp)}."),
+        L(f"② オペランドに X の値 {h2(x)} を足して、ゼロページの場所 {h2(ptr)} を得る(256 バイトで折り返す)。",
+          f"② Add the value {h2(x)} of X to the operand to get zero-page location {h2(ptr)} (wraps at 256 bytes)."),
+        L(f"③ {h4(ptr)} の {h2(t & 0xFF)} を下位、{h4(ptr + 1)} の {h2(t >> 8)} を上位として読む。",
+          f"③ Read {h2(t & 0xFF)} at {h4(ptr)} as the low byte and {h2(t >> 8)} at {h4(ptr + 1)} as the high byte."),
+        L(f"④ 2 バイトを合わせた {h4(t)} が実効アドレスになる。",
+          f"④ The two bytes together, {h4(t)}, are the effective address."),
+        L(f"⑤ {h4(t)} の内容 {h2(e['value'])} を読んで、A に入れる。",
+          f"⑤ Read the contents {h2(e['value'])} of {h4(t)} and put it in A."),
     ])
 
 
@@ -368,11 +420,11 @@ def s_indirect_indexed(sc):
     e = EX["indirect-indexed"]
     zp, y, b = e["zp"], e["y"], e["base"]
     eff = b + y
-    sc.bytes_row([(f"{e['opcode']:02X}", "オペコード"), (f"{zp:02X}", "オペランド")])
-    sc.label(30, 140, "レジスタ")
-    sc.label(396, 112, "ゼロページ", anchor="middle")
-    sc.label(586, 112, "メモリ", anchor="middle")
-    comp1 = sc.comp(160, 140, 130, ["ポインタの場所", h2(zp)])
+    sc.bytes_row([(f"{e['opcode']:02X}", OPC), (f"{zp:02X}", OPD)])
+    sc.label(30, 140, REGS)
+    sc.label(396, 112, ZPG, anchor="middle")
+    sc.label(586, 112, MEM, anchor="middle")
+    comp1 = sc.comp(160, 140, 130, [L("ポインタの場所", "Pointer at"), h2(zp)])
     sc.arrow([(162, 98), (162, 120), (225, 120), comp1["t"]], 1, badge=(162, 112))
     sc.cell(330, 168, h4(zp), h2(b & 0xFF), "target", aw=72, vw=60)
     sc.cell(330, 202, h4(zp + 1), h2(b >> 8), "target", aw=72, vw=60)
@@ -386,10 +438,14 @@ def s_indirect_indexed(sc):
     sc.reg("A", 335, h2(e["value"]), hl=True)
     sc.arrow([(652, 276), (685, 276), (685, 335), (140, 335)], 6, badge=(685, 305), color=ORANGE)
     finish(sc, 360, [
-        f"① オペコード {h2(e['opcode'])}(LDA)と、オペランド {h2(zp)} を読む。",
-        f"② {h4(zp)} の {h2(b & 0xFF)} を下位、{h4(zp + 1)} の {h2(b >> 8)} を上位として読み、基準の番地 {h4(b)} を得る。",
-        f"③④ 基準の番地に Y の値 {h2(y)} を足して、実効アドレス {h4(eff)} を得る。",
-        f"⑤⑥ {h4(eff)} の内容 {h2(e['value'])} を読んで、A に入れる。",
+        L(f"① オペコード {h2(e['opcode'])}(LDA)と、オペランド {h2(zp)} を読む。",
+          f"① Read opcode {h2(e['opcode'])} (LDA) and operand {h2(zp)}."),
+        L(f"② {h4(zp)} の {h2(b & 0xFF)} を下位、{h4(zp + 1)} の {h2(b >> 8)} を上位として読み、基準の番地 {h4(b)} を得る。",
+          f"② Read {h2(b & 0xFF)} at {h4(zp)} as the low byte and {h2(b >> 8)} at {h4(zp + 1)} as the high byte to get base address {h4(b)}."),
+        L(f"③④ 基準の番地に Y の値 {h2(y)} を足して、実効アドレス {h4(eff)} を得る。",
+          f"③④ Add the value {h2(y)} of Y to the base address to get effective address {h4(eff)}."),
+        L(f"⑤⑥ {h4(eff)} の内容 {h2(e['value'])} を読んで、A に入れる。",
+          f"⑤⑥ Read the contents {h2(e['value'])} of {h4(eff)} and put it in A."),
     ], y0=385)
 
 
@@ -398,38 +454,68 @@ def s_relative(sc):
     npc = e["next_pc"]
     off = e["offset"]
     tgt = npc + off
-    sc.bytes_row([(f"{e['opcode']:02X}", "オペコード"), (f"{off:02X}", "オペランド(距離)")])
-    sc.label(30, 140, "レジスタ")
-    sc.reg("PC", 168, h4(npc), sub="命令を読み終えた位置")
+    sc.bytes_row([(f"{e['opcode']:02X}", OPC), (f"{off:02X}", L("オペランド(距離)", "Operand (offset)"))])
+    sc.label(30, 140, REGS)
+    sc.reg("PC", 168, h4(npc), sub=L("命令を読み終えた位置", "Next instruction"))
     comp = sc.comp(190, 140, 210, [f"{h4(npc)} + {h2(off)}", f"= {h4(tgt)}"])
     sc.arrow([(162, 98), (162, 120), (295, 120), comp["t"]], 1, badge=(162, 112))
     sc.arrow([(140, 168), (190, 168)], 2, badge=(165, 168))
     sc.reg("PC", 310, h4(tgt), hl=True)
     sc.arrow([(295, 196), (295, 310), (140, 310)], 3, badge=(295, 250), color=ORANGE)
-    sc.text(440, 160, "分岐の条件が成り立つときだけ、", size=13, fill=MUTED)
-    sc.text(440, 182, "PC を書き換える。", size=13, fill=MUTED)
+    sc.text(440, 160, L("分岐の条件が成り立つときだけ、", "PC is changed only when"), size=13, fill=MUTED)
+    sc.text(440, 182, L("PC を書き換える。", "the branch condition is true."), size=13, fill=MUTED)
     finish(sc, 360, [
-        f"① オペコード {h2(e['opcode'])}(BNE)と、距離 {h2(off)} を読む。距離は符号付きの 1 バイト。",
-        f"② 命令を読み終えた PC は {h4(npc)}。ここに距離を足す。",
-        f"③ 条件が成り立つとき、PC は {h4(tgt)} になる。成り立たないときは {h4(npc)} のまま。",
+        L(f"① オペコード {h2(e['opcode'])}(BNE)と、距離 {h2(off)} を読む。距離は符号付きの 1 バイト。",
+          f"① Read opcode {h2(e['opcode'])} (BNE) and offset {h2(off)}. The offset is a signed 1-byte value."),
+        L(f"② 命令を読み終えた PC は {h4(npc)}。ここに距離を足す。",
+          f"② After the instruction is read, PC is {h4(npc)}. The offset is added to it."),
+        L(f"③ 条件が成り立つとき、PC は {h4(tgt)} になる。成り立たないときは {h4(npc)} のまま。",
+          f"③ If the condition is true, PC becomes {h4(tgt)}. If not, PC stays {h4(npc)}."),
     ])
 
 
-MODES = [
-    ("implied", "インプライド(Implied)", "オペランドを持たず、メモリの内容を使わない。例は INX。", "INX", s_implied),
-    ("accumulator", "アキュムレータ(Accumulator)", "操作の対象が A レジスタ自身。例は ASL A。", "ASL A", s_accumulator),
-    ("immediate", "イミディエイト(Immediate)", "オペランドの値が、そのまま使われる。例は LDA #$10。", "LDA #$10", s_immediate),
-    ("zeropage", "ゼロページ(Zero Page)", "1 バイトのオペランドで、先頭 256 バイトの番地を指定する。例は LDA $10。", "LDA $10", s_zeropage),
-    ("zeropage-x", "ゼロページ X(Zero Page,X)", "オペランドに X の値を足した、ゼロページの番地を使う。例は LDA $10,X。", "LDA $10,X", s_zeropage_x),
-    ("zeropage-y", "ゼロページ Y(Zero Page,Y)", "オペランドに Y の値を足した、ゼロページの番地を使う。例は LDX $10,Y。", "LDX $10,Y", s_zeropage_y),
-    ("absolute", "アブソリュート(Absolute)", "2 バイトのオペランドで、64KB のどの番地でも指定する。例は LDA $0400。", "LDA $0400", s_absolute),
-    ("absolute-x", "アブソリュート X(Absolute,X)", "2 バイトのオペランドに X の値を足した番地を使う。例は LDA $0410,X。", "LDA $0410,X", s_absolute_x),
-    ("absolute-y", "アブソリュート Y(Absolute,Y)", "2 バイトのオペランドに Y の値を足した番地を使う。例は LDA $0420,Y。", "LDA $0420,Y", s_absolute_y),
-    ("indirect", "インダイレクト(Indirect)", "オペランドの番地に収めた 2 バイトを、飛び先として使う。JMP だけのモード。例は JMP ($0430)。", "JMP ($0430)", s_indirect),
-    ("indexed-indirect", "インデックスト・インダイレクト(Indexed Indirect)", "ゼロページの表から、X 番目の 2 バイトの番地を取り出す。例は LDA ($20,X)。", "LDA ($20,X)", s_indexed_indirect),
-    ("indirect-indexed", "インダイレクト・インデックスト(Indirect Indexed)", "ゼロページの 2 バイトの番地に Y の値を足した番地を使う。例は LDA ($30),Y。", "LDA ($30),Y", s_indirect_indexed),
-    ("relative", "リラティブ(Relative)", "分岐命令で、次の命令からの距離(符号付き 1 バイト)を足した番地へ飛ぶ。例は BNE。", "BNE +2", s_relative),
-]
+def modes():
+    return [
+        ("implied", L("インプライド(Implied)", "Implied"),
+         L("オペランドを持たず、メモリの内容を使わない。例は INX。", "No operand, and the contents of memory are not used. Example: INX."),
+         "INX", s_implied),
+        ("accumulator", L("アキュムレータ(Accumulator)", "Accumulator"),
+         L("操作の対象が A レジスタ自身。例は ASL A。", "The operation acts on the A register itself. Example: ASL A."),
+         "ASL A", s_accumulator),
+        ("immediate", L("イミディエイト(Immediate)", "Immediate"),
+         L("オペランドの値が、そのまま使われる。例は LDA #$10。", "The operand value is used as it is. Example: LDA #$10."),
+         "LDA #$10", s_immediate),
+        ("zeropage", L("ゼロページ(Zero Page)", "Zero Page"),
+         L("1 バイトのオペランドで、先頭 256 バイトの番地を指定する。例は LDA $10。", "A 1-byte operand selects an address in the first 256 bytes. Example: LDA $10."),
+         "LDA $10", s_zeropage),
+        ("zeropage-x", L("ゼロページ X(Zero Page,X)", "Zero Page,X"),
+         L("オペランドに X の値を足した、ゼロページの番地を使う。例は LDA $10,X。", "The address is the operand plus X, within zero page. Example: LDA $10,X."),
+         "LDA $10,X", s_zeropage_x),
+        ("zeropage-y", L("ゼロページ Y(Zero Page,Y)", "Zero Page,Y"),
+         L("オペランドに Y の値を足した、ゼロページの番地を使う。例は LDX $10,Y。", "The address is the operand plus Y, within zero page. Example: LDX $10,Y."),
+         "LDX $10,Y", s_zeropage_y),
+        ("absolute", L("アブソリュート(Absolute)", "Absolute"),
+         L("2 バイトのオペランドで、64KB のどの番地でも指定する。例は LDA $0400。", "A 2-byte operand selects any address in the 64KB space. Example: LDA $0400."),
+         "LDA $0400", s_absolute),
+        ("absolute-x", L("アブソリュート X(Absolute,X)", "Absolute,X"),
+         L("2 バイトのオペランドに X の値を足した番地を使う。例は LDA $0410,X。", "The address is the 2-byte operand plus X. Example: LDA $0410,X."),
+         "LDA $0410,X", s_absolute_x),
+        ("absolute-y", L("アブソリュート Y(Absolute,Y)", "Absolute,Y"),
+         L("2 バイトのオペランドに Y の値を足した番地を使う。例は LDA $0420,Y。", "The address is the 2-byte operand plus Y. Example: LDA $0420,Y."),
+         "LDA $0420,Y", s_absolute_y),
+        ("indirect", L("インダイレクト(Indirect)", "Indirect"),
+         L("オペランドの番地に収めた 2 バイトを、飛び先として使う。JMP だけのモード。例は JMP ($0430)。", "The 2 bytes stored at the operand's address are the jump target. Only JMP uses this mode. Example: JMP ($0430)."),
+         "JMP ($0430)", s_indirect),
+        ("indexed-indirect", L("インデックスト・インダイレクト(Indexed Indirect)", "Indexed Indirect (zp,X)"),
+         L("ゼロページの表から、X 番目の 2 バイトの番地を取り出す。例は LDA ($20,X)。", "Takes the X-th 2-byte address from a table in zero page. Example: LDA ($20,X)."),
+         "LDA ($20,X)", s_indexed_indirect),
+        ("indirect-indexed", L("インダイレクト・インデックスト(Indirect Indexed)", "Indirect Indexed (zp),Y"),
+         L("ゼロページの 2 バイトの番地に Y の値を足した番地を使う。例は LDA ($30),Y。", "The address is the 2-byte address in zero page plus Y. Example: LDA ($30),Y."),
+         "LDA ($30),Y", s_indirect_indexed),
+        ("relative", L("リラティブ(Relative)", "Relative"),
+         L("分岐命令で、次の命令からの距離(符号付き 1 バイト)を足した番地へ飛ぶ。例は BNE。", "A branch jumps to the address of the next instruction plus a signed 1-byte offset. Example: BNE."),
+         "BNE +2", s_relative),
+    ]
 
 
 # ---- 第5章(命令リファレンス)の図 ----
@@ -486,7 +572,7 @@ def shift_row(sc, y0, kind, a, carry_in):
         sc.arrow([(top_x, y0), (top_x, y0 - 14), (cx + 26, y0 - 14), (cx + 26, y0)], None, color=BLUE)
         sc.arrow([(cx + 26, y0 + 34), (cx + 26, y0 + 50), (xs[0] + bw / 2, y0 + 50), (xs[0] + bw / 2, y0 + 34)], None, color=BLUE)
     rb = format(r, "08b")
-    sc.text(30, y0 + 70, f"実行後: A = %{rb[:4]} {rb[4:]}({h2(r)})、C = {c}", size=13, mono=False)
+    sc.text(30, y0 + 70, L(f"実行後: A = %{rb[:4]} {rb[4:]}({h2(r)})、C = {c}", f"After: A = %{rb[:4]} {rb[4:]} ({h2(r)}), C = {c}"), size=13, mono=False)
     return r, c
 
 
@@ -494,7 +580,8 @@ def f5_shift(sc):
     a = 0xB1
     for i in range(8):
         sc.label(190 + i * 48 + 22, 90, f"b{7 - i}", anchor="middle")
-    sc.text(30, 56, f"実行前: A = %10110001({h2(a)})。ROL と ROR は、実行前の C が 1 の場合", size=13)
+    sc.text(30, 56, L(f"実行前: A = %10110001({h2(a)})。ROL と ROR は、実行前の C が 1 の場合",
+                       f"Before: A = %10110001 ({h2(a)}). For ROL and ROR, C is 1 before the instruction."), size=13)
     ys = [130, 250, 370, 490]
     for y0, kind in zip(ys, ["ASL", "LSR", "ROL", "ROR"]):
         shift_row(sc, y0, kind, a, 1)
@@ -504,7 +591,7 @@ def f5_shift(sc):
 def stack_panel(sc, dy, kind):
     """PHA / PLA の 1 面。SP = $FD、A = $42 の例。"""
     sc.text(30, dy + 24, "PHA" if kind == "PHA" else "PLA", size=16, weight="bold", mono=True, fill=BLUE)
-    sc.label(545, dy + 30, "スタック(メモリ)", anchor="middle")
+    sc.label(545, dy + 30, L("スタック(メモリ)", "Stack (memory)"), anchor="middle")
     ys = {0x1FE: dy + 56, 0x1FD: dy + 92, 0x1FC: dy + 128}
     cells = {}
     if kind == "PHA":
@@ -516,8 +603,10 @@ def stack_panel(sc, dy, kind):
         sc.arrow([(140, dy + 92), (470, dy + 92)], 1, badge=(300, dy + 92))
         sc.arrow([(170, dy + 150), (310, dy + 150), (310, dy + 128), (470, dy + 128)], 2, badge=(240, dy + 150), color=ORANGE)
         sc.steps(dy + 186, [
-            "① SP が指す番地 $01FD(= $0100 + $FD)に、A の値 $42 を書く。",
-            "② SP から 1 を引く。SP は $FD から $FC になり、次の書き込みは $01FC になる。",
+            L("① SP が指す番地 $01FD(= $0100 + $FD)に、A の値 $42 を書く。",
+              "① Write the value $42 of A to the address $01FD that SP points to (= $0100 + $FD)."),
+            L("② SP から 1 を引く。SP は $FD から $FC になり、次の書き込みは $01FC になる。",
+              "② Subtract 1 from SP. SP goes from $FD to $FC, and the next write goes to $01FC."),
         ])
     else:
         sc.cell(470, ys[0x1FE], h4(0x1FE), "..", "dim", aw=72, vw=60)
@@ -528,8 +617,9 @@ def stack_panel(sc, dy, kind):
         sc.arrow([(170, dy + 150), (310, dy + 150), (310, dy + 128), (470, dy + 128)], 1, badge=(240, dy + 150))
         sc.arrow([(470, dy + 92), (140, dy + 92)], 2, badge=(300, dy + 92), color=ORANGE)
         sc.steps(dy + 186, [
-            "① SP に 1 を足す。SP は $FC から $FD になる。",
-            "② SP が指す番地 $01FD の内容 $42 を読んで、A に入れる。",
+            L("① SP に 1 を足す。SP は $FC から $FD になる。", "① Add 1 to SP. SP goes from $FC to $FD."),
+            L("② SP が指す番地 $01FD の内容 $42 を読んで、A に入れる。",
+              "② Read the contents $42 of the address $01FD that SP points to and put it in A."),
         ])
 
 
@@ -541,30 +631,35 @@ def f5_stack(sc):
 
 def f5_jsr_rts(sc):
     # JSR($0300 にある 3 バイトの命令)
-    boxes = sc.bytes_row([("20", "オペコード"), ("40", "オペランド(下位)"), ("03", "オペランド(上位)")])
+    boxes = sc.bytes_row([("20", OPC), ("40", OPL), ("03", OPH)])
     for i, a in enumerate(["$0300", "$0301", "$0302"]):
         sc.label(boxes[i][0] + 32, 114, a, anchor="middle")
     sc.reg("PC", 150, "$0340", hl=True, x=470)
     sc.arrow([(358, 82), (410, 82), (410, 150), (470, 150)], 4, badge=(410, 110), color=ORANGE)
-    sc.reg("PC", 190, "$0303", sub="3 バイト読み終えた位置")
+    sc.reg("PC", 190, "$0303", sub=L("3 バイト読み終えた位置", "After reading 3 bytes"))
     comp = sc.comp(250, 162, 170, ["PC − 1", "= $0302"])
     sc.arrow([(140, 190), (250, 190)], 1, badge=(195, 190))
-    sc.label(555, 214, "スタック", anchor="middle")
+    sc.label(555, 214, STK, anchor="middle")
     sc.cell(470, 240, h4(0x1FD), "$03", "target", aw=72, vw=60)
     sc.cell(470, 276, h4(0x1FC), "$02", "target", aw=72, vw=60)
     sc.cell(470, 312, h4(0x1FB), "..", "dim", aw=72, vw=60)
     sc.arrow([(420, 176), (445, 176), (445, 240), (470, 240)], 2, badge=(432, 176))
     sc.arrow([(420, 202), (445, 202), (445, 276), (470, 276)], 3, badge=(432, 202))
     sc.reg("SP", 300, "$FD → $FB", hl=True, w=140)
-    sc.steps(350, [
+    sc.steps(350, L([
         "① 3 バイトを読み終えた PC は $0303。",
         "② ③ PC から 1 を引いた $0302 を、上位($03)、下位($02)の順に積む。$0302 は、JSR の最後のバイトの番地。",
         "④ PC はオペランドの $0340 になる。SP は 2 減って $FB になる。",
-    ])
+    ], [
+        "① After the 3 bytes are read, PC is $0303.",
+        "② ③ Push PC − 1 = $0302: the high byte ($03) first, then the low byte ($02).",
+        "   $0302 is the address of the last byte of the JSR instruction.",
+        "④ PC becomes the operand $0340. SP drops by 2 and becomes $FB.",
+    ]))
     # RTS
     dy = 470
     sc.text(30, dy + 8, "RTS", size=16, weight="bold", mono=True, fill=BLUE)
-    sc.label(555, dy + 20, "スタック", anchor="middle")
+    sc.label(555, dy + 20, STK, anchor="middle")
     sc.cell(470, dy + 40, h4(0x1FD), "$03", "target", aw=72, vw=60)
     sc.cell(470, dy + 76, h4(0x1FC), "$02", "target", aw=72, vw=60)
     sc.cell(470, dy + 112, h4(0x1FB), "..", "dim", aw=72, vw=60)
@@ -575,39 +670,44 @@ def f5_jsr_rts(sc):
     sc.reg("PC", dy + 140, "$0303", hl=True)
     sc.arrow([(335, dy + 104), (335, dy + 140), (140, dy + 140)], 3, badge=(250, dy + 140), color=ORANGE)
     sc.steps(dy + 180, [
-        "① ② SP に 1 ずつ足しながら、下位($02)、上位($03)の順に取り出し、$0302 を作る。",
-        "③ 1 を足した $0303 を PC に入れる。$0303 は、JSR の次の命令の番地。",
+        L("① ② SP に 1 ずつ足しながら、下位($02)、上位($03)の順に取り出し、$0302 を作る。",
+          "① ② Add 1 to SP each time and pull the low byte ($02), then the high byte ($03), to get $0302."),
+        L("③ 1 を足した $0303 を PC に入れる。$0303 は、JSR の次の命令の番地。",
+          "③ Put $0303 (that plus 1) in PC. $0303 is the address of the instruction after JSR."),
     ])
     sc.h = dy + 224
 
 
 def f5_brk_rti(sc):
     # BRK($0302 にある)
-    boxes = sc.bytes_row([("00", "オペコード"), ("99", "署名バイト(使われない)")], hl_from=9)
+    boxes = sc.bytes_row([("00", OPC), ("99", L("署名バイト(使われない)", "Signature byte (unused)"))], hl_from=9)
     sc.label(boxes[0][0] + 32, 114, "$0302", anchor="middle")
     sc.label(boxes[1][0] + 32, 114, "$0303", anchor="middle")
     sc.reg("PC", 168, "$0304")
     sc.reg("P", 222, "$24")
-    sc.label(555, 130, "スタック", anchor="middle")
+    sc.label(555, 130, STK, anchor="middle")
     sc.cell(470, 150, h4(0x1FD), "$03", "target", aw=72, vw=60)
     sc.cell(470, 186, h4(0x1FC), "$04", "target", aw=72, vw=60)
     sc.cell(470, 222, h4(0x1FB), "$34", "target", aw=72, vw=60)
     sc.arrow([(140, 168), (430, 168), (430, 150), (470, 150)], 1, badge=(300, 168))
     sc.arrow([(430, 168), (430, 186), (470, 186)], None)
     sc.arrow([(140, 222), (470, 222)], 2, badge=(300, 222))
-    sc.label(555, 266, "割り込みベクタ", anchor="middle")
-    sc.cell(470, 292, h4(0xFFFE), "下位", "normal", aw=72, vw=60)
-    sc.cell(470, 328, h4(0xFFFF), "上位", "normal", aw=72, vw=60)
-    sc.reg("PC", 310, "ベクタの番地", hl=True, w=170)
+    sc.label(555, 266, L("割り込みベクタ", "Interrupt vector"), anchor="middle")
+    sc.cell(470, 292, h4(0xFFFE), L("下位", "Low"), "normal", aw=72, vw=60)
+    sc.cell(470, 328, h4(0xFFFF), L("上位", "High"), "normal", aw=72, vw=60)
+    sc.reg("PC", 310, L("ベクタの番地", "Vector address"), hl=True, w=170)
     sc.arrow([(470, 310), (200, 310)], 3, badge=(335, 310), color=ORANGE)
     sc.steps(365, [
-        "① PC の $0304 を、上位($03)、下位($04)の順に積む。署名バイトの次の番地。",
-        "② P を積む。B(ビット 4)とビット 5 は 1 にして積む($24 は $34 になる)。",
-        "③ I を 1 にして、$FFFE(下位)と $FFFF(上位)の番地を PC に入れる。",
+        L("① PC の $0304 を、上位($03)、下位($04)の順に積む。署名バイトの次の番地。",
+          "① Push PC = $0304 (the address after the signature byte): high byte ($03), then low byte ($04)."),
+        L("② P を積む。B(ビット 4)とビット 5 は 1 にして積む($24 は $34 になる)。",
+          "② Push P with B (bit 4) and bit 5 set to 1 ($24 is pushed as $34)."),
+        L("③ I を 1 にして、$FFFE(下位)と $FFFF(上位)の番地を PC に入れる。",
+          "③ Set I to 1 and load PC from $FFFE (low byte) and $FFFF (high byte)."),
     ])
     dy = 480
     sc.text(30, dy + 8, "RTI", size=16, weight="bold", mono=True, fill=BLUE)
-    sc.label(555, dy + 20, "スタック", anchor="middle")
+    sc.label(555, dy + 20, STK, anchor="middle")
     sc.cell(470, dy + 40, h4(0x1FD), "$03", "target", aw=72, vw=60)
     sc.cell(470, dy + 76, h4(0x1FC), "$04", "target", aw=72, vw=60)
     sc.cell(470, dy + 112, h4(0x1FB), "$34", "target", aw=72, vw=60)
@@ -616,8 +716,10 @@ def f5_brk_rti(sc):
     sc.arrow([(470, dy + 112), (170, dy + 112)], 1, badge=(320, dy + 112), color=ORANGE)
     sc.arrow([(470, dy + 58), (140, dy + 58)], 2, badge=(300, dy + 58), color=ORANGE)
     sc.steps(dy + 160, [
-        "① P を取り出す。B は取り込まず、ビット 5 は 1 にする。",
-        "② PC の下位($04)、上位($03)の順に取り出す。RTS と違って、1 を足さない。",
+        L("① P を取り出す。B は取り込まず、ビット 5 は 1 にする。",
+          "① Pull P. B is not loaded, and bit 5 is set to 1."),
+        L("② PC の下位($04)、上位($03)の順に取り出す。RTS と違って、1 を足さない。",
+          "② Pull PC: low byte ($04), then high byte ($03). Unlike RTS, nothing is added."),
     ])
     sc.h = dy + 205
 
@@ -647,19 +749,21 @@ def branch_panel(sc, x0, title, rows, bi, ti, offtxt):
 
 
 def f5_branch(sc):
-    branch_panel(sc, 30, "前へ分岐(距離 +2)", [
+    branch_panel(sc, 30, L("前へ分岐(距離 +2)", "Branch forward (offset +2)"), [
         ("$0302", "D0 02", "BNE $0306", "branch"),
         ("$0304", "A9 EE", "LDA #$EE", "dim"),
         ("$0306", "8D F0 03", "STA $03F0", "target"),
-    ], 0, 2, "次の命令 $0304 + $02 = $0306")
-    branch_panel(sc, 380, "後ろへ分岐(距離 −3)", [
+    ], 0, 2, L("次の命令 $0304 + $02 = $0306", "Next instruction $0304 + $02 = $0306"))
+    branch_panel(sc, 380, L("後ろへ分岐(距離 −3)", "Branch backward (offset −3)"), [
         ("$0302", "CA", "DEX", "target"),
         ("$0303", "D0 FD", "BNE $0302", "branch"),
         ("$0305", "8E F0 03", "STX $03F0", "dim"),
-    ], 1, 0, "次の命令 $0305 + $FD(−3) = $0302")
+    ], 1, 0, L("次の命令 $0305 + $FD(−3) = $0302", "Next instruction $0305 + $FD (−3) = $0302"))
     sc.steps(250, [
-        "距離は、分岐命令の次の命令の番地から測る。$FD は、符号付きの 8 ビットで −3。",
-        "条件が成り立たないとき、PC は次の命令に進む。成り立つときだけ、PC に距離を足す。",
+        L("距離は、分岐命令の次の命令の番地から測る。$FD は、符号付きの 8 ビットで −3。",
+          "The offset is measured from the address of the instruction after the branch. $FD is −3 as a signed 8-bit value."),
+        L("条件が成り立たないとき、PC は次の命令に進む。成り立つときだけ、PC に距離を足す。",
+          "If the condition is false, PC goes to the next instruction. Only if true is the offset added."),
     ])
     sc.h = 310
 
@@ -667,7 +771,7 @@ def f5_branch(sc):
 def f5_bit(sc):
     m = 0xC0
     a = 0x01
-    sc.text(30, 56, f"BIT $0400(メモリの内容 {h2(m)}、A = {h2(a)} の例)", size=14, weight="bold")
+    sc.text(30, 56, L(f"BIT $0400(メモリの内容 {h2(m)}、A = {h2(a)} の例)", f"BIT $0400 (example: memory contents {h2(m)}, A = {h2(a)})"), size=14, weight="bold")
     xs = [30 + i * 48 for i in range(8)]
     for i, x in enumerate(xs):
         sc.label(x + 22, 76, f"b{7 - i}", anchor="middle")
@@ -676,7 +780,7 @@ def f5_bit(sc):
     bitbox(sc, xs[1], 190, "V = 1", w=44, hl="orange", size=13)
     sc.arrow([(xs[0] + 22, 116), (xs[0] + 22, 190)], 1, badge=(xs[0] + 22, 160))
     sc.arrow([(xs[1] + 22, 116), (xs[1] + 22, 190)], 2, badge=(xs[1] + 22, 160))
-    sc.text(xs[0], 250, "ビット 7 → N、ビット 6 → V", size=12, fill=MUTED)
+    sc.text(xs[0], 250, L("ビット 7 → N、ビット 6 → V", "Bit 7 → N, bit 6 → V"), size=12, fill=MUTED)
     sc.reg("A", 99, h2(a), x=500)
     sc.comp(440, 170, 220, ["A AND M", f"{h2(a)} AND {h2(m)} = $00"])
     sc.arrow([(414, 99), (470, 99), (470, 170)], 3, badge=(442, 99))
@@ -684,40 +788,57 @@ def f5_bit(sc):
     bitbox(sc, 520, 250, "Z = 1", w=60, hl="orange", size=13)
     sc.arrow([(550, 226), (550, 250)], 5, badge=(550, 238), color=ORANGE)
     sc.steps(310, [
-        "① ② メモリの内容のビット 7 が N に、ビット 6 が V に、そのまま写る。",
-        "③ ④ A とメモリの内容を AND する。結果そのものは捨てて、A は変わらない。",
-        "⑤ AND の結果が 0 なら、Z を 1 にする。",
+        L("① ② メモリの内容のビット 7 が N に、ビット 6 が V に、そのまま写る。",
+          "① ② Bit 7 of the memory contents is copied to N, and bit 6 to V, as they are."),
+        L("③ ④ A とメモリの内容を AND する。結果そのものは捨てて、A は変わらない。",
+          "③ ④ A is ANDed with the memory contents. The result itself is discarded and A is unchanged."),
+        L("⑤ AND の結果が 0 なら、Z を 1 にする。", "⑤ If the AND result is 0, Z is set to 1."),
     ])
     sc.h = 396
 
 
-REF = [
-    ("shift", "ビットの動き(ASL、LSR、ROL、ROR)", "ASL、LSR、ROL、ROR が、A の 8 ビットとキャリーをどう動かすか。", "", f5_shift),
-    ("stack", "スタック(PHA と PLA)", "PHA が SP の指す番地に A を書いて SP を 1 減らし、PLA が SP を 1 増やして A に読むこと。", "", f5_stack),
-    ("jsr-rts", "JSR と RTS", "JSR が戻り番地(最後のバイトの番地)を積み、RTS が 1 を足して戻ること。", "", f5_jsr_rts),
-    ("brk-rti", "BRK と RTI", "BRK が PC と P を積んでベクタへ飛び、RTI が P と PC を取り出して戻ること。", "", f5_brk_rti),
-    ("branch", "分岐の飛び先", "分岐命令の距離は、次の命令の番地から測ること。前へも後ろへも分岐できること。", "", f5_branch),
-    ("bit", "BIT のフラグ", "BIT がメモリの上位 2 ビットを N と V に写し、A との AND で Z を決めること。", "", f5_bit),
-]
+def ref5():
+    return [
+        ("shift", L("ビットの動き(ASL、LSR、ROL、ROR)", "Bit movement (ASL, LSR, ROL, ROR)"),
+         L("ASL、LSR、ROL、ROR が、A の 8 ビットとキャリーをどう動かすか。", "How ASL, LSR, ROL and ROR move the 8 bits of A and the carry."),
+         "", f5_shift),
+        ("stack", L("スタック(PHA と PLA)", "Stack (PHA and PLA)"),
+         L("PHA が SP の指す番地に A を書いて SP を 1 減らし、PLA が SP を 1 増やして A に読むこと。", "PHA writes A to the address SP points to and decrements SP by 1. PLA increments SP by 1 and reads into A."),
+         "", f5_stack),
+        ("jsr-rts", L("JSR と RTS", "JSR and RTS"),
+         L("JSR が戻り番地(最後のバイトの番地)を積み、RTS が 1 を足して戻ること。", "JSR pushes the return address (the address of its last byte). RTS adds 1 to it and returns."),
+         "", f5_jsr_rts),
+        ("brk-rti", L("BRK と RTI", "BRK and RTI"),
+         L("BRK が PC と P を積んでベクタへ飛び、RTI が P と PC を取り出して戻ること。", "BRK pushes PC and P and jumps through the vector. RTI pulls P and PC and returns."),
+         "", f5_brk_rti),
+        ("branch", L("分岐の飛び先", "Branch destination"),
+         L("分岐命令の距離は、次の命令の番地から測ること。前へも後ろへも分岐できること。", "A branch offset is measured from the address of the next instruction. A branch can go forward or backward."),
+         "", f5_branch),
+        ("bit", L("BIT のフラグ", "Flags set by BIT"),
+         L("BIT がメモリの上位 2 ビットを N と V に写し、A との AND で Z を決めること。", "BIT copies the top 2 bits of memory to N and V, and sets Z from the AND with A."),
+         "", f5_bit),
+    ]
 
 
 # ---- 第6章(フラグ、スタック、割り込み)の図 ----
 
 def f6_flags(sc):
     names = ["N", "V", "-", "B", "D", "I", "Z", "C"]
-    desc = [("結果が負", "(最上位ビット)"), ("符号付きの", "桁あふれ"), ("常に 1", "(実体なし)"), ("積むときだけ", "(実体なし)"),
-            ("10進モード", ""), ("割り込み", "禁止"), ("結果が 0", ""), ("桁上がり", "(SBC は借りの逆)")]
+    desc = L([("結果が負", "(最上位ビット)"), ("符号付きの", "桁あふれ"), ("常に 1", "(実体なし)"), ("積むときだけ", "(実体なし)"),
+              ("10進モード", ""), ("割り込み", "禁止"), ("結果が 0", ""), ("桁上がり", "(SBC は借りの逆)")],
+             [("Negative", "(top bit)"), ("Signed", "overflow"), ("Always 1", "(no real bit)"), ("Only on push", "(no real bit)"),
+              ("Decimal", "mode"), ("Interrupt", "disable"), ("Result is 0", ""), ("Carry", "(SBC: 1 = no borrow)")])
     for i, (n, d) in enumerate(zip(names, desc)):
         x = 30 + i * 84
-        sc.label(x + 38, 76, f"ビット {7 - i}", anchor="middle")
+        sc.label(x + 38, 76, L(f"ビット {7 - i}", f"Bit {7 - i}"), anchor="middle")
         fill, stroke = (BOX, LINE) if n not in ("-", "B") else ("#ffffff", "#d0d7de")
         sc.rect(x, 82, 76, 40, fill=fill, stroke=stroke, sw=1.4)
         sc.text(x + 38, 109, n, size=20, weight="bold", anchor="middle", mono=True, fill=INK if n not in ("-", "B") else MUTED)
         sc.text(x + 38, 142, d[0], size=12, anchor="middle")
         sc.text(x + 38, 158, d[1], size=11, anchor="middle", fill=MUTED)
-    rows = [("リセット後の値(Glow65): $24", "00100100", None),
-            ("PHP と BRK が積む値(例: $34)。B が 1", "00110100", 3),
-            ("IRQ と NMI が積む値(例: $24)。B が 0", "00100100", 3)]
+    rows = [(L("リセット後の値(Glow65): $24", "Value after reset (Glow65): $24"), "00100100", None),
+            (L("PHP と BRK が積む値(例: $34)。B が 1", "Value pushed by PHP and BRK (example: $34). B is 1"), "00110100", 3),
+            (L("IRQ と NMI が積む値(例: $24)。B が 0", "Value pushed by IRQ and NMI (example: $24). B is 0"), "00100100", 3)]
     y = 196
     for label, bits, hl in rows:
         sc.text(30, y, label, size=13, weight="bold")
@@ -731,13 +852,13 @@ def f6_flags(sc):
 
 
 def f6_compare(sc):
-    sc.text(30, 62, "A = $30 のとき、M を変えて比べた結果", size=13)
+    sc.text(30, 62, L("A = $30 のとき、M を変えて比べた結果", "Results of comparing with different values of M when A = $30"), size=13)
     for j, n in enumerate(["C", "Z", "N"]):
         sc.text(330 + j * 70 + 28, 90, n, size=14, weight="bold", anchor="middle", mono=True)
-    sc.text(540, 90, "使う分岐", size=13, weight="bold")
-    rows = [("A < M", "CMP #$40", (0, 0, 1), "BCC(C = 0)"),
-            ("A = M", "CMP #$30", (1, 1, 0), "BEQ(Z = 1)"),
-            ("A > M", "CMP #$20", (1, 0, 0), "BCS(C = 1)と BNE(Z = 0)")]
+    sc.text(540, 90, L("使う分岐", "Branch to use"), size=13, weight="bold")
+    rows = [("A < M", "CMP #$40", (0, 0, 1), L("BCC(C = 0)", "BCC (C=0)")),
+            ("A = M", "CMP #$30", (1, 1, 0), L("BEQ(Z = 1)", "BEQ (Z=1)")),
+            ("A > M", "CMP #$20", (1, 0, 0), L("BCS(C = 1)と BNE(Z = 0)", "BCS (C=1), BNE (Z=0)"))]
     y = 108
     for case, asm, (c, z, n), br in rows:
         sc.text(30, y + 20, case, size=18, weight="bold", mono=True, fill=BLUE)
@@ -746,17 +867,19 @@ def f6_compare(sc):
             bitbox(sc, 330 + j * 70, y, str(v), w=56, hl="orange" if v else None)
         sc.text(540, y + 22, br, size=13)
         y += 56
-    sc.text(30, y + 20, "C は A が M 以上のとき 1。Z は A と M が等しいとき 1。N は A − M の結果の最上位ビット。", size=13)
-    sc.text(30, y + 42, "N は、符号付きの大小を直接表すものではない。比較は、符号なしの数として行われる。", size=13, fill=MUTED)
+    sc.text(30, y + 20, L("C は A が M 以上のとき 1。Z は A と M が等しいとき 1。N は A − M の結果の最上位ビット。",
+                          "C is 1 when A is greater than or equal to M. Z is 1 when A equals M. N is the top bit of A − M."), size=13)
+    sc.text(30, y + 42, L("N は、符号付きの大小を直接表すものではない。比較は、符号なしの数として行われる。",
+                          "N does not directly show signed order. The comparison treats both values as unsigned."), size=13, fill=MUTED)
     sc.h = y + 64
 
 
 def f6_nested(sc):
-    sc.text(30, 62, "SP = $FD から始める", size=13)
+    sc.text(30, 62, L("SP = $FD から始める", "Start with SP = $FD"), size=13)
     panels = [
-        ("① 最初の JSR のあと", 0xFB, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "..", "d"), (0x1FA, "..", "d"), (0x1F9, "..", "d")]),
-        ("② 2 つ目の JSR のあと", 0xF9, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "$03", "t"), (0x1FA, "$22", "t"), (0x1F9, "..", "d")]),
-        ("③ RTS で 1 つ戻ったあと", 0xFB, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "$03", "d"), (0x1FA, "$22", "d"), (0x1F9, "..", "d")]),
+        (L("① 最初の JSR のあと", "① After the first JSR"), 0xFB, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "..", "d"), (0x1FA, "..", "d"), (0x1F9, "..", "d")]),
+        (L("② 2 つ目の JSR のあと", "② After the second JSR"), 0xF9, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "$03", "t"), (0x1FA, "$22", "t"), (0x1F9, "..", "d")]),
+        (L("③ RTS で 1 つ戻ったあと", "③ After one RTS"), 0xFB, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "$03", "d"), (0x1FA, "$22", "d"), (0x1F9, "..", "d")]),
     ]
     for i, (title, sp, rows) in enumerate(panels):
         x0 = 30 + i * 232
@@ -768,12 +891,17 @@ def f6_nested(sc):
             if addr == 0x100 + sp:
                 sc.arrow([(x0 + 172, y), (x0 + 128, y)], None, color=ORANGE)
                 sc.text(x0 + 178, y + 5, "SP", size=13, weight="bold", fill=ORANGE)
-    sc.steps(330, [
+    sc.steps(330, L([
         "$01FD と $01FC は、最初の JSR が積んだ戻り番地(`$0302`)。上位が先、下位が次。".replace("`", ""),
         "$01FB と $01FA は、2 つ目の JSR が積んだ戻り番地($0322)。SP は 2 つずつ下がる。",
         "RTS は、SP を戻して番地を取り出す。取り出した値は、メモリに残るが、次の PHA や JSR で上書きされる。",
-    ])
-    sc.h = 420
+    ], [
+        "$01FD and $01FC hold the return address ($0302) pushed by the first JSR: high byte first, then low byte.",
+        "$01FB and $01FA hold the return address ($0322) pushed by the second JSR. SP drops by 2 each time.",
+        "RTS moves SP back and pulls the address. The pulled values stay in memory",
+        "   until a later PHA or JSR overwrites them.",
+    ]))
+    sc.h = L(420, 440)
 
 
 def f6_flow(sc):
@@ -791,15 +919,15 @@ def f6_flow(sc):
         sc.text(x + 34, y + 25, l1, size=13, weight="bold")
         sc.text(x + 34, y + 45, l2, size=12, fill=MUTED)
     seq = [
-        (0, 0, "①", "主プログラムを実行", "命令を 1 つずつ実行", None),
-        (1, 0, "②", "割り込みの要求", "NMI、または IRQ", None),
-        (2, 0, "③", "実行中の命令を終える", "命令の途中では受けない", "cpu"),
-        (2, 1, "④", "PC と P を積む", "PCH、PCL、P の順", "cpu"),
-        (1, 1, "⑤", "I フラグを 1 にする", "IRQ を重ねて受けない", "cpu"),
-        (0, 1, "⑥", "ベクタを読んで飛ぶ", "NMI $FFFA、IRQ $FFFE", "cpu"),
-        (0, 2, "⑦", "ハンドラを実行", "レジスタを保存して使う", "handler"),
-        (1, 2, "⑧", "RTI を実行", "P と PC を取り出す", "handler"),
-        (2, 2, "⑨", "主プログラムの続き", "積んだ PC の番地から", None),
+        (0, 0, "①", L("主プログラムを実行", "Run the main program"), L("命令を 1 つずつ実行", "One instruction at a time"), None),
+        (1, 0, "②", L("割り込みの要求", "Interrupt request"), L("NMI、または IRQ", "NMI or IRQ"), None),
+        (2, 0, "③", L("実行中の命令を終える", "Finish the instruction"), L("命令の途中では受けない", "Not taken mid-instruction"), "cpu"),
+        (2, 1, "④", L("PC と P を積む", "Push PC and P"), L("PCH、PCL、P の順", "PCH, PCL, then P"), "cpu"),
+        (1, 1, "⑤", L("I フラグを 1 にする", "Set the I flag to 1"), L("IRQ を重ねて受けない", "Blocks further IRQs"), "cpu"),
+        (0, 1, "⑥", L("ベクタを読んで飛ぶ", "Read vector, jump"), "NMI $FFFA、IRQ $FFFE" if LANG == "ja" else "NMI $FFFA, IRQ $FFFE", "cpu"),
+        (0, 2, "⑦", L("ハンドラを実行", "Run the handler"), L("レジスタを保存して使う", "Save registers before use"), "handler"),
+        (1, 2, "⑧", L("RTI を実行", "Run RTI"), L("P と PC を取り出す", "Pull P and PC"), "handler"),
+        (2, 2, "⑨", L("主プログラムの続き", "Main program resumes"), L("積んだ PC の番地から", "From the pushed PC address"), None),
     ]
     pos = {}
     for c, r, n, l1, l2, kind in seq:
@@ -816,7 +944,8 @@ def f6_flow(sc):
     sc.arrow([mid("⑥", "b"), mid("⑦", "t")], None)
     sc.arrow([mid("⑦", "r"), mid("⑧", "l")], None)
     sc.arrow([mid("⑧", "r"), mid("⑨", "l")], None)
-    sc.text(30, 392, "青い枠は、CPU が自動で行う手順。橙の枠は、プログラム(ハンドラ)が行う手順。", size=13)
+    sc.text(30, 392, L("青い枠は、CPU が自動で行う手順。橙の枠は、プログラム(ハンドラ)が行う手順。",
+                       "Blue boxes: steps the CPU does automatically. Orange boxes: steps the program (handler) does."), size=13)
     sc.h = 420
 
 
@@ -835,40 +964,53 @@ def f6_nmi_irq(sc):
         path.append((x1, cur))
         d = "M " + " L ".join(f"{a} {b}" for a, b in path)
         sc.parts.append(f'<path d="{d}" fill="none" stroke="{INK}" stroke-width="2"/>')
-        sc.text(x0 - 8, yh + 4, "あり", size=11, anchor="end", fill=MUTED)
-        sc.text(x0 - 8, yl + 4, "なし", size=11, anchor="end", fill=MUTED)
+        sc.text(x0 - 8, yh + 4, L("あり", "Active"), size=11, anchor="end", fill=MUTED)
+        sc.text(x0 - 8, yl + 4, L("なし", "Idle"), size=11, anchor="end", fill=MUTED)
         return yh
     def mark(x, y):
         sc.arrow([(x, y - 34), (x, y - 4)], None, color=ORANGE)
     # NMI
     y = 120
-    wave(y, [(250, 1), (420, 0), (500, 1), (590, 0)], "NMI", "(要求の線)")
+    wave(y, [(250, 1), (420, 0), (500, 1), (590, 0)], "NMI", L("(要求の線)", "(request line)"))
     mark(250, y + 4); mark(500, y + 4)
-    sc.text(250, y - 40, "受け付け", size=11, anchor="middle", fill=ORANGE)
-    sc.text(500, y - 40, "受け付け", size=11, anchor="middle", fill=ORANGE)
-    sc.text(30, y + 76, "要求が「なし」から「あり」に変わった 1 回ごとに、1 回だけ受け付ける。I フラグには関係しない。", size=12)
+    sc.text(250, y - 40, L("受け付け", "Accepted"), size=11, anchor="middle", fill=ORANGE)
+    sc.text(500, y - 40, L("受け付け", "Accepted"), size=11, anchor="middle", fill=ORANGE)
+    sc.text(30, y + 76, L("要求が「なし」から「あり」に変わった 1 回ごとに、1 回だけ受け付ける。I フラグには関係しない。",
+                          "Accepted once for each change from Idle to Active. The I flag does not matter."), size=12)
     # IRQ 消さない
     y = 260
-    wave(y, [(250, 1)], "IRQ", "(要因を消さない)")
+    wave(y, [(250, 1)], "IRQ", L("(要因を消さない)", "(cause not cleared)"))
     for x in (270, 350, 430, 510, 590, 670):
         mark(x, y + 4)
-    sc.text(30, y + 76, "要求が「あり」の間、RTI のあとすぐに、何度でも受け付ける(I = 0 のとき)。", size=12)
+    sc.text(30, y + 76, L("要求が「あり」の間、RTI のあとすぐに、何度でも受け付ける(I = 0 のとき)。",
+                          "While the request stays Active, it is accepted again right after each RTI (when I = 0)."), size=12)
     # IRQ 消す
     y = 390
-    wave(y, [(250, 1), (300, 0)], "IRQ", "(ハンドラが要因を消す)")
+    wave(y, [(250, 1), (300, 0)], "IRQ", L("(ハンドラが要因を消す)", "(handler clears cause)"))
     mark(270, y + 4)
-    sc.text(318, y + 24, "$A001 を読んで、要求を下げる", size=11, fill=MUTED)
-    sc.text(30, y + 76, "ハンドラが要因を消せば、受け付けは 1 回で終わる。", size=12)
+    sc.text(318, y + 24, L("$A001 を読んで、要求を下げる", "Reading $A001 clears the request"), size=11, fill=MUTED)
+    sc.text(30, y + 76, L("ハンドラが要因を消せば、受け付けは 1 回で終わる。", "If the handler clears the cause, the request is accepted only once."), size=12)
     sc.h = 500
 
 
-REF6 = [
-    ("flags", "P レジスタの 8 ビット", "N、V、B、D、I、Z、C のビットの位置と意味。リセット後、PHP と BRK、IRQ と NMI が積む P の値の違い。", "", f6_flags),
-    ("compare", "CMP の結果とフラグ", "CMP のあとの C、Z、N の読み方と、使う分岐命令の対応。", "", f6_compare),
-    ("stack-nested", "ネストした JSR とスタック", "JSR を 2 回重ねたときのスタックの中身と、RTS で戻ったあとの様子。", "", f6_nested),
-    ("interrupt-flow", "割り込みの流れ", "割り込みの要求から、ハンドラの実行、RTI による復帰までの手順。", "", f6_flow),
-    ("nmi-irq", "NMI と IRQ の違い", "NMI がエッジで 1 回、IRQ がレベルで、要因が消えるまで繰り返し受け付けられること。", "", f6_nmi_irq),
-]
+def ref6():
+    return [
+        ("flags", L("P レジスタの 8 ビット", "The 8 bits of the P register"),
+         L("N、V、B、D、I、Z、C のビットの位置と意味。リセット後、PHP と BRK、IRQ と NMI が積む P の値の違い。", "Bit positions and meanings of N, V, B, D, I, Z and C. How the value of P differs after reset, when pushed by PHP and BRK, and when pushed by IRQ and NMI."),
+         "", f6_flags),
+        ("compare", L("CMP の結果とフラグ", "CMP results and flags"),
+         L("CMP のあとの C、Z、N の読み方と、使う分岐命令の対応。", "How to read C, Z and N after CMP, and which branch instruction goes with each result."),
+         "", f6_compare),
+        ("stack-nested", L("ネストした JSR とスタック", "Nested JSR and the stack"),
+         L("JSR を 2 回重ねたときのスタックの中身と、RTS で戻ったあとの様子。", "The contents of the stack after two nested JSRs, and after returning with RTS."),
+         "", f6_nested),
+        ("interrupt-flow", L("割り込みの流れ", "Interrupt flow"),
+         L("割り込みの要求から、ハンドラの実行、RTI による復帰までの手順。", "The steps from an interrupt request, through the handler, to the return by RTI."),
+         "", f6_flow),
+        ("nmi-irq", L("NMI と IRQ の違い", "NMI and IRQ compared"),
+         L("NMI がエッジで 1 回、IRQ がレベルで、要因が消えるまで繰り返し受け付けられること。", "NMI is accepted once per edge. IRQ is level-triggered and is accepted repeatedly until its cause is cleared."),
+         "", f6_nmi_irq),
+    ]
 
 # ---- 第7章(メモリマップと I/O)の図 ----
 
@@ -897,27 +1039,27 @@ def band(sc, x, y, w, h, kind, l1, l2=None):
 def f7_map(sc):
     x0, w0 = 30, 230
     y = 62
-    mains = [("rom", "$F000-$FFFF", "モニタの ROM とベクタ", 56),
-             ("rom", "$C000-$EFFF", "BASIC の ROM", 72),
-             ("none", "$A100-$BFFF", "何もつながっていない", 50),
+    mains = [("rom", "$F000-$FFFF", L("モニタの ROM とベクタ", "Monitor ROM and vectors"), 56),
+             ("rom", "$C000-$EFFF", L("BASIC の ROM", "BASIC ROM"), 72),
+             ("none", "$A100-$BFFF", L("何もつながっていない", "Nothing connected"), 50),
              ("io", "$A000-$A0FF", "UART", 40),
-             ("none", "$8000-$9FFF", "何もつながっていない", 50),
-             ("ram", "$0000-$7FFF", "RAM(32KB)", 228)]
+             ("none", "$8000-$9FFF", L("何もつながっていない", "Nothing connected"), 50),
+             ("ram", "$0000-$7FFF", L("RAM(32KB)", "RAM (32KB)"), 228)]
     ram_top = ram_bot = 0
     for kind, a, n, h in mains:
         band(sc, x0, y, w0, h, kind, a, n)
         if a.startswith("$0000"):
             ram_top, ram_bot = y, y + h
         y += h
-    subs = [("$0400-$7FFF", "BASIC のプログラムと変数", 62),
-            ("$03F8-$03FB", "割り込みベクタ(RAM)", 30),
-            ("$0300-$03F7", "ユーザープログラム用", 38),
-            ("$0200-$027F", "モニタの行入力バッファ", 38),
-            ("$0100-$01FF", "スタック", 30),
-            ("$0000-$00FF", "ゼロページ", 30)]
+    subs = [("$0400-$7FFF", L("BASIC のプログラムと変数", "BASIC program, variables"), 62),
+            ("$03F8-$03FB", L("割り込みベクタ(RAM)", "Interrupt vectors (RAM)"), 30),
+            ("$0300-$03F7", L("ユーザープログラム用", "User programs"), 38),
+            ("$0200-$027F", L("モニタの行入力バッファ", "Monitor line buffer"), 38),
+            ("$0100-$01FF", STK, 30),
+            ("$0000-$00FF", ZPG, 30)]
     xs, ws = 410, 280
     ys = ram_top
-    sc.text(xs, ram_top - 8, "RAM の主な使い道", size=12, weight="bold")
+    sc.text(xs, ram_top - 8, L("RAM の主な使い道", "Main uses of RAM"), size=12, weight="bold")
     for a, n, h in subs:
         sc.rect(xs, ys, ws, h, fill=BLUE_BG, stroke=BLUE, sw=2, rx=3)
         sc.text(xs + 10, ys + h / 2 + 5, a, size=12, mono=True)
@@ -927,24 +1069,25 @@ def f7_map(sc):
     sc.parts.append(f'<line x1="{x0 + w0}" y1="{ram_bot}" x2="{xs}" y2="{ys}" stroke="{BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>')
     # 凡例
     ly = max(ram_bot, ys) + 26
-    for i, (kind, text) in enumerate([("ram", "RAM"), ("rom", "ROM"), ("io", "I/O"), ("none", "未接続")]):
+    for i, (kind, text) in enumerate([("ram", "RAM"), ("rom", "ROM"), ("io", "I/O"), ("none", L("未接続", "Not connected"))]):
         lx = 30 + i * 120
         if kind == "none":
             dashed_rect(sc, lx, ly - 12, 22, 16)
         else:
             band(sc, lx, ly - 12, 22, 16, kind, "")
         sc.text(lx + 30, ly + 1, text, size=12)
-    sc.text(30, ly + 28, "未接続のアドレスを読むと $FF が返り、書き込みは無視される。ROM への書き込みも無視される。", size=12, fill=MUTED)
+    sc.text(30, ly + 28, L("未接続のアドレスを読むと $FF が返り、書き込みは無視される。ROM への書き込みも無視される。",
+                         "Reading an unconnected address returns $FF, and writing to it is ignored. Writes to ROM are ignored too."), size=12, fill=MUTED)
     sc.h = ly + 46
 
 
 def f7_uart(sc):
-    sc.text(30, 62, "MC6850 風の最小構成", size=13)
+    sc.text(30, 62, L("MC6850 風の最小構成", "Minimal MC6850-style layout"), size=13)
     def regrow(y, title, cells, notes=None):
         sc.text(30, y, title, size=13, weight="bold")
         for i in range(8):
             x = 30 + i * 84
-            sc.label(x + 38, y + 18, f"ビット {7 - i}", anchor="middle")
+            sc.label(x + 38, y + 18, L(f"ビット {7 - i}", f"Bit {7 - i}"), anchor="middle")
         for i, (name, desc, hl) in enumerate(cells):
             x = 30 + i * 84
             hlc = {"b": "blue", "o": "orange"}.get(hl)
@@ -952,17 +1095,19 @@ def f7_uart(sc):
             sc.text(x + 38, y + 76, desc[0], size=11, anchor="middle")
             if len(desc) > 1:
                 sc.text(x + 38, y + 91, desc[1], size=11, anchor="middle", fill=MUTED)
-    regrow(100, "状態レジスタ($A000 を読む)", [
-        ("IRQ", ("割り込み", "要求中"), "o"), ("0", ("未使用",), None), ("0", ("未使用",), None), ("0", ("未使用",), None),
-        ("0", ("未使用",), None), ("0", ("未使用",), None), ("TDRE", ("送信可",), "b"), ("RDRF", ("受信あり",), "b")])
-    regrow(250, "制御レジスタ($A000 に書く)", [
-        ("RIE", ("受信割り込みの", "許可"), "o"), ("-", ("使わない",), None), ("-", ("使わない",), None), ("-", ("使わない",), None),
-        ("-", ("使わない",), None), ("-", ("使わない",), None), ("1", ("11 で",), "b"), ("1", ("マスタリセット",), "b")])
-    sc.text(30, 410, "データレジスタ($A001)", size=13, weight="bold")
+    UNUSED = (L("未使用", "Unused"),)
+    NOTUSED = (L("使わない", "Unused"),)
+    regrow(100, L("状態レジスタ($A000 を読む)", "Status register (read $A000)"), [
+        ("IRQ", L(("割り込み", "要求中"), ("Interrupt", "pending")), "o"), ("0", UNUSED, None), ("0", UNUSED, None), ("0", UNUSED, None),
+        ("0", UNUSED, None), ("0", UNUSED, None), ("TDRE", (L("送信可", "Can send"),), "b"), ("RDRF", (L("受信あり", "Byte received"),), "b")])
+    regrow(250, L("制御レジスタ($A000 に書く)", "Control register (write $A000)"), [
+        ("RIE", L(("受信割り込みの", "許可"), ("RX interrupt", "enable")), "o"), ("-", NOTUSED, None), ("-", NOTUSED, None), ("-", NOTUSED, None),
+        ("-", NOTUSED, None), ("-", NOTUSED, None), ("1", (L("11 で", "11 means"),), "b"), ("1", (L("マスタリセット", "master reset"),), "b")])
+    sc.text(30, 410, L("データレジスタ($A001)", "Data register ($A001)"), size=13, weight="bold")
     sc.rect(30, 420, 330, 42, fill=BLUE_BG, stroke=BLUE, sw=2)
-    sc.text(195, 446, "読むと: 受信した 1 バイト", size=13, anchor="middle")
+    sc.text(195, 446, L("読むと: 受信した 1 バイト", "Read: the received byte"), size=13, anchor="middle")
     sc.rect(372, 420, 330, 42, fill=ORANGE_BG, stroke=ORANGE, sw=2)
-    sc.text(537, 446, "書くと: 送信する 1 バイト", size=13, anchor="middle")
+    sc.text(537, 446, L("書くと: 送信する 1 バイト", "Write: the byte to send"), size=13, anchor="middle")
     sc.h = 490
 
 
@@ -984,39 +1129,57 @@ def flow_panel(sc, cx, title, first, test, last, bit):
     sc.text(cx, 333, last, size=13, anchor="middle", mono=True)
     sc.arrow([(cx, 128), (cx, 165)], None)
     sc.arrow([(cx, 255), (cx, 306)], None, color=ORANGE)
-    sc.text(cx + 10, 284, "はい(1)", size=12, fill=ORANGE)
+    sc.text(cx + 10, 284, L("はい(1)", "Yes (1)"), size=12, fill=ORANGE)
     sc.arrow([(cx - 120, 210), (cx - 150, 210), (cx - 150, 106), (cx - 120, 106)], None)
-    sc.text(cx - 148, 232, "いいえ(0)", size=12, fill=BLUE)
+    sc.text(cx - 148, 232, L("いいえ(0)", "No (0)"), size=12, fill=BLUE)
 
 
 def f7_polling(sc):
-    flow_panel(sc, 190, "送信(1 バイトを送る)", "LDA $A000", ["TDRE(ビット 1)", "が 1 か"], "STA $A001", 1)
-    flow_panel(sc, 530, "受信(1 バイトを受け取る)", "LDA $A000", ["RDRF(ビット 0)", "が 1 か"], "LDA $A001", 0)
-    sc.steps(384, [
+    flow_panel(sc, 190, L("送信(1 バイトを送る)", "Transmit (send 1 byte)"), "LDA $A000", L(["TDRE(ビット 1)", "が 1 か"], ["TDRE (bit 1)", "is 1?"]), "STA $A001", 1)
+    flow_panel(sc, 530, L("受信(1 バイトを受け取る)", "Receive (get 1 byte)"), "LDA $A000", L(["RDRF(ビット 0)", "が 1 か"], ["RDRF (bit 0)", "is 1?"]), "LDA $A001", 0)
+    sc.steps(384, L([
         "状態レジスタの該当ビットを AND で取り出し、0 の間は読み直す。1 になったら、データレジスタに触る。",
         "送信は TDRE が 1 のとき書く。受信は RDRF が 1 のとき読む。読むと、受信した 1 バイトがキューから消える。",
-    ])
-    sc.h = 440
+    ], [
+        "Pick out the bit in the status register with AND, and read again while it is 0.",
+        "When it is 1, access the data register.",
+        "Transmit: write when TDRE is 1. Receive: read when RDRF is 1.",
+        "Reading removes the received byte from the queue.",
+    ]))
+    sc.h = L(440, 484)
 
 
-REF7 = [
-    ("memory-map", "メモリマップ全体", "Glow65 の 64KB のアドレス空間の割り振りと、RAM の主な使い道。", "", f7_map),
-    ("uart", "UART のレジスタ", "UART の状態レジスタ、制御レジスタ、データレジスタのビットの意味。", "", f7_uart),
-    ("polling", "ポーリングの流れ", "状態レジスタのビットを調べて、送信と受信を行う流れ。", "", f7_polling),
-]
+def ref7():
+    return [
+        ("memory-map", L("メモリマップ全体", "Whole memory map"),
+         L("Glow65 の 64KB のアドレス空間の割り振りと、RAM の主な使い道。", "How the 64KB address space of Glow65 is allocated, and the main uses of RAM."),
+         "", f7_map),
+        ("uart", L("UART のレジスタ", "UART registers"),
+         L("UART の状態レジスタ、制御レジスタ、データレジスタのビットの意味。", "The meaning of the bits in the UART status, control and data registers."),
+         "", f7_uart),
+        ("polling", L("ポーリングの流れ", "Polling flow"),
+         L("状態レジスタのビットを調べて、送信と受信を行う流れ。", "How to check the status register bits to transmit and receive."),
+         "", f7_polling),
+    ]
+
 
 def main():
+    if ARG_LANG == "all":
+        # 文字列は import 時に言語で選ぶので、言語ごとに自分自身を起動する
+        for lang in ("ja", "en"):
+            subprocess.run([sys.executable, os.path.abspath(__file__), "--lang", lang], check=True)
+        return
     os.makedirs(OUT_DIR, exist_ok=True)
-    for name, title, desc, asm, fn in MODES:
+    for name, title, desc, asm, fn in modes():
         p = build(name, title, desc, asm, fn)
         print(os.path.normpath(p))
-    for name, title, desc, asm, fn in REF:
+    for name, title, desc, asm, fn in ref5():
         p = build(name, title, desc, asm, fn, prefix="05")
         print(os.path.normpath(p))
-    for name, title, desc, asm, fn in REF6:
+    for name, title, desc, asm, fn in ref6():
         p = build(name, title, desc, asm, fn, prefix="06")
         print(os.path.normpath(p))
-    for name, title, desc, asm, fn in REF7:
+    for name, title, desc, asm, fn in ref7():
         p = build(name, title, desc, asm, fn, prefix="07")
         print(os.path.normpath(p))
 

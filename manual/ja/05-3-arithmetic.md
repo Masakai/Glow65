@@ -1,5 +1,7 @@
 # 5.3 算術演算と比較
 
+[日本語](05-3-arithmetic.md) | [English](../en/05-3-arithmetic.md)
+
 [← 5.2 レジスタ間の転送](05-2-transfer.md) &nbsp;·&nbsp; [5.4 論理演算とシフト →](05-4-logic-shift.md) &nbsp;·&nbsp; [章の入口](05-reference.md)
 
 足し算、引き算、比較、1 ずつの増減をまとめた分類です。ADC と SBC は、C(キャリー)を計算に使います。ADC の前には CLC、SBC の前には SEC で、C を決めておきます。

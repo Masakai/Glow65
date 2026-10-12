@@ -1,6 +1,6 @@
 # Glow65
 
-[English](README.md) | **日本語** | [Webサイト](https://masakai.github.io/Glow65/) | [紹介動画](https://masakai.github.io/Glow65/#video)
+[English](README.md) | **日本語** | [Webサイト](https://masakai.github.io/Glow65/) | [紹介動画](https://masakai.github.io/Glow65/#video) | [マニュアル](manual/ja/README.md)
 
 **6502 の学習用に、CPU の動作がわかるよう、昔のコンピュータのように LED が光る GUI を持ったエミュレータを作成しました。**
 
@@ -46,6 +46,8 @@ Glow65 は**全体が独自実装ではありません**。
 ## 自作プログラムを動かす
 
 Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)は6章あります。[LED カウンタ](tutorial/README.ja.md)(アセンブルして、またはバイトを手入力して読み込み、実行し、CPU を遅くしてバスアクセスを1つずつ辿る)、[16 ビットの足し算とキャリーフラグ](tutorial/02-addition.ja.md)、[UART で文字を出す](tutorial/03-uart.ja.md)、[キーボードを読むエコー](tutorial/04-echo.ja.md)、[BASIC から機械語を呼ぶ USR](tutorial/05-usr.ja.md)、[割り込み](tutorial/06-interrupts.ja.md)(NMI ボタンと UART 受信 IRQ)です。
+
+6502 の仕組みを読んで学ぶには、[マニュアル](manual/ja/README.md)を使います。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。[英語版](manual/en/README.md)もあります。
 
 ## クイックスタート
 
@@ -190,6 +192,7 @@ Sources/Glow65App/     SwiftUI アプリ: フロントパネル、端末、起�
 ROM/monitor.s         モニタ ROM のソース(ca65)
 ROM/basic/            BASIC: 原典、マクロ、リンカ設定
 Tools/                ビルドと変換のスクリプト(assemble.sh は自作プログラムのビルド用)
+manual/               マニュアル: 8 章(日本語と英語)、図の生成スクリプト
 tutorial/             チュートリアル: 6章(LED カウンタ、足し算、UART、エコー、USR、割り込み)とサンプルプログラム
 Tests/                単体テストと結合テスト
 documents/designs/    設計書(日本語)

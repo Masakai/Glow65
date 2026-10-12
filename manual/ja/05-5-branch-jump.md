@@ -1,5 +1,7 @@
 # 5.5 分岐とジャンプ
 
+[日本語](05-5-branch-jump.md) | [English](../en/05-5-branch-jump.md)
+
 [← 5.4 論理演算とシフト](05-4-logic-shift.md) &nbsp;·&nbsp; [5.6 スタックとフラグ操作 →](05-6-stack-flags.md) &nbsp;·&nbsp; [章の入口](05-reference.md)
 
 実行の流れを変える命令です。条件分岐(BCC、BCS、BEQ、BNE、BMI、BPL、BVC、BVS)は、フラグを見て、次の命令の番地からの距離だけ飛びます。JMP は、指定の番地へ無条件に飛びます。
