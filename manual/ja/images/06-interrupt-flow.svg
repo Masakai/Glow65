@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420" role="img" aria-labelledby="t d">
+<title id="t">割り込みの流れ</title>
+<desc id="d">割り込みの要求から、ハンドラの実行、RTI による復帰までの手順。</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="419" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">割り込みの流れ</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></text>
+<rect x="30" y="80" width="200" height="60" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="42" y="104" font-size="15" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">①</text>
+<text x="64" y="105" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">主プログラムを実行</text>
+<text x="64" y="125" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">命令を 1 つずつ実行</text>
+<rect x="260" y="80" width="200" height="60" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="272" y="104" font-size="15" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">②</text>
+<text x="294" y="105" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">割り込みの要求</text>
+<text x="294" y="125" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">NMI、または IRQ</text>
+<rect x="490" y="80" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="502" y="104" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">③</text>
+<text x="524" y="105" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">実行中の命令を終える</text>
+<text x="524" y="125" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">命令の途中では受けない</text>
+<rect x="490" y="190" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="502" y="214" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">④</text>
+<text x="524" y="215" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">PC と P を積む</text>
+<text x="524" y="235" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">PCH、PCL、P の順</text>
+<rect x="260" y="190" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="272" y="214" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">⑤</text>
+<text x="294" y="215" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">I フラグを 1 にする</text>
+<text x="294" y="235" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">IRQ を重ねて受けない</text>
+<rect x="30" y="190" width="200" height="60" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="42" y="214" font-size="15" font-weight="bold" text-anchor="start" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">⑥</text>
+<text x="64" y="215" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ベクタを読んで飛ぶ</text>
+<text x="64" y="235" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">NMI $FFFA、IRQ $FFFE</text>
+<rect x="30" y="300" width="200" height="60" rx="6" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="42" y="324" font-size="15" font-weight="bold" text-anchor="start" fill="#bc4c00" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">⑦</text>
+<text x="64" y="325" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ハンドラを実行</text>
+<text x="64" y="345" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">レジスタを保存して使う</text>
+<rect x="260" y="300" width="200" height="60" rx="6" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="272" y="324" font-size="15" font-weight="bold" text-anchor="start" fill="#bc4c00" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">⑧</text>
+<text x="294" y="325" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">RTI を実行</text>
+<text x="294" y="345" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">P と PC を取り出す</text>
+<rect x="490" y="300" width="200" height="60" rx="6" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.4"/>
+<text x="502" y="324" font-size="15" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">⑨</text>
+<text x="524" y="325" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">主プログラムの続き</text>
+<text x="524" y="345" font-size="12" font-weight="normal" text-anchor="start" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">積んだ PC の番地から</text>
+<path d="M 230 110.0 L 260 110.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 460 110.0 L 490 110.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 590.0 140 L 590.0 190" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 490 220.0 L 460 220.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 260 220.0 L 230 220.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 130.0 250 L 130.0 300" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 230 330.0 L 260 330.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M 460 330.0 L 490 330.0" fill="none" stroke="#0969da" stroke-width="2" marker-end="url(#ah)"/>
+<text x="30" y="392" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">青い枠は、CPU が自動で行う手順。橙の枠は、プログラム(ハンドラ)が行う手順。</text>
+</svg>

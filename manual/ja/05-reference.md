@@ -157,6 +157,4 @@
 
 1. MOS Technology, "MCS6500 Microcomputer Family Hardware Manual", 1976年1月版: https://www.commodore.ca/wp-content/uploads/2018/11/kim1_hardware.txt
 
-## 次の章
-
-第6章「フラグ、スタック、割り込み」は準備中です。
+次の章: [6. フラグ、スタック、割り込み →](06-flags-stack-interrupts.md)

@@ -672,7 +672,6 @@ def f5_bit(sc):
     for i, x in enumerate(xs):
         sc.label(x + 22, 76, f"b{7 - i}", anchor="middle")
         bitbox(sc, x, 82, str((m >> (7 - i)) & 1), hl="blue" if i < 2 else None)
-    sc.label(30, 134, "メモリ $0400 の内容", anchor="start")
     bitbox(sc, xs[0], 190, "N = 1", w=44, hl="orange", size=13)
     bitbox(sc, xs[1], 190, "V = 1", w=44, hl="orange", size=13)
     sc.arrow([(xs[0] + 22, 116), (xs[0] + 22, 190)], 1, badge=(xs[0] + 22, 160))
@@ -702,6 +701,175 @@ REF = [
 ]
 
 
+# ---- 第6章(フラグ、スタック、割り込み)の図 ----
+
+def f6_flags(sc):
+    names = ["N", "V", "-", "B", "D", "I", "Z", "C"]
+    desc = [("結果が負", "(最上位ビット)"), ("符号付きの", "桁あふれ"), ("常に 1", "(実体なし)"), ("積むときだけ", "(実体なし)"),
+            ("10進モード", ""), ("割り込み", "禁止"), ("結果が 0", ""), ("桁上がり", "(SBC は借りの逆)")]
+    for i, (n, d) in enumerate(zip(names, desc)):
+        x = 30 + i * 84
+        sc.label(x + 38, 76, f"ビット {7 - i}", anchor="middle")
+        fill, stroke = (BOX, LINE) if n not in ("-", "B") else ("#ffffff", "#d0d7de")
+        sc.rect(x, 82, 76, 40, fill=fill, stroke=stroke, sw=1.4)
+        sc.text(x + 38, 109, n, size=20, weight="bold", anchor="middle", mono=True, fill=INK if n not in ("-", "B") else MUTED)
+        sc.text(x + 38, 142, d[0], size=12, anchor="middle")
+        sc.text(x + 38, 158, d[1], size=11, anchor="middle", fill=MUTED)
+    rows = [("リセット後の値(Glow65): $24", "00100100", None),
+            ("PHP と BRK が積む値(例: $34)。B が 1", "00110100", 3),
+            ("IRQ と NMI が積む値(例: $24)。B が 0", "00100100", 3)]
+    y = 196
+    for label, bits, hl in rows:
+        sc.text(30, y, label, size=13, weight="bold")
+        for i, b in enumerate(bits):
+            x = 30 + i * 84
+            on = b == "1"
+            hlc = "orange" if hl == i else None
+            bitbox(sc, x, y + 8, b, w=76, h=30, hl=hlc if hlc else ("blue" if on else None))
+        y += 70
+    sc.h = y + 4
+
+
+def f6_compare(sc):
+    sc.text(30, 62, "A = $30 のとき、M を変えて比べた結果", size=13)
+    for j, n in enumerate(["C", "Z", "N"]):
+        sc.text(330 + j * 70 + 28, 90, n, size=14, weight="bold", anchor="middle", mono=True)
+    sc.text(540, 90, "使う分岐", size=13, weight="bold")
+    rows = [("A < M", "CMP #$40", (0, 0, 1), "BCC(C = 0)"),
+            ("A = M", "CMP #$30", (1, 1, 0), "BEQ(Z = 1)"),
+            ("A > M", "CMP #$20", (1, 0, 0), "BCS(C = 1)と BNE(Z = 0)")]
+    y = 108
+    for case, asm, (c, z, n), br in rows:
+        sc.text(30, y + 20, case, size=18, weight="bold", mono=True, fill=BLUE)
+        sc.text(130, y + 20, asm, size=14, mono=True)
+        for j, v in enumerate((c, z, n)):
+            bitbox(sc, 330 + j * 70, y, str(v), w=56, hl="orange" if v else None)
+        sc.text(540, y + 22, br, size=13)
+        y += 56
+    sc.text(30, y + 20, "C は A が M 以上のとき 1。Z は A と M が等しいとき 1。N は A − M の結果の最上位ビット。", size=13)
+    sc.text(30, y + 42, "N は、符号付きの大小を直接表すものではない。比較は、符号なしの数として行われる。", size=13, fill=MUTED)
+    sc.h = y + 64
+
+
+def f6_nested(sc):
+    sc.text(30, 62, "SP = $FD から始める", size=13)
+    panels = [
+        ("① 最初の JSR のあと", 0xFB, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "..", "d"), (0x1FA, "..", "d"), (0x1F9, "..", "d")]),
+        ("② 2 つ目の JSR のあと", 0xF9, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "$03", "t"), (0x1FA, "$22", "t"), (0x1F9, "..", "d")]),
+        ("③ RTS で 1 つ戻ったあと", 0xFB, [(0x1FD, "$03", "t"), (0x1FC, "$02", "t"), (0x1FB, "$03", "d"), (0x1FA, "$22", "d"), (0x1F9, "..", "d")]),
+    ]
+    for i, (title, sp, rows) in enumerate(panels):
+        x0 = 30 + i * 232
+        sc.text(x0, 86, title, size=13, weight="bold")
+        sc.text(x0, 106, f"SP = ${sp:02X}", size=13, mono=True, fill=ORANGE, weight="bold")
+        for k, (addr, val, kind) in enumerate(rows):
+            y = 134 + k * 34
+            sc.cell(x0, y, h4(addr), val, "target" if kind == "t" else "dim", aw=70, vw=52)
+            if addr == 0x100 + sp:
+                sc.arrow([(x0 + 172, y), (x0 + 128, y)], None, color=ORANGE)
+                sc.text(x0 + 178, y + 5, "SP", size=13, weight="bold", fill=ORANGE)
+    sc.steps(330, [
+        "$01FD と $01FC は、最初の JSR が積んだ戻り番地(`$0302`)。上位が先、下位が次。".replace("`", ""),
+        "$01FB と $01FA は、2 つ目の JSR が積んだ戻り番地($0322)。SP は 2 つずつ下がる。",
+        "RTS は、SP を戻して番地を取り出す。取り出した値は、メモリに残るが、次の PHA や JSR で上書きされる。",
+    ])
+    sc.h = 420
+
+
+def f6_flow(sc):
+    W_, H_ = 200, 60
+    xs = [30, 260, 490]
+    ys = [80, 190, 300]
+    def box(x, y, n, l1, l2, kind):
+        fill, stroke, sw = BOX, LINE, 1.4
+        if kind == "cpu":
+            fill, stroke, sw = BLUE_BG, BLUE, 2
+        elif kind == "handler":
+            fill, stroke, sw = ORANGE_BG, ORANGE, 2
+        sc.rect(x, y, W_, H_, fill=fill, stroke=stroke, sw=sw, rx=6)
+        sc.text(x + 12, y + 24, f"{n}", size=15, weight="bold", fill=stroke if kind else INK)
+        sc.text(x + 34, y + 25, l1, size=13, weight="bold")
+        sc.text(x + 34, y + 45, l2, size=12, fill=MUTED)
+    seq = [
+        (0, 0, "①", "主プログラムを実行", "命令を 1 つずつ実行", None),
+        (1, 0, "②", "割り込みの要求", "NMI、または IRQ", None),
+        (2, 0, "③", "実行中の命令を終える", "命令の途中では受けない", "cpu"),
+        (2, 1, "④", "PC と P を積む", "PCH、PCL、P の順", "cpu"),
+        (1, 1, "⑤", "I フラグを 1 にする", "IRQ を重ねて受けない", "cpu"),
+        (0, 1, "⑥", "ベクタを読んで飛ぶ", "NMI $FFFA、IRQ $FFFE", "cpu"),
+        (0, 2, "⑦", "ハンドラを実行", "レジスタを保存して使う", "handler"),
+        (1, 2, "⑧", "RTI を実行", "P と PC を取り出す", "handler"),
+        (2, 2, "⑨", "主プログラムの続き", "積んだ PC の番地から", None),
+    ]
+    pos = {}
+    for c, r, n, l1, l2, kind in seq:
+        box(xs[c], ys[r], n, l1, l2, kind)
+        pos[n] = (xs[c], ys[r])
+    def mid(n, side):
+        x, y = pos[n]
+        return {"r": (x + W_, y + H_ / 2), "l": (x, y + H_ / 2), "b": (x + W_ / 2, y + H_), "t": (x + W_ / 2, y)}[side]
+    sc.arrow([mid("①", "r"), mid("②", "l")], None)
+    sc.arrow([mid("②", "r"), mid("③", "l")], None)
+    sc.arrow([mid("③", "b"), mid("④", "t")], None)
+    sc.arrow([mid("④", "l"), mid("⑤", "r")], None)
+    sc.arrow([mid("⑤", "l"), mid("⑥", "r")], None)
+    sc.arrow([mid("⑥", "b"), mid("⑦", "t")], None)
+    sc.arrow([mid("⑦", "r"), mid("⑧", "l")], None)
+    sc.arrow([mid("⑧", "r"), mid("⑨", "l")], None)
+    sc.text(30, 392, "青い枠は、CPU が自動で行う手順。橙の枠は、プログラム(ハンドラ)が行う手順。", size=13)
+    sc.h = 420
+
+
+def f6_nmi_irq(sc):
+    x0, x1 = 190, 690
+    def wave(y, pts, label, sub):
+        yl, yh = y + 40, y
+        sc.text(30, y + 26, label, size=13, weight="bold")
+        sc.text(30, y + 46, sub, size=11, fill=MUTED)
+        path = []
+        cur = yl
+        path.append((x0, cur))
+        for x, lvl in pts:
+            ny = yh if lvl else yl
+            path.append((x, cur)); path.append((x, ny)); cur = ny
+        path.append((x1, cur))
+        d = "M " + " L ".join(f"{a} {b}" for a, b in path)
+        sc.parts.append(f'<path d="{d}" fill="none" stroke="{INK}" stroke-width="2"/>')
+        sc.text(x0 - 8, yh + 4, "あり", size=11, anchor="end", fill=MUTED)
+        sc.text(x0 - 8, yl + 4, "なし", size=11, anchor="end", fill=MUTED)
+        return yh
+    def mark(x, y):
+        sc.arrow([(x, y - 34), (x, y - 4)], None, color=ORANGE)
+    # NMI
+    y = 120
+    wave(y, [(250, 1), (420, 0), (500, 1), (590, 0)], "NMI", "(要求の線)")
+    mark(250, y + 4); mark(500, y + 4)
+    sc.text(250, y - 40, "受け付け", size=11, anchor="middle", fill=ORANGE)
+    sc.text(500, y - 40, "受け付け", size=11, anchor="middle", fill=ORANGE)
+    sc.text(30, y + 76, "要求が「なし」から「あり」に変わった 1 回ごとに、1 回だけ受け付ける。I フラグには関係しない。", size=12)
+    # IRQ 消さない
+    y = 260
+    wave(y, [(250, 1)], "IRQ", "(要因を消さない)")
+    for x in (270, 350, 430, 510, 590, 670):
+        mark(x, y + 4)
+    sc.text(30, y + 76, "要求が「あり」の間、RTI のあとすぐに、何度でも受け付ける(I = 0 のとき)。", size=12)
+    # IRQ 消す
+    y = 390
+    wave(y, [(250, 1), (300, 0)], "IRQ", "(ハンドラが要因を消す)")
+    mark(270, y + 4)
+    sc.text(318, y + 24, "$A001 を読んで、要求を下げる", size=11, fill=MUTED)
+    sc.text(30, y + 76, "ハンドラが要因を消せば、受け付けは 1 回で終わる。", size=12)
+    sc.h = 500
+
+
+REF6 = [
+    ("flags", "P レジスタの 8 ビット", "N、V、B、D、I、Z、C のビットの位置と意味。リセット後、PHP と BRK、IRQ と NMI が積む P の値の違い。", "", f6_flags),
+    ("compare", "CMP の結果とフラグ", "CMP のあとの C、Z、N の読み方と、使う分岐命令の対応。", "", f6_compare),
+    ("stack-nested", "ネストした JSR とスタック", "JSR を 2 回重ねたときのスタックの中身と、RTS で戻ったあとの様子。", "", f6_nested),
+    ("interrupt-flow", "割り込みの流れ", "割り込みの要求から、ハンドラの実行、RTI による復帰までの手順。", "", f6_flow),
+    ("nmi-irq", "NMI と IRQ の違い", "NMI がエッジで 1 回、IRQ がレベルで、要因が消えるまで繰り返し受け付けられること。", "", f6_nmi_irq),
+]
+
 def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     for name, title, desc, asm, fn in MODES:
@@ -709,6 +877,9 @@ def main():
         print(os.path.normpath(p))
     for name, title, desc, asm, fn in REF:
         p = build(name, title, desc, asm, fn, prefix="05")
+        print(os.path.normpath(p))
+    for name, title, desc, asm, fn in REF6:
+        p = build(name, title, desc, asm, fn, prefix="06")
         print(os.path.normpath(p))
 
 
