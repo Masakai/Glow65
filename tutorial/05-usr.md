@@ -1,6 +1,6 @@
 # Tutorial 5: calling machine code from BASIC (USR)
 
-[English](05-usr.md) | [日本語](05-usr.ja.md) &nbsp;·&nbsp; [← 4. Reading the keyboard](04-echo.md)
+[English](05-usr.md) | [日本語](05-usr.ja.md) &nbsp;·&nbsp; [← 4. Reading the keyboard](04-echo.md) &nbsp;·&nbsp; [6. Interrupts →](06-interrupts.md)
 
 BASIC is easy to write and slow to run. Machine code is the opposite. BASIC's `USR` function lets you use both: write the program in BASIC, and call a machine-code routine when you need one. In this chapter the routine doubles a number. Everything below was run on Glow65 and checked by `Tests/Glow65Tests/TutorialUSRTests.swift`.
 
@@ -51,7 +51,7 @@ to_fac: jmp (ADRGAY)
 
 ## 3. Load it
 
-The routine goes at `$0300`, as before. BASIC keeps its own program and variables from `$0400` upwards, so it does not touch `$0300-$03FF`. Load the file first, then start BASIC:
+The routine goes at `$0300`, as before. BASIC keeps its own program and variables from `$0400` upwards, so it does not touch `$0300-$03F7`. Load the file first, then start BASIC:
 
 ```bash
 swift run Glow65App --load tutorial/usr_double.bin@0300
@@ -146,8 +146,10 @@ Load `usr_double` again first.
 
 ## 8. Things to remember
 
-- Your routine may use `$0300-$03FF` freely, and the FAC and the other BASIC zero-page locations only as BASIC expects. BASIC itself uses almost all of page zero, so avoid other zero-page addresses.
+- Your routine may use `$0300-$03F7` freely, and the FAC and the other BASIC zero-page locations only as BASIC expects. BASIC itself uses almost all of page zero, so avoid other zero-page addresses.
 - A routine called with `USR` must end with `rts`.
 - From machine code you can call the monitor's routines (`CHROUT` at `$F003`, `GETKEY` at `$F00C`).
+
+Next: [6. Interrupts →](06-interrupts.md)
 
 [← 4. Reading the keyboard](04-echo.md)

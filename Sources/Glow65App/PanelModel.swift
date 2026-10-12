@@ -117,6 +117,7 @@ final class PanelModel: ObservableObject {
                 case "poweron": self.setPower(true)
                 case "poweroff": self.setPower(false)
                 case "reset": self.pressReset()
+                case "nmi": self.pressNMI()
                 case "run": self.setRun(true)
                 case "stop": self.setRun(false)
                 case "step": self.pressStep()
@@ -248,6 +249,11 @@ final class PanelModel: ObservableObject {
     func pressReset() {
         guard isPowerOn else { return }
         runner.reset()
+    }
+
+    func pressNMI() {
+        guard isPowerOn else { return }
+        runner.triggerNMI()
     }
 
     func setRun(_ on: Bool) {

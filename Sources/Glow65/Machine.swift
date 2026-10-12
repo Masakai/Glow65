@@ -39,6 +39,7 @@ public final class Machine {
     public func step() -> Int {
         guard isPoweredOn else { return 0 }
         // 割り込み受付でなければ、最初のバスアクセスは命令フェッチ(SYNC)
+        cpu.irqLine = bus.uart.interruptRequest
         let servicesInterrupt = cpu.nmiPending
             || (cpu.irqLine && cpu.p & CPU6502.Flag.interruptDisable == 0)
         bus.probe?.syncPending = !servicesInterrupt

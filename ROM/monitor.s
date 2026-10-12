@@ -17,6 +17,8 @@ UART_CTRL = $A000       ; bit0=RDRF, bit1=TDRE
 UART_DATA = $A001
 BUF       = $0200       ; 行入力バッファ
 BASIC     = $C000       ; BASIC のコールドスタート
+NMIVEC    = $03F8       ; NMI のハンドラアドレス(RAM。ユーザーが書き換える)
+IRQVEC    = $03FA       ; IRQ/BRK のハンドラアドレス(同上)
 
 PTR       = $F0         ; 2バイト: 現在アドレス
 ENDP      = $F2         ; 2バイト: 終了アドレス
@@ -230,6 +232,12 @@ RESET:
         txs
         lda #$03            ; UART マスタリセット
         sta UART_CTRL
+        lda #<DEFISR        ; 割り込みベクタを RTI だけのハンドラにしておく
+        sta NMIVEC
+        sta IRQVEC
+        lda #>DEFISR
+        sta NMIVEC+1
+        sta IRQVEC+1
         lda #<Banner
         ldy #>Banner
         jsr PRSTR
@@ -237,6 +245,8 @@ MONITOR:
         ldx #$FF
         txs
         cld
+        lda #$00            ; UART の受信割り込みを切る(マスタリセットはしない)
+        sta UART_CTRL
 CMDLOOP:
         lda #'*'
         jsr CHROUT
@@ -541,8 +551,12 @@ DIS_OPERAND:
         bne @sl
 @end:   rts
 
+; NMI/IRQ は RAM のベクタ経由でユーザーのハンドラへ飛ぶ
 NMI_ISR:
+        jmp (NMIVEC)
 IRQ_ISR:
+        jmp (IRQVEC)
+DEFISR:
         rti
 
         .segment "RODATA"

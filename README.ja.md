@@ -14,7 +14,7 @@ macOS 向けの 6502 ワンボードマイコン エミュレータ(Swift 製)�
 
 Glow65 は、架空の 6502 ボードをエミュレートします。構成は CPU、RAM 32KB、シリアルポート(UART)、小さなモニタと Microsoft BASIC を載せた ROM です。ウインドウは2つの部分でできています。
 
-- **フロントパネル**: アドレスバス、データバス、PC、SP、A、X、Y、ステータスフラグ、バス信号の LED と、PC の位置の命令(逆アセンブルしたもの)の表示。スイッチは POWER、RESET、RUN/STOP、STEP、STEP MODE、SPEED。
+- **フロントパネル**: アドレスバス、データバス、PC、SP、A、X、Y、ステータスフラグ、バス信号の LED と、PC の位置の命令(逆アセンブルしたもの)の表示。スイッチは POWER、RESET、NMI、RUN/STOP、STEP、STEP MODE、SPEED。
 - **端末**: UART につながり、モニタと BASIC を操作します。
 
 パネルは CPU の動きを観察するためのものです。1kHz 以下では、バスアクセスを1つずつ表示します。100kHz 以上では、各ビットが 1 だったアクセスの割合を LED の明るさにするので、昔のパネルの LED の光り方を模した残光が出ます。実機にある余分なダミーリード/ダミーライトは再現していないため、バスの表示は実際の 6502 と少し異なります。
@@ -45,7 +45,7 @@ Glow65 は**全体が独自実装ではありません**。
 
 ## 自作プログラムを動かす
 
-Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)は5章あります。[LED カウンタ](tutorial/README.ja.md)(アセンブルして、またはバイトを手入力して読み込み、実行し、CPU を遅くしてバスアクセスを1つずつ辿る)、[16 ビットの足し算とキャリーフラグ](tutorial/02-addition.ja.md)、[UART で文字を出す](tutorial/03-uart.ja.md)、[キーボードを読むエコー](tutorial/04-echo.ja.md)、[BASIC から機械語を呼ぶ USR](tutorial/05-usr.ja.md)です。
+Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)は6章あります。[LED カウンタ](tutorial/README.ja.md)(アセンブルして、またはバイトを手入力して読み込み、実行し、CPU を遅くしてバスアクセスを1つずつ辿る)、[16 ビットの足し算とキャリーフラグ](tutorial/02-addition.ja.md)、[UART で文字を出す](tutorial/03-uart.ja.md)、[キーボードを読むエコー](tutorial/04-echo.ja.md)、[BASIC から機械語を呼ぶ USR](tutorial/05-usr.ja.md)、[割り込み](tutorial/06-interrupts.ja.md)(NMI ボタンと UART 受信 IRQ)です。
 
 ## クイックスタート
 
@@ -94,6 +94,7 @@ swift run glow65-cli --load tutorial/counter.bin@0300   # RAM に置くプログ
 |---|---|
 | POWER | ON で RAM を消去してリセットから開始。OFF で全 LED が消灯 |
 | RESET | CPU をリセット。RAM は保持 |
+| NMI | マスク不可割り込みを1回かける。モニタは RAM の `$03F8` にあるハンドラのアドレスへ飛ばす |
 | RUN/STOP | CPU の停止と再開 |
 | STEP | 停止中に、1命令(INSTR)または1バスアクセス(CYCLE)進める |
 | STEP MODE | INSTR と CYCLE の切り替え |
@@ -105,7 +106,7 @@ swift run glow65-cli --load tutorial/counter.bin@0300   # RAM に置くプログ
 
 自作のプログラムを読み込むには、POWER を入れたあとに **File → Load Program…**(⌘O)を使うか、起動オプション `--load file.bin@0300` を使います。アセンブリから生のバイナリを作るには `Tools/assemble.sh` を使います(cc65 が必要)。
 
-動作確認用に、`Glow65App --power-on --input 'd f000 f00f\r'` は電源を入れて文字列を入力します。`--no-splash` は起動バナーを出しません。`--script "3:poweron;5:input=g 0300\r;10:speed=10"` は、操作を時刻どおりに自動実行します(`poweron`、`poweroff`、`reset`、`run`、`stop`、`step`、`speed=<Hz>`、`mode=cycle|instr`、`input=<文字列>`)。画面収録に便利です。
+動作確認用に、`Glow65App --power-on --input 'd f000 f00f\r'` は電源を入れて文字列を入力します。`--no-splash` は起動バナーを出しません。`--script "3:poweron;5:input=g 0300\r;10:speed=10"` は、操作を時刻どおりに自動実行します(`poweron`、`poweroff`、`reset`、`run`、`stop`、`step`、`nmi`、`speed=<Hz>`、`mode=cycle|instr`、`input=<文字列>`)。画面収録に便利です。
 
 ## メモリマップ
 
@@ -113,9 +114,11 @@ swift run glow65-cli --load tutorial/counter.bin@0300   # RAM に置くプログ
 |---|---|
 | `$0000-$7FFF` | RAM 32KB |
 | `$0200-$027F` | (RAM の中)モニタの行入力バッファ |
-| `$0300-$03FF` | (RAM の中)自作プログラム用に空けてある領域 |
+| `$0300-$03F7` | (RAM の中)自作プログラム用に空けてある領域 |
+| `$03F8-$03F9` | (RAM の中)NMI ハンドラのアドレス(モニタがここ経由で飛ぶ) |
+| `$03FA-$03FB` | (RAM の中)IRQ と BRK のハンドラのアドレス(同上) |
 | `$0400-$7FFF` | (RAM の中)BASIC のプログラムと変数 |
-| `$A000` | UART 状態(bit0: 受信可、bit1: 送信可)/制御 |
+| `$A000` | UART 状態(bit0: 受信可、bit1: 送信可、bit7: 割り込み要求)/制御(bit7: 受信割り込みの許可) |
 | `$A001` | UART データ |
 | `$C000-$EFFF` | Microsoft BASIC(約 8.6KB を使用) |
 | `$F000-$FFFF` | モニタ ROM とベクタ |
@@ -173,7 +176,7 @@ Sources/Glow65App/     SwiftUI アプリ: フロントパネル、端末、起�
 ROM/monitor.s         モニタ ROM のソース(ca65)
 ROM/basic/            BASIC: 原典、マクロ、リンカ設定
 Tools/                ビルドと変換のスクリプト(assemble.sh は自作プログラムのビルド用)
-tutorial/             チュートリアル: 5章(LED カウンタ、足し算、UART、エコー、USR)とサンプルプログラム
+tutorial/             チュートリアル: 6章(LED カウンタ、足し算、UART、エコー、USR、割り込み)とサンプルプログラム
 Tests/                単体テストと結合テスト
 documents/designs/    設計書(日本語)
 ```
@@ -182,7 +185,7 @@ documents/designs/    設計書(日本語)
 
 - NMOS 6502 のみです。公式命令を実装しており、未定義命令は2サイクルの NOP として動きます。
 - ダミーリード/ダミーライト(インデックスがページを跨ぐときの余分な読み出しなど)は再現していません。そのため、サイクル単位のバス表示は実機と少し異なります。
-- 割り込みは CPU に実装済みですが、ボードにはまだ割り込み源がありません。
+- 割り込み源は NMI ボタンと UART の受信割り込みだけです。割り込みの受け付けは、実機の 7 サイクルではなく5つのバスアクセスで表示されます(ダミーリードは再現しません)。
 - BASIC の `SAVE` と `LOAD` は使えません。
 - BASIC の全機能は試験していません(`GET`、`WAIT`、`USR`、`ON GOTO` など)。
 

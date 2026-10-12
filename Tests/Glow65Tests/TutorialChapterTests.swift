@@ -50,7 +50,7 @@ final class TutorialChapterTests: XCTestCase {
         try which.run()
         which.waitUntilExit()
         guard which.terminationStatus == 0 else { throw XCTSkip("ca65 がない") }
-        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper", "usr_double", "usr_hello"] {
+        for name in ["counter", "add", "hello", "hello_monitor", "echo", "echo_upper", "usr_double", "usr_hello", "nmi_count", "irq_echo"] {
             let out = FileManager.default.temporaryDirectory.appendingPathComponent("glow65-\(name)-\(UUID().uuidString).bin")
             defer { try? FileManager.default.removeItem(at: out) }
             let p = Process()
@@ -88,14 +88,14 @@ final class TutorialChapterTests: XCTestCase {
         try c.machine.bus.loadRAM(try program("add"), at: 0x0300)
         // 5 + 7 = 12
         var lines = c.type("e 03f0 05 00 07 00\rg 0300\rd 03f0 03f5\r")
-        XCTAssertTrue(lines.contains("03F0: 05 00 07 00 0C 00 00 00 00 00 00 00 00 00 00 00"), "\(lines)")
+        XCTAssertTrue(lines.contains("03F0: 05 00 07 00 0C 00 00 00 CE F3 CE F3 00 00 00 00"), "\(lines)")
         XCTAssertEqual(lines.last, "*")                     // RTS でモニタに戻った
         // $01FF + $0001 = $0200(下位バイトの繰り上がりが上位バイトに届く)
         lines = c.type("e 03f0 ff 01 01 00\rg 0300\rd 03f0 03f5\r")
-        XCTAssertTrue(lines.contains("03F0: FF 01 01 00 00 02 00 00 00 00 00 00 00 00 00 00"), "\(lines)")
+        XCTAssertTrue(lines.contains("03F0: FF 01 01 00 00 02 00 00 CE F3 CE F3 00 00 00 00"), "\(lines)")
         // $FFFF + $0001 = $0000(最上位からあふれた繰り上がりは保存されない)
         lines = c.type("e 03f0 ff ff 01 00\rg 0300\rd 03f0 03f5\r")
-        XCTAssertTrue(lines.contains("03F0: FF FF 01 00 00 00 00 00 00 00 00 00 00 00 00 00"), "\(lines)")
+        XCTAssertTrue(lines.contains("03F0: FF FF 01 00 00 00 00 00 CE F3 CE F3 00 00 00 00"), "\(lines)")
     }
 
     /// 手順書の表: $01FF + $0001 の 1 命令ごとの A と C
@@ -132,7 +132,7 @@ final class TutorialChapterTests: XCTestCase {
         try c.machine.bus.loadRAM(try program("add"), at: 0x0300)
         // E 0300 38 / E 0304 ED F2 03 / E 030D ED F3 03 : $0200 - $0001 = $01FF
         let lines = c.type("e 03f0 00 02 01 00\re 0300 38\re 0304 ed f2 03\re 030d ed f3 03\rg 0300\rd 03f0 03f5\r")
-        XCTAssertTrue(lines.contains("03F0: 00 02 01 00 FF 01 00 00 00 00 00 00 00 00 00 00"), "\(lines)")
+        XCTAssertTrue(lines.contains("03F0: 00 02 01 00 FF 01 00 00 CE F3 CE F3 00 00 00 00"), "\(lines)")
     }
 
     // MARK: 第 3 章 UART

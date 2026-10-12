@@ -244,6 +244,7 @@ struct FrontPanelView: View {
                     title: "POWER", upLabel: "ON", downLabel: "OFF",
                     isOn: Binding(get: { model.isPowerOn }, set: { model.setPower($0) }))
                 MomentarySwitch(title: "RESET") { model.pressReset() }
+                MomentarySwitch(title: "NMI") { model.pressNMI() }
                 ToggleSwitch(
                     title: "RUN/STOP", upLabel: "RUN", downLabel: "STOP",
                     isOn: Binding(get: { model.isRunSwitchOn }, set: { model.setRun($0) }))

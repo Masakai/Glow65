@@ -2,7 +2,7 @@
 
 **English** | [日本語](README.ja.md)
 
-Chapters: **1. LED counter** · [2. Addition and the carry flag](02-addition.md) · [3. The UART](03-uart.md) · [4. Reading the keyboard](04-echo.md) · [5. USR](05-usr.md)
+Chapters: **1. LED counter** · [2. Addition and the carry flag](02-addition.md) · [3. The UART](03-uart.md) · [4. Reading the keyboard](04-echo.md) · [5. USR](05-usr.md) · [6. Interrupts](06-interrupts.md)
 
 You will write a five-line 6502 program, load it into Glow65, and watch it count in binary on the LEDs. Everything below was run on Glow65 and checked by the tests in `Tests/Glow65Tests/TutorialTests.swift`.
 
@@ -30,7 +30,7 @@ One trip around the loop takes 11 cycles.
 
 ## 2. Get it into the computer
 
-You need to put the 11 bytes `A9 00 8D F0 03 18 69 01 4C 02 03` in RAM at `$0300`. `$0300-$03FF` is free for your programs. (`$0200-$027F` is the monitor's line buffer, so a program there would be overwritten by the command you type to start it.)
+You need to put the 11 bytes `A9 00 8D F0 03 18 69 01 4C 02 03` in RAM at `$0300`. `$0300-$03F7` is free for your programs (`$03F8-$03FB` hold the interrupt vectors of chapter 6). (`$0200-$027F` is the monitor's line buffer, so a program there would be overwritten by the command you type to start it.)
 
 **Option A: type the bytes.** No tools needed. Start the app (`swift run Glow65App`), flip **POWER** up, click the terminal, and type:
 
@@ -111,7 +111,7 @@ Press **RESET** to stop the loop and get the monitor back, then type:
 D 03F0 03FF
 ```
 
-The first byte of the line is the last value the program wrote to `$03F0`.
+The first byte of the line is the last value the program wrote to `$03F0`. The line holds 16 bytes; the four non-zero bytes in the middle (`$03F8-$03FB`, `CE F3 CE F3`) are the monitor's interrupt vectors, which chapter 6 explains.
 
 ## 6. Experiments
 
@@ -129,6 +129,6 @@ Press RESET, change a byte with `E`, check the result with `L 0300 0308`, and ru
 2. **Write somewhere else.** `E 0303 F1` makes `sta` write to `$03F1`. Check with `D 03F0 03FF`.
 3. **Count down.** `E 0305 38 E9 01` replaces `clc` / `adc #$01` with `sec` / `sbc #$01`. Same length, opposite direction. `L 0300 0308` now shows `SEC` and `SBC   #$01` at `$0305` and `$0306`.
 
-When you are ready for more, change `counter.s`, run `Tools/assemble.sh` again, and load the new file. Programs must fit in the 256 bytes at `$0300-$03FF` (see `ROM/user.cfg`).
+When you are ready for more, change `counter.s`, run `Tools/assemble.sh` again, and load the new file. Programs must fit in the 248 bytes at `$0300-$03F7` (see `ROM/user.cfg`).
 
 Next: [2. Addition and the carry flag →](02-addition.md)

@@ -14,7 +14,7 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UART), and ROM holding a small monitor and Microsoft BASIC. The window has two parts:
 
-- **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, RUN/STOP, STEP, STEP MODE and SPEED.
+- **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, NMI, RUN/STOP, STEP, STEP MODE and SPEED.
 - **Terminal.** Connected to the UART. Use it to talk to the monitor and BASIC.
 
 The panel is for watching the CPU work. At 1 kHz and below, each bus access is shown one at a time. At 100 kHz and above, LED brightness is the fraction of accesses in which the bit was 1, which imitates the glow of an old panel's LEDs. The extra dummy reads and writes of real hardware are not reproduced, so the bus view differs slightly from a real 6502.
@@ -45,7 +45,7 @@ See [NOTICE.md](NOTICE.md) for details. No Altair or IMSAI names, logos, or phot
 
 ## Write your own program
 
-Glow65 is for learning, so the first thing to try is your own program. The [tutorial](tutorial/README.md) has five chapters: [an LED counter](tutorial/README.md) (assemble or type the bytes, load, run, then slow the CPU down and step through every bus access), [16-bit addition and the carry flag](tutorial/02-addition.md), [printing text through the UART](tutorial/03-uart.md), [reading the keyboard with an echo program](tutorial/04-echo.md), and [calling machine code from BASIC with `USR`](tutorial/05-usr.md).
+Glow65 is for learning, so the first thing to try is your own program. The [tutorial](tutorial/README.md) has six chapters: [an LED counter](tutorial/README.md) (assemble or type the bytes, load, run, then slow the CPU down and step through every bus access), [16-bit addition and the carry flag](tutorial/02-addition.md), [printing text through the UART](tutorial/03-uart.md), [reading the keyboard with an echo program](tutorial/04-echo.md), [calling machine code from BASIC with `USR`](tutorial/05-usr.md), and [interrupts](tutorial/06-interrupts.md) (the NMI button and a UART receive IRQ).
 
 ## Quick start
 
@@ -94,6 +94,7 @@ swift run glow65-cli --load tutorial/counter.bin@0300   # a program for RAM, loa
 |---|---|
 | POWER | On: clears RAM and starts from reset. Off: all LEDs go dark |
 | RESET | Resets the CPU. RAM is kept |
+| NMI | Raises a non-maskable interrupt (once per press). The monitor sends it to the handler address in RAM at `$03F8` |
 | RUN/STOP | Stops or resumes the CPU |
 | STEP | While stopped, runs one instruction (INSTR) or one bus access (CYCLE) |
 | STEP MODE | Chooses between INSTR and CYCLE stepping |
@@ -105,7 +106,7 @@ While an instruction is shown access by access, the register LEDs show the value
 
 To load your own program, use **File → Load Program…** (⌘O) after turning POWER on, or the launch option `--load file.bin@0300`. Build a binary from assembly with `Tools/assemble.sh` (needs cc65).
 
-For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on and types the given text. `--no-splash` skips the startup banner. `--script "3:poweron;5:input=g 0300\r;10:speed=10"` runs a timed script of operations (`poweron`, `poweroff`, `reset`, `run`, `stop`, `step`, `speed=<Hz>`, `mode=cycle|instr`, `input=<text>`), which is handy for screen recordings.
+For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on and types the given text. `--no-splash` skips the startup banner. `--script "3:poweron;5:input=g 0300\r;10:speed=10"` runs a timed script of operations (`poweron`, `poweroff`, `reset`, `run`, `stop`, `step`, `nmi`, `speed=<Hz>`, `mode=cycle|instr`, `input=<text>`), which is handy for screen recordings.
 
 ## Memory map
 
@@ -113,9 +114,11 @@ For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on a
 |---|---|
 | `$0000-$7FFF` | RAM, 32 KB |
 | `$0200-$027F` | (inside RAM) the monitor's line buffer |
-| `$0300-$03FF` | (inside RAM) free for your programs |
+| `$0300-$03F7` | (inside RAM) free for your programs |
+| `$03F8-$03F9` | (inside RAM) NMI handler address (the monitor jumps through it) |
+| `$03FA-$03FB` | (inside RAM) IRQ and BRK handler address (same) |
 | `$0400-$7FFF` | (inside RAM) BASIC programs and variables |
-| `$A000` | UART status (bit 0: receive ready, bit 1: transmit empty) / control |
+| `$A000` | UART status (bit 0: receive ready, bit 1: transmit empty, bit 7: interrupt request) / control (bit 7: enable the receive interrupt) |
 | `$A001` | UART data |
 | `$C000-$EFFF` | Microsoft BASIC (about 8.6 KB used) |
 | `$F000-$FFFF` | Monitor ROM and vectors |
@@ -173,7 +176,7 @@ Sources/Glow65App/     SwiftUI app: front panel, terminal, startup banner
 ROM/monitor.s         Monitor ROM source (ca65)
 ROM/basic/            BASIC: upstream source, prelude, linker config
 Tools/                Build and conversion scripts (assemble.sh builds your own programs)
-tutorial/             Tutorial: five chapters (LED counter, addition, UART, echo, USR) with sample programs
+tutorial/             Tutorial: six chapters (LED counter, addition, UART, echo, USR, interrupts) with sample programs
 Tests/                Unit and integration tests
 documents/designs/    Design document (Japanese)
 ```
@@ -182,7 +185,7 @@ documents/designs/    Design document (Japanese)
 
 - NMOS 6502 only. Official instructions are implemented; undefined opcodes run as a 2-cycle NOP.
 - Dummy reads and writes (for example the extra read when an index crosses a page) are not reproduced, so the cycle-by-cycle bus view differs slightly from real hardware.
-- Interrupts are implemented in the CPU but the board has no interrupt source yet.
+- The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
 - BASIC `SAVE` and `LOAD` are not available.
 - Not everything in BASIC has been tested (for example `GET`, `WAIT`, `USR`, `ON GOTO`).
 
