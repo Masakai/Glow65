@@ -103,6 +103,10 @@ footer{padding:46px 0 70px;border-top:1px solid var(--line);color:var(--dim);fon
 footer .wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between}
 footer a{color:var(--mute)}
 
+.video-wrap{max-width:960px;margin:0 auto}
+.video-wrap video{width:100%;height:auto;display:block;border-radius:16px;border:1px solid var(--line);background:#000;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.9),0 0 70px -24px rgba(255,42,26,.45)}
+.video-wrap p{font:12px/1.7 var(--mono);color:var(--dim);margin:12px 4px 0}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}
 .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.logo i b{animation:none}}
@@ -125,6 +129,7 @@ footer a{color:var(--mute)}
   <div class="wrap">
     <a class="logo" href="#top" aria-label="Glow65"><i aria-hidden="true"><b></b><b></b><b></b></i>GLOW65</a>
     <ul>
+      <li><a href="#video"><span lang="en">Video</span><span lang="ja">動画</span></a></li>
       <li><a href="#features"><span lang="en">Features</span><span lang="ja">特長</span></a></li>
       <li><a href="#how"><span lang="en">How it works</span><span lang="ja">仕組み</span></a></li>
       <li><a href="#start"><span lang="en">Get started</span><span lang="ja">使い方</span></a></li>
@@ -154,6 +159,23 @@ footer a{color:var(--mute)}
 </header>
 
 <main>
+<section id="video" style="padding-top:40px">
+  <div class="wrap">
+    <div class="video-wrap reveal">
+      <video lang="en" controls playsinline preload="none" poster="assets/poster-en.jpg" aria-label="Glow65 promo video (English narration)">
+        <source src="assets/glow65-en.mp4" type="video/mp4">
+      </video>
+      <video lang="ja" controls playsinline preload="none" poster="assets/poster-ja.jpg" aria-label="Glow65 紹介動画(日本語ナレーション)">
+        <source src="assets/glow65-ja.mp4" type="video/mp4">
+      </video>
+      <p>
+        <span lang="en">Promo video, about 25 seconds, with sound. The screens are recordings of the real app, with the operations run by a script. The narration is AI-generated (Gemini TTS).</span>
+        <span lang="ja">紹介動画(約 25 秒、音声あり)。画面は実際のアプリの録画で、操作はスクリプトで自動実行しています。ナレーションは AI 音声(Gemini TTS)です。</span>
+      </p>
+    </div>
+  </div>
+</section>
+
 <section id="features">
   <div class="wrap">
     <div class="kicker reveal"><span lang="en">Features</span><span lang="ja">特長</span></div>
@@ -256,6 +278,7 @@ swift run Glow65App</pre>
   const saved = (() => { try { return localStorage.getItem("lang"); } catch { return null; } })();
   const initial = (navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
   const setLang = (l) => {
+    document.querySelectorAll("video").forEach(v => v.pause());
     root.dataset.lang = l; root.lang = l;
     try { localStorage.setItem("lang", l); } catch {}
     document.title = l === "ja" ? "Glow65 — 6502 が考える様子を、LED で見る" : "Glow65 — See the 6502 think";
