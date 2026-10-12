@@ -176,7 +176,7 @@ ANDs A with a memory value and sets Z to 1 if the result is 0. The result itself
 
 **Examples**
 
-Before: memory `$0400` holds `$C0`.
+Setup: memory `$0400` holds `$C0`.
 
 ```
         LDA #$01
@@ -185,7 +185,7 @@ Before: memory `$0400` holds `$C0`.
 
 The memory value `$C0` has bits 7 and 6 set to 1, so N and V become 1. `$01 AND $C0` is 0, so Z is also 1.
 
-Before: memory `$0400` holds `$3F`.
+Setup: memory `$0400` holds `$3F`.
 
 ```
         LDA #$01
@@ -231,7 +231,7 @@ Shifts left by 1 bit. The most significant bit goes out to C, and 0 enters the l
 
 `%10000001` becomes `%00000010`. The 1 that was the most significant bit goes out to C.
 
-Before: memory `$0400` holds `$40`.
+Setup: memory `$0400` holds `$40`.
 
 ```
         ASL $0400
@@ -325,14 +325,14 @@ With C at 1, `$80` becomes `$01`. The old C (1) enters the least significant bit
 
 With C at 0, `$40` becomes `$80`. N is 1.
 
-Before: memory from `$0400` holds `81 42`.
+Setup: memory from `$0400` holds `81 42`.
 
 ```
         ASL $0400
         ROL $0401
 ```
 
-This shifts a 16-bit value left. It doubles `$4281` with `ASL` and `ROL` and gets `$8502`. The C that the low-byte ASL shifts out enters the least significant bit in the high-byte ROL.
+This shifts a 16-bit value left. It doubles `$4281` with `ASL` and `ROL` and gets `$8502`. The C that the low-byte ASL shifts out enters the least significant bit of the high-byte ROL.
 
 <a id="ror"></a>
 

@@ -121,7 +121,7 @@ Pushes P onto the stack. The pushed value is P with B (bit 4) and bit 5 set to 1
 
 ### PLP (Pull Processor Status)
 
-Replaces P with the value pulled from the stack. B (bit 4) of the pulled value is not taken in, and bit 5 stays 1. N, V, D, I, Z, and C all take the pulled value.
+Replaces P with the value pulled from the stack. PLP ignores B (bit 4) of the pulled value, and bit 5 stays 1. N, V, D, I, Z, and C all take the pulled value.
 
 **Flags affected**
 
@@ -156,7 +156,7 @@ After `SEC`, P is pushed, `CLC` sets C to 0, and `PLP` restores P. C returns to 
         PLP
 ```
 
-Push `$C3` (`%11000011`) and take it in with `PLP`, and N, V, Z, and C become 1 and D becomes 0.
+Push `$C3` (`%11000011`) and pull it with `PLP`, and N, V, Z, and C become 1 and D becomes 0.
 
 PHP and PLP are used to save and restore the flags around an interrupt or a subroutine.
 
@@ -346,7 +346,7 @@ Sets D to 1. ADC and SBC calculate in BCD.
 
 D becomes 1.
 
-After you use decimal mode, return to normal with CLD. If D stays 1, the results of later additions and subtractions change.
+After you use decimal mode, switch back with CLD. If D stays 1, the results of later additions and subtractions change.
 
 <a id="clv"></a>
 
@@ -453,6 +453,6 @@ NOP is used to leave a temporary gap in the middle of a program, to adjust execu
 
 ---
 
-[← 5.5 Branch and Jump](05-5-branch-jump.md) &nbsp;·&nbsp; [Chapter start](05-reference.md)
+[← 5.5 Branch and Jump](05-5-branch-jump.md) &nbsp;·&nbsp; [5.7 Instructions Added by the 65C02 →](05-7-65c02.md) &nbsp;·&nbsp; [Chapter start](05-reference.md)
 
 Next chapter: [6. Flags, the Stack, and Interrupts →](06-flags-stack-interrupts.md)

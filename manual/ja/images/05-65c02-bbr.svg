@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="476" viewBox="0 0 720 476" role="img" aria-labelledby="t d">
+<title id="t">BBR のオペコードとビット</title>
+<desc id="d">BBR3 で、オペコードのビット 4〜6 が調べるビットを表し、ゼロページの値のそのビットが 0 なら分岐すること。</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#0969da"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#bc4c00"/></marker></defs>
+<rect x="0.5" y="0.5" width="719" height="475" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="30" y="32" font-size="16" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">BBR のオペコードとビット</text>
+<text x="690" y="32" font-size="16" font-weight="bold" text-anchor="end" fill="#0969da" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">BBR3 $10,label</text>
+<text x="62" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">オペコード</text>
+<rect x="30" y="66" width="64" height="32" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="62" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">3F</text>
+<text x="162" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">オペランド(ゼロページ)</text>
+<rect x="130" y="66" width="64" height="32" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="162" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">10</text>
+<text x="262" y="60" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">距離</text>
+<rect x="230" y="66" width="64" height="32" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="262" y="88" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">05</text>
+<text x="30" y="126" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">オペコード $3F をビットで見る</text>
+<text x="212" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b7</text>
+<text x="260" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b6</text>
+<text x="308" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b5</text>
+<text x="356" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b4</text>
+<text x="404" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b3</text>
+<text x="452" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b2</text>
+<text x="500" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b1</text>
+<text x="548" y="152" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b0</text>
+<rect x="190" y="158" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="212.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="238" y="158" width="44" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="260.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="286" y="158" width="44" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="308.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="334" y="158" width="44" height="34" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="2"/>
+<text x="356.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="382" y="158" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="404.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="430" y="158" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="452.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="478" y="158" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="500.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="526" y="158" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="548.0" y="180.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<text x="212" y="212" font-size="12" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">0 = BBR</text>
+<text x="308" y="212" font-size="12" font-weight="normal" text-anchor="middle" fill="#bc4c00" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">n = 3(調べるビット)</text>
+<text x="30" y="256" font-size="13" font-weight="bold" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ゼロページ $0010 の値 $24</text>
+<text x="212" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b7</text>
+<text x="260" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b6</text>
+<text x="308" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b5</text>
+<text x="356" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b4</text>
+<text x="404" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b3</text>
+<text x="452" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b2</text>
+<text x="500" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b1</text>
+<text x="548" y="282" font-size="11" font-weight="normal" text-anchor="middle" fill="#57606a" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">b0</text>
+<rect x="190" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="212.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="238" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="260.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="286" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="308.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="334" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="356.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="382" y="288" width="44" height="34" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+<text x="404.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="430" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="452.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">1</text>
+<rect x="478" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="500.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<rect x="526" y="288" width="44" height="34" rx="4" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2"/>
+<text x="548.0" y="310.0" font-size="15" font-weight="bold" text-anchor="middle" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">0</text>
+<text x="404" y="342" font-size="12" font-weight="normal" text-anchor="middle" fill="#0969da" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">ビット 3 = 0</text>
+<text x="30" y="380" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">① オペコード $3F は BBR。ビット 4〜6(%011)が、調べるビット 3 を表す。</text>
+<text x="30" y="402" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">② ゼロページ $10 の値 $24 を読み、ビット 3 を調べる。ビット 3 は 0。</text>
+<text x="30" y="424" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">③ BBR は 0 のとき分岐する。次の命令の番地 $0303 に距離 $05 を足して、$0308 へ飛ぶ。</text>
+<text x="30" y="446" font-size="13" font-weight="normal" text-anchor="start" fill="#1f2328" font-family="-apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif">BBS は、ビットが 1 のとき分岐する。フラグは変わらない。</text>
+</svg>

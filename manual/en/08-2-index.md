@@ -67,6 +67,29 @@ Alphabetical order. Each link goes to the heading of the instruction in Chapter 
 | [TXS](05-2-transfer.md#txs-transfer-x-to-stack-pointer) | Transfer X to Stack Pointer |
 | [TYA](05-2-transfer.md#tya-transfer-y-to-a) | Transfer Y to A |
 
+### Instructions Added by the 65C02
+
+These are available in the Glow65 65C02 mode. Each links to its heading in section 5.7.
+
+| Mnemonic | Name |
+|---|---|
+| [BBR](05-7-65c02.md#bbr-branch-on-bit-reset) | Branch on Bit Reset |
+| [BBS](05-7-65c02.md#bbs-branch-on-bit-set) | Branch on Bit Set |
+| [BRA](05-7-65c02.md#bra-branch-always) | Branch Always |
+| [PHX](05-7-65c02.md#phx-push-x-register) | Push X Register |
+| [PHY](05-7-65c02.md#phy-push-y-register) | Push Y Register |
+| [PLX](05-7-65c02.md#plx-pull-x-register) | Pull X Register |
+| [PLY](05-7-65c02.md#ply-pull-y-register) | Pull Y Register |
+| [RMB](05-7-65c02.md#rmb-reset-memory-bit) | Reset Memory Bit |
+| [SMB](05-7-65c02.md#smb-set-memory-bit) | Set Memory Bit |
+| [STP](05-7-65c02.md#stp-stop-the-clock) | Stop the Clock |
+| [STZ](05-7-65c02.md#stz-store-zero) | Store Zero |
+| [TRB](05-7-65c02.md#trb-test-and-reset-bits) | Test and Reset Bits |
+| [TSB](05-7-65c02.md#tsb-test-and-set-bits) | Test and Set Bits |
+| [WAI](05-7-65c02.md#wai-wait-for-interrupt) | Wait for Interrupt |
+| [INC A](05-7-65c02.md#inc-a) | New modes of INC and DEC |
+| [DEC A](05-7-65c02.md#dec-a) | New modes of INC and DEC |
+
 ## 8.2.2 Addressing Mode Index
 
 | Mode | Example | Section |
@@ -178,6 +201,9 @@ Alphabetical order. Each link goes to the heading of the instruction in Chapter 
 | Figure 5-6 | PHA and PLA | [05-stack.svg](images/05-stack.svg) | [5.6 Stack and Flag Operations](05-6-stack-flags.md#56-stack-and-flag-operations) |
 | Figure 5-7 | After CLC (V is off) | [05-gui-adc-before.png](../ja/images/05-gui-adc-before.png) | [5.3 Arithmetic and Comparison](05-3-arithmetic.md#53-arithmetic-and-comparison) |
 | Figure 5-8 | After ADC #$50 (N and V are lit) | [05-gui-adc-after.png](../ja/images/05-gui-adc-after.png) | [5.3 Arithmetic and Comparison](05-3-arithmetic.md#53-arithmetic-and-comparison) |
+| Figure 5-9 | BBR opcode and bit | [05-65c02-bbr.svg](images/05-65c02-bbr.svg) | [BBR (Branch on Bit Reset)](05-7-65c02.md#bbr-branch-on-bit-reset) |
+| Figure 5-10 | Zero page indirect | [05-65c02-zp-indirect.svg](images/05-65c02-zp-indirect.svg) | [Zero Page Indirect `($nn)`](05-7-65c02.md#zero-page-indirect-nn) |
+| Figure 5-11 | TSB and TRB | [05-65c02-tsb-trb.svg](images/05-65c02-tsb-trb.svg) | [TSB (Test and Set Bits)](05-7-65c02.md#tsb-test-and-set-bits) |
 | Figure 6-1 | The 8 bits of the P register | [06-flags.svg](images/06-flags.svg) | [6.1 Flags (the P Register)](06-flags-stack-interrupts.md#61-flags-the-p-register) |
 | Figure 6-2 | Flags and branches after CMP | [06-compare.svg](images/06-compare.svg) | [6.1.8 After a Comparison (CMP)](06-flags-stack-interrupts.md#618-after-a-comparison-cmp) |
 | Figure 6-3 | The stack with two nested JSR calls | [06-stack-nested.svg](images/06-stack-nested.svg) | [6.2.3 Nested JSR](06-flags-stack-interrupts.md#623-nested-jsr) |

@@ -165,7 +165,7 @@ Copies the value of SP to X. N and Z are set from the copied value.
         TSX
 ```
 
-After SP is set to `$F0`, `TSX` reads it, so X becomes `$F0` and N becomes 1.
+When SP is `$F0`, `TSX` copies it to X, so X becomes `$F0` and N becomes 1.
 
 Changing SP moves the stack. This example saves SP before it runs and restores it before it ends.
 

@@ -820,6 +820,118 @@ def ref5():
     ]
 
 
+# ---- 5.7 65C02 の追加命令の図 ----
+
+def bits_row(sc, y, value, hl_idx=(), kind="blue", label=None, x0=190):
+    """8 ビットの箱を 1 行描く。左端が b7。hl_idx は強調する箱の位置(0 が b7)。"""
+    for i in range(8):
+        bitbox(sc, x0 + i * 48, y, str((value >> (7 - i)) & 1), hl=kind if i in hl_idx else None)
+    if label:
+        sc.text(30, y + 22, label, size=13, mono=True)
+
+
+def f65_bbr(sc):
+    code, zp, off, base, val = 0x3F, 0x10, 0x05, 0x0300, 0x24
+    n = (code >> 4) & 7
+    nxt = base + 3
+    sc.bytes_row([(f"{code:02X}", OPC), (f"{zp:02X}", L("オペランド(ゼロページ)", "Operand (zero page)")),
+                  (f"{off:02X}", L("距離", "Offset"))])
+    sc.text(30, 126, L(f"オペコード {h2(code)} をビットで見る", f"Opcode {h2(code)} as bits"), size=13, weight="bold")
+    for i in range(8):
+        sc.label(190 + i * 48 + 22, 152, f"b{7 - i}", anchor="middle")
+    bits_row(sc, 158, code, hl_idx=(1, 2, 3), kind="orange")
+    sc.text(212, 212, "0 = BBR", size=12, anchor="middle", fill=MUTED)
+    sc.text(190 + 2 * 48 + 22, 212, L(f"n = {n}(調べるビット)", f"n = {n} (the bit to test)"), size=12,
+            anchor="middle", fill=ORANGE)
+    sc.text(30, 256, L(f"ゼロページ {h4(zp)} の値 {h2(val)}", f"Value {h2(val)} at zero page {h4(zp)}"), size=13,
+            weight="bold")
+    for i in range(8):
+        sc.label(190 + i * 48 + 22, 282, f"b{7 - i}", anchor="middle")
+    bits_row(sc, 288, val, hl_idx=(7 - n,), kind="blue")
+    sc.text(190 + (7 - n) * 48 + 22, 342, L(f"ビット {n} = {(val >> n) & 1}", f"Bit {n} = {(val >> n) & 1}"),
+            size=12, anchor="middle", fill=BLUE)
+    finish(sc, 380, [
+        L(f"① オペコード {h2(code)} は BBR。ビット 4〜6(%{n:03b})が、調べるビット {n} を表す。",
+          f"① Opcode {h2(code)} is BBR. Bits 4 to 6 (%{n:03b}) give the bit to test, bit {n}."),
+        L(f"② ゼロページ {h2(zp)} の値 {h2(val)} を読み、ビット {n} を調べる。ビット {n} は 0。",
+          f"② Read the value {h2(val)} at zero page {h2(zp)} and test bit {n}. Bit {n} is 0."),
+        L(f"③ BBR は 0 のとき分岐する。次の命令の番地 {h4(nxt)} に距離 {h2(off)} を足して、{h4(nxt + off)} へ飛ぶ。",
+          f"③ BBR branches when the bit is 0. It adds the offset {h2(off)} to the next address "
+          f"{h4(nxt)} and jumps to {h4(nxt + off)}."),
+        L("BBS は、ビットが 1 のとき分岐する。フラグは変わらない。", "BBS branches when the bit is 1. No flags change."),
+    ], y0=380)
+
+
+def f65_zp_indirect(sc):
+    zp, ptr, val, op = 0x20, 0x0400, 0x5A, 0xB2
+    sc.bytes_row([(f"{op:02X}", OPC), (f"{zp:02X}", OPD)])
+    sc.label(396, 112, ZPG, anchor="middle")
+    sc.label(586, 112, MEM, anchor="middle")
+    comp1 = sc.comp(160, 140, 130, [L("ポインタの場所", "Pointer at"), h2(zp)])
+    sc.arrow([(162, 98), (162, 120), (225, 120), comp1["t"]], 1, badge=(162, 112))
+    sc.cell(330, 168, h4(zp), h2(ptr & 0xFF), "target", aw=72, vw=60)
+    sc.cell(330, 202, h4(zp + 1), h2(ptr >> 8), "target", aw=72, vw=60)
+    sc.arrow([comp1["r"], (330, 168)], 2, badge=(310, 168))
+    comp2 = sc.comp(321, 250, 150, [L("実効アドレス", "Effective address"), h4(ptr)], h=52)
+    sc.arrow([(396, 216), (396, 250)], 3, badge=(416, 233))
+    sc.cell(520, 276, h4(ptr), h2(val), "target", aw=72, vw=60)
+    sc.arrow([comp2["r"], (520, 276)], 4, badge=(491, 276))
+    sc.reg("A", 335, h2(val), hl=True)
+    sc.arrow([(652, 276), (685, 276), (685, 335), (140, 335)], 5, badge=(685, 305), color=ORANGE)
+    finish(sc, 360, [
+        L(f"① オペコード {h2(op)}(LDA)と、オペランド {h2(zp)} を読む。",
+          f"① Read opcode {h2(op)} (LDA) and operand {h2(zp)}."),
+        L(f"② {h4(zp)} の {h2(ptr & 0xFF)} を下位、{h4(zp + 1)} の {h2(ptr >> 8)} を上位として読む。",
+          f"② Read {h2(ptr & 0xFF)} at {h4(zp)} as the low byte and {h2(ptr >> 8)} at {h4(zp + 1)} as the high byte."),
+        L(f"③ 2 バイトを合わせた {h4(ptr)} が実効アドレスになる。X も Y も足さない。",
+          f"③ The two bytes together, {h4(ptr)}, are the effective address. Neither X nor Y is added."),
+        L(f"④⑤ {h4(ptr)} の内容 {h2(val)} を読んで、A に入れる。",
+          f"④⑤ Read the contents {h2(val)} of {h4(ptr)} and put it in A."),
+    ], y0=385)
+
+
+def f65_tsb_trb(sc):
+    a, m = 0x3C, 0x0F
+    land = a & m
+    tsb, trb = m | a, m & ~a & 0xFF
+    for i in range(8):
+        sc.label(190 + i * 48 + 22, 66, f"b{7 - i}", anchor="middle")
+    bits_row(sc, 74, a, kind="blue", label="A")
+    bits_row(sc, 124, m, kind="blue", label=L("メモリ M", "Memory M"))
+    bits_row(sc, 184, land, kind="orange", label="A AND M")
+    sc.text(590, 206, "Z = 0", size=14, weight="bold", mono=True, fill=ORANGE)
+    bits_row(sc, 254, tsb, kind="orange", label="TSB: M OR A")
+    bits_row(sc, 304, trb, kind="orange", label="TRB: M AND NOT A")
+    sc.text(590, 276, h2(tsb), size=14, weight="bold", mono=True)
+    sc.text(590, 326, h2(trb), size=14, weight="bold", mono=True)
+    finish(sc, 370, [
+        L(f"A = {h2(a)} と M = {h2(m)} を AND する。結果 {h2(land)} は捨てて、0 かどうかだけを Z に入れる。",
+          f"A = {h2(a)} and M = {h2(m)} are ANDed. The result {h2(land)} is discarded; only whether it is 0 goes into Z."),
+        L(f"TSB は、A の 1 のビットを、メモリで 1 にする。M は {h2(tsb)} になる。",
+          f"TSB sets, in memory, the bits that are 1 in A. M becomes {h2(tsb)}."),
+        L(f"TRB は、A の 1 のビットを、メモリで 0 にする。M は {h2(trb)} になる(元の M から別に求めた値)。",
+          f"TRB clears, in memory, the bits that are 1 in A. M becomes {h2(trb)} (found separately from the original M)."),
+        L("A と、Z 以外のフラグは変わらない。", "A and the flags other than Z do not change."),
+    ], y0=370)
+
+
+def ref65():
+    return [
+        ("65c02-bbr", L("BBR のオペコードとビット", "BBR opcode and bit"),
+         L("BBR3 で、オペコードのビット 4〜6 が調べるビットを表し、ゼロページの値のそのビットが 0 なら分岐すること。",
+           "In BBR3, bits 4 to 6 of the opcode give the bit to test, and the branch is taken if that bit of the zero page value is 0."),
+         "BBR3 $10,label", f65_bbr),
+        ("65c02-zp-indirect", L("ゼロページ・インダイレクト", "Zero page indirect"),
+         L("LDA ($20) が、ゼロページの 2 バイトを実効アドレスとして読み、その内容を A に入れること。",
+           "LDA ($20) reads the 2 bytes in zero page as the effective address and loads their target into A."),
+         "LDA ($20)", f65_zp_indirect),
+        ("65c02-tsb-trb", L("TSB と TRB", "TSB and TRB"),
+         L("TSB と TRB が、A と M の AND で Z を決め、A の 1 のビットをメモリで 1 または 0 にすること。",
+           "TSB and TRB set Z from the AND of A and M, then set or clear in memory the bits that are 1 in A."),
+         "TSB / TRB", f65_tsb_trb),
+    ]
+
+
 # ---- 第6章(フラグ、スタック、割り込み)の図 ----
 
 def f6_flags(sc):
@@ -1174,6 +1286,9 @@ def main():
         p = build(name, title, desc, asm, fn)
         print(os.path.normpath(p))
     for name, title, desc, asm, fn in ref5():
+        p = build(name, title, desc, asm, fn, prefix="05")
+        print(os.path.normpath(p))
+    for name, title, desc, asm, fn in ref65():
         p = build(name, title, desc, asm, fn, prefix="05")
         print(os.path.normpath(p))
     for name, title, desc, asm, fn in ref6():

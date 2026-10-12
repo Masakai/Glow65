@@ -4,7 +4,7 @@
 
 [← 1. The History of the 6502](01-history.md)
 
-All a CPU handles is strings of 0s and 1s. This chapter explains how people read and write those strings. It covers bits and bytes, binary and hexadecimal, negative numbers, characters, and memory and addresses, in that order. The math you need is powers of 2 (2, 4, 8, 16 ...) and the four basic operations.
+All a CPU handles is strings of 0s and 1s. This chapter explains how people read and write those strings. It covers bits and bytes, binary and hexadecimal, negative numbers, characters, and memory and addresses, in that order. The math you need is powers of 2 (2, 4, 8, 16 ...) and basic arithmetic (addition, subtraction, multiplication, and division).
 
 At the end of each section there is something you can try in Glow65. How to use the monitor is described in "Monitor commands" in the [README](../../README.md). Practice problems and their answers are at the end of the chapter.
 
@@ -44,7 +44,7 @@ The result is `%11001000`.
 
 Binary takes many digits and is hard to read. It takes 8 digits for 8 bits and 16 digits for 16 bits. So we use **hexadecimal**, which groups 4 bits at a time and writes them as one digit.
 
-4 bits have 16 combinations, from 0 to 15. One hexadecimal digit stands for 0 to 15. For 10 to 15, it uses the letters A to F.
+Four bits have 16 combinations, from 0 to 15. One hexadecimal digit stands for 0 to 15. For 10 to 15, it uses the letters A to F.
 
 | Decimal | Binary | Hex | | Decimal | Binary | Hex |
 |---|---|---|---|---|---|---|
@@ -61,7 +61,7 @@ In the 6502 world, a hexadecimal number starts with `$`. `$A0` is the hexadecima
 
 To **convert between binary and hexadecimal**, split the number into groups of 4 bits and look each group up in the table.
 
-- Split `%10100000` into 4 bits at a time, and you get `1010` and `0000`. From the table, these are A and 0. The result is `$A0`.
+- Split `%10100000` into groups of 4 bits, and you get `1010` and `0000`. From the table, these are A and 0. The result is `$A0`.
 - In `$3C`, 3 is `0011` and C is `1100`. The result is `%00111100`.
 
 To **convert hexadecimal to decimal**, multiply the upper digit by 16 and add the lower digit. For `$A0`, A is 10, so it is 10 x 16 + 0 = 160.
@@ -76,7 +76,7 @@ A 16-bit value is written with 4 hexadecimal digits. Think of `$1234` as the upp
 
 > **What you can try in Glow65**
 >
-> The data bus LEDs on the panel are 8 LEDs, D7 to D0. An LED lights when the corresponding bit of the value on the bus is 1. When the value is `$A0` (`%10100000`), two LEDs light, D7 and D5. The address bus has 16 LEDs, A15 to A0. 
+> The data bus LEDs on the panel are 8 LEDs, D7 to D0. An LED lights when the corresponding bit of the value on the bus is 1. When the value is `$A0` (`%10100000`), two LEDs light, D7 and D5. The address bus has 16 LEDs, A15 to A0.
 >
 > To see `$A0` on the LEDs, run `LDA #$A0` and read the A register LEDs.
 >
@@ -130,7 +130,7 @@ Two's complement has the advantage that signed numbers can be calculated with th
 
 > **What you can try in Glow65**
 >
-> The branch instruction `BNE` holds its destination as a distance (a signed 1 byte) from the next instruction. With `L` in the monitor, you can see how the distance byte turns into a destination address.
+> The branch instruction `BNE` holds its destination as a distance (a 1-byte signed number) from the next instruction. With `L` in the monitor, you can see how the distance byte turns into a destination address.
 >
 > ```
 > *E 0300 D0 FB
@@ -300,7 +300,7 @@ The answers and how to solve them are in the next section.
 
 **Problem 8** Read the following 8-bit values as signed numbers and give them in decimal. (1) `$F0` (2) `$80`
 
-**Problem 9** Adding `$01` to `$7F` in 8 bits gives `$80`. (1) Read as unsigned numbers, what is the change, from what to what? (2) Read as signed numbers, what is the change, from what to what?
+**Problem 9** Adding `$01` to `$7F` in 8 bits gives `$80`. (1) Read as unsigned numbers, it changes from what value to what value? (2) Read as signed numbers, it changes from what value to what value?
 
 **Problem 10** Give the ASCII codes of the string `HI` in hexadecimal. The code of the character `7` is `$37`. Give the calculation that gets the number 7 from this character.
 
@@ -351,7 +351,7 @@ The answers and how to solve them are in the next section.
 
 **Problem 9** (1) From 127 to 128 (2) From 127 to -128
 
-- The same change in bits is just an increase of 1 for unsigned numbers. For signed numbers, it goes from the largest number to the smallest number.
+- The same change in bits is only an increase of 1 when read as unsigned numbers. When read as signed numbers, the value jumps from the largest number to the smallest number.
 
 **Problem 10** `HI` is `$48 $49`. The number 7 is `$37 - $30 = 7`.
 

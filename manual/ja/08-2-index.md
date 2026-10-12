@@ -67,6 +67,29 @@
 | [TXS](05-2-transfer.md#txs) | Transfer X to Stack Pointer(X を SP へ転送) |
 | [TYA](05-2-transfer.md#tya) | Transfer Y to A(Y を A へ転送) |
 
+### 65C02 で加わる命令
+
+Glow65 の 65C02 モードで使える命令です。第5章の 5.7 の見出しへ飛びます。
+
+| ニーモニック | 名前 |
+|---|---|
+| [BBR](05-7-65c02.md#bbrbranch-on-bit-resetビットが-0-なら分岐) | Branch on Bit Reset(ビットが 0 なら分岐) |
+| [BBS](05-7-65c02.md#bbsbranch-on-bit-setビットが-1-なら分岐) | Branch on Bit Set(ビットが 1 なら分岐) |
+| [BRA](05-7-65c02.md#brabranch-alwaysいつも分岐) | Branch Always(いつも分岐) |
+| [PHX](05-7-65c02.md#phxpush-x-registerx-を積む) | Push X Register(X を積む) |
+| [PHY](05-7-65c02.md#phypush-y-registery-を積む) | Push Y Register(Y を積む) |
+| [PLX](05-7-65c02.md#plxpull-x-registerx-に取り出す) | Pull X Register(X に取り出す) |
+| [PLY](05-7-65c02.md#plypull-y-registery-に取り出す) | Pull Y Register(Y に取り出す) |
+| [RMB](05-7-65c02.md#rmbreset-memory-bitメモリのビットを-0-にする) | Reset Memory Bit(メモリのビットを 0 にする) |
+| [SMB](05-7-65c02.md#smbset-memory-bitメモリのビットを-1-にする) | Set Memory Bit(メモリのビットを 1 にする) |
+| [STP](05-7-65c02.md#stpstop-the-clock停止) | Stop the Clock(停止) |
+| [STZ](05-7-65c02.md#stzstore-zeroメモリに-0-を書く) | Store Zero(メモリに 0 を書く) |
+| [TRB](05-7-65c02.md#trbtest-and-reset-bitsビットを調べて-0-にする) | Test and Reset Bits(ビットを調べて 0 にする) |
+| [TSB](05-7-65c02.md#tsbtest-and-set-bitsビットを調べて-1-にする) | Test and Set Bits(ビットを調べて 1 にする) |
+| [WAI](05-7-65c02.md#waiwait-for-interrupt割り込みを待つ) | Wait for Interrupt(割り込みを待つ) |
+| [INC A](05-7-65c02.md#inc-a) | INC と DEC の新しいモード |
+| [DEC A](05-7-65c02.md#dec-a) | INC と DEC の新しいモード |
+
 ## 8.2.2 アドレッシングモードの索引
 
 | モード | 書き方の例 | 節 |
@@ -178,6 +201,9 @@
 | 図 5-6 | PHA と PLA | [05-stack.svg](images/05-stack.svg) | [5.6 スタックとフラグ操作](05-6-stack-flags.md#56-スタックとフラグ操作) |
 | 図 5-7 | CLC のあと(V は消灯) | [05-gui-adc-before.png](images/05-gui-adc-before.png) | [5.3 算術演算と比較](05-3-arithmetic.md#53-算術演算と比較) |
 | 図 5-8 | ADC #$50 のあと(N と V が点灯) | [05-gui-adc-after.png](images/05-gui-adc-after.png) | [5.3 算術演算と比較](05-3-arithmetic.md#53-算術演算と比較) |
+| 図 5-9 | BBR のオペコードとビット | [05-65c02-bbr.svg](images/05-65c02-bbr.svg) | [BBR(Branch on Bit Reset)ビットが 0 なら分岐](05-7-65c02.md#bbrbranch-on-bit-resetビットが-0-なら分岐) |
+| 図 5-10 | ゼロページ・インダイレクト | [05-65c02-zp-indirect.svg](images/05-65c02-zp-indirect.svg) | [ゼロページ・インダイレクト `($nn)`](05-7-65c02.md#ゼロページインダイレクト-nn) |
+| 図 5-11 | TSB と TRB | [05-65c02-tsb-trb.svg](images/05-65c02-tsb-trb.svg) | [TSB(Test and Set Bits)ビットを調べて 1 にする](05-7-65c02.md#tsbtest-and-set-bitsビットを調べて-1-にする) |
 | 図 6-1 | P レジスタの 8 ビット | [06-flags.svg](images/06-flags.svg) | [6.1 フラグ(P レジスタ)](06-flags-stack-interrupts.md#61-フラグp-レジスタ) |
 | 図 6-2 | CMP のあとのフラグと分岐 | [06-compare.svg](images/06-compare.svg) | [6.1.8 比較(CMP)のあと](06-flags-stack-interrupts.md#618-比較cmpのあと) |
 | 図 6-3 | JSR を 2 回重ねたときのスタック | [06-stack-nested.svg](images/06-stack-nested.svg) | [6.2.3 JSR を重ねたとき](06-flags-stack-interrupts.md#623-jsr-を重ねたとき) |

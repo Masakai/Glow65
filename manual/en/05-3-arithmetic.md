@@ -63,7 +63,7 @@ Adds the memory value and C to A, and puts the result in A. If the result exceed
 
 With C at 1, `1 + 1 + 1` makes A `$03`.
 
-Before: memory from `$0400` holds `FF 12 01 00`.
+Setup: memory from `$0400` holds `FF 12 01 00`.
 
 ```
         CLC
@@ -79,7 +79,7 @@ This is a 16-bit addition. It adds `$12FF + $0001`, starting from the low byte. 
 
 **V flag**: When the operands are treated as signed numbers, V becomes 1 if the result is outside -128 to 127. In other words, V becomes 1 when two numbers with the same sign are added and the sign of the result differs.
 
-**Decimal mode**: When D is 1, ADC adds in BCD (a format that treats each 4 bits as a digit from 0 to 9). `$09 + $01` gives `$10`, not `$0A`. C shows the decimal carry. On the NMOS 6502, N, V, and Z in decimal mode may not match the value of the result. When you finish using decimal mode, return to normal with CLD.
+**Decimal mode**: When D is 1, ADC adds in BCD (a format that treats each 4 bits as a digit from 0 to 9). `$09 + $01` gives `$10`, not `$0A`. C shows the decimal carry. On the NMOS 6502, N, V, and Z in decimal mode may not match the value of the result. When you finish using decimal mode, switch back with CLD.
 
 <a id="sbc"></a>
 
@@ -299,7 +299,7 @@ Adds 1 to a memory value. After `$FF` it wraps around to `$00`. N and Z change. 
 
 **Examples**
 
-Before: memory `$0400` holds `$FF`.
+Setup: memory `$0400` holds `$FF`.
 
 ```
         INC $0400
@@ -334,7 +334,7 @@ Subtracts 1 from a memory value. After `$00` it wraps around to `$FF`. N and Z c
 
 **Examples**
 
-Before: memory `$0400` holds `$00`.
+Setup: memory `$0400` holds `$00`.
 
 ```
         DEC $0400

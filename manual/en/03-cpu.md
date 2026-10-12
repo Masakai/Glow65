@@ -1,4 +1,4 @@
-# Chapter 3 Inside the CPU
+# Chapter 3: Inside the CPU
 
 [English](03-cpu.md) | [日本語](../ja/03-cpu.md)
 
@@ -14,7 +14,7 @@ A register called the **PC** (program counter) remembers where the CPU reads nex
 
 ## 3.2 Registers
 
-A **register** is a small storage area of a few bytes inside the CPU. It can be read and written faster than memory. The 6502 has the following six registers[1].
+A **register** is a small storage area of a few bytes inside the CPU. It can be read and written faster than memory. The 6502 has the following six registers [1].
 
 | Register | Width | Role |
 |---|---|---|
@@ -49,7 +49,7 @@ After a reset (power-on or the RESET switch), the CPU starts from a fixed state.
 | P | `$24` (`%00100100`). The I flag is 1, and bit 5 is 1 |
 | PC | The 2 bytes at addresses `$FFFC` and `$FFFD` (low byte first) |
 
-Section 3.7 explains how the PC is determined from `$FFFC` and `$FFFD`. On a real 6502, the internal state of the registers after reset is not defined, so the program must initialize them[1].
+Section 3.7 explains how the PC is determined from `$FFFC` and `$FFFD`. On a real 6502, the internal state of the registers after reset is not defined, so the program must initialize them [1].
 
 > **What you can try in Glow65**
 >
@@ -91,13 +91,13 @@ The CPU and memory are connected by many lines. A bundle of such lines is called
 | R/W | 1 line | 1 for a read, 0 for a write |
 | SYNC | 1 line | 1 while the CPU reads the first byte of an instruction (the opcode) |
 
-The 16 address bus lines correspond to the 16-bit addresses from Chapter 2. The 8 data bus lines correspond to the 8 bits of one byte[1].
+The 16 address bus lines correspond to the 16-bit addresses from Chapter 2. The 8 data bus lines correspond to the 8 bits of one byte [1].
 
 R/W shows whether the CPU is **reading** or **writing** memory. To read, the CPU puts out the address and the memory puts the byte on the data bus. To write, the CPU puts out both the address and the byte.
 
-SYNC shows that the byte being read is the first byte of an instruction. SYNC is not raised when the CPU reads a byte in the middle of an instruction, or when it writes[1].
+SYNC shows that the byte being read is the first byte of an instruction. SYNC stays 0 when the CPU reads a byte in the middle of an instruction, and when it writes [1].
 
-**In one clock (cycle), the CPU accesses the bus exactly once.** It either reads or writes[1].
+**In one clock (cycle), the CPU accesses the bus exactly once.** It either reads or writes [1].
 
 > **What you can try in Glow65**
 >
@@ -136,28 +136,28 @@ Once the CPU has read the opcode, it knows how many bytes the instruction needs 
 | 11 | `$0309` | `02` | Read | | |
 | 12 | `$030A` | `03` | Read | | |
 
-SYNC is raised only when the first byte of an instruction is read. `STA $03F0` reads three times (the opcode and the 2-byte address), then writes once.
+SYNC is 1 only when the first byte of an instruction is read. `STA $03F0` reads three times (the opcode and the 2-byte address), then writes once.
 
 ### Cycles and the Clock
 
 The CPU moves forward on a **clock**, a signal that ticks at a fixed interval. One period of the clock is one **cycle**. With a 1 MHz clock, there are 1 million cycles per second, and one cycle takes 1 microsecond.
 
-The number of cycles an instruction takes depends on the instruction. According to MOS Technology's documentation, instructions take from 2 to 7 cycles[1]. `LDA #$00` takes 2 cycles and `STA $03F0` takes 4 cycles.
+The number of cycles an instruction takes depends on the instruction. According to MOS Technology's documentation, instructions take from 2 to 7 cycles [1]. `LDA #$00` takes 2 cycles and `STA $03F0` takes 4 cycles.
 
-On a real 6502, even a 1-byte instruction such as `CLC` takes 2 cycles, and the CPU reads the next byte once more. That read is not used[1]. Glow65 does not reproduce this extra read, which is why `CLC` has only one access in the table. The cycle counter still advances by 2, as on the real chip.
+On a real 6502, even a 1-byte instruction such as `CLC` takes 2 cycles, and the CPU reads the next byte once more. That extra read is not used [1]. Glow65 does not reproduce this extra read, which is why `CLC` has only one access in the table. The cycle counter still advances by 2, as on the real chip.
 
 > **Column: Single-Stepping with SYNC**
 >
-> MOS Technology's documentation describes a use for the SYNC signal. SYNC is 1 in the cycle that reads an opcode. If the CPU's RDY pin is set to 0 at that moment, the CPU stops in that state. Setting RDY back to 1 resumes it. This mechanism makes it possible to build single-stepping, which executes one instruction at a time[1]. The STEP switch in Glow65 is also a feature for advancing one instruction or one bus access at a time.
+> MOS Technology's documentation describes a use for the SYNC signal. SYNC is 1 in the cycle that reads an opcode. If the CPU's RDY pin is set to 0 at that moment, the CPU stops in that state. Setting RDY back to 1 resumes it. This mechanism makes it possible to build single-stepping, which executes one instruction at a time [1]. The STEP switch in Glow65 is also a feature for advancing one instruction or one bus access at a time.
 
 > **What you can try in Glow65**
 >
-> You can follow the action cycle by cycle on the panel. After resetting as in section 3.2, set **STEP MODE** to CYCLE and press **STEP** one time at a time. The CPU runs the program at the start of the monitor (`SEI`, `CLD`, `LDX #$FF`, `TXS`).
+> You can follow the action cycle by cycle on the panel. After resetting as in section 3.2, set **STEP MODE** to CYCLE and press **STEP** once for each step. The CPU runs the program at the start of the monitor (`SEI`, `CLD`, `LDX #$FF`, `TXS`).
 >
 > | STEP | ADDRESS BUS | DATA BUS | SYNC | What happened in that STEP |
 > |---|---|---|---|---|
-> | Before pressing | `$FFFD` | `$F1` | | The read from the reset (3.2) |
-> | 1st | `$F12A` | `$78` | lit | The opcode of `SEI` was read. It is a one-read instruction, so the PC advances to `$F12B` and INSTRUCTION AT PC becomes `CLD` |
+> | Before pressing | `$FFFD` | `$F1` | | The read made by the reset (3.2) |
+> | 1st | `$F12A` | `$78` | lit | The opcode of `SEI` was read. It is an instruction that needs only one read, so the PC advances to `$F12B` and INSTRUCTION AT PC becomes `CLD` |
 > | 2nd | `$F12B` | `$D8` | lit | The opcode of `CLD` was read. The PC is `$F12C` |
 > | 3rd | `$F12C` | `$A2` | lit | The opcode of `LDX #$FF` was read |
 > | 4th | `$F12D` | `$FF` | dark | The operand of `LDX` was read |
@@ -183,7 +183,7 @@ On a real 6502, even a 1-byte instruction such as `CLC` takes 2 cycles, and the 
 >
 > Figure 3-5 5th STEP. The buses do not change. X becomes `$FF`, N lights, and the PC becomes `$F12E`
 >
-> If you set SPEED to 10 Hz and RUN, the same actions flow continuously. The low LEDs of the address bus change each time the PC advances.
+> If you set SPEED to 10 Hz and switch to RUN, the same actions run continuously. The low LEDs of the address bus change each time the PC advances.
 >
 > If you set STEP MODE to INSTR, each press of STEP advances one instruction. The bus keeps the last bus access of that instruction. The detailed steps are in [Tutorial Chapter 1](../../tutorial/README.md).
 
@@ -229,7 +229,7 @@ In a 3-byte instruction, the address is stored in little-endian order, as in Cha
 
 ## 3.6 An Example of Executing Instructions
 
-Let us follow the next program through its bus activity and its changes to registers and flags.
+Follow the next program through its bus accesses and its changes to registers and flags.
 
 ```
 0300  A9 80        LDA #$80
@@ -267,7 +267,7 @@ When the value is 0, Z becomes 1 and N becomes 0. After `LDA #$00`, only Z is 1.
 >
 > The `$FF` of `LDX #$FF` has its most significant bit set, so N lights. `TXS` only copies the value of X into SP and does not change the flags. `LDA #$03` has a most significant bit of 0 and is not 0, so neither N nor Z lights.
 >
-> The STEP counts are counted from right after the reset in section 3.2.
+> The STEP counts start from right after the reset in section 3.2.
 >
 > ![The panel after the 3rd STEP in INSTR. X is FF, N is lit, and the next instruction is TXS](../ja/images/03-instr-3.png)
 >
@@ -311,7 +311,7 @@ When the value is 0, Z becomes 1 and N becomes 0. After `LDA #$00`, only Z is 1.
 
 ## 3.7 Vectors for Reset and Interrupts
 
-On a reset or an interrupt, the CPU reads the address to jump to from a fixed place in memory. This place is called a **vector**. The vectors are in the last 6 bytes of the address space[1].
+On a reset or an interrupt, the CPU reads the address to jump to from a fixed place in memory. This place is called a **vector**. The vectors are in the last 6 bytes of the address space [1].
 
 | Address | Use |
 |---|---|
@@ -361,7 +361,7 @@ The answers and explanations are in the next section.
 
 **Problem 4** 3 reads and 1 write. SYNC is 1 once.
 
-- Reads: the opcode `8D`, the low byte `F0`, and the high byte `03`. Write: once, to `$03F0`. SYNC is raised only when the opcode is read.
+- Reads: the opcode `8D`, the low byte `F0`, and the high byte `03`. Write: once, to `$03F0`. SYNC is 1 only when the opcode is read.
 
 **Problem 5** `A9 10` = `LDA #$10` (2 bytes), `8D 00 04` = `STA $0400` (3 bytes), `AA` = `TAX` (1 byte). 6 bytes in total.
 

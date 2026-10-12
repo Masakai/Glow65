@@ -14,7 +14,7 @@ This chapter gives the definitions of the terms in Chapters 1 to 7, and an index
 
 ## 8.3 Correspondence with the Tutorial
 
-The manual is for reading and understanding, and the [tutorial](../../tutorial/README.md) is for hands-on work. After you read a chapter of the manual, try the matching chapter of the tutorial, and the content will stay with you.
+The manual is for reading and understanding, and the [tutorial](../../tutorial/README.md) is for hands-on work. After you read a chapter of the manual, try the matching chapter of the tutorial, and you will remember the content better.
 
 | Tutorial | Contents | Matching manual chapters |
 |---|---|---|
@@ -24,5 +24,6 @@ The manual is for reading and understanding, and the [tutorial](../../tutorial/R
 | [4. Reading the keyboard](../../tutorial/04-echo.md) | An echo program that receives by polling | [Chapter 7 Polling](07-memory-io.md#731-polling), [Chapter 7 Monitor Routines](07-memory-io.md#74-monitor-routines) |
 | [5. USR](../../tutorial/05-usr.md) | Call machine code from BASIC | [Chapter 7 How RAM Is Used](07-memory-io.md#713-how-ram-is-used), [Chapter 5 JSR and RTS](05-5-branch-jump.md#55-branch-and-jump) |
 | [6. Interrupts](../../tutorial/06-interrupts.md) | NMI and IRQ handlers | [Chapter 6 Interrupts](06-flags-stack-interrupts.md#63-interrupts), [Chapter 6 The Stack](06-flags-stack-interrupts.md#62-the-stack) |
+| [7. Switching to the 65C02](../../tutorial/07-65c02.md) | The same program for the 6502 and the 65C02, and undefined opcodes | [Chapter 4 Modes Added by the 65C02](04-addressing.md#411-modes-added-by-the-65c02), [Chapter 5 The 65C02](05-7-65c02.md) |
 
 The addressing modes (Chapter 4) and the instruction reference (Chapter 5) work as a dictionary when you read the tutorial programs.

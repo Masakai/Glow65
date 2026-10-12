@@ -321,7 +321,7 @@ handler:
         pha             ; save A
         txa
         pha             ; save X
-        ...             ; work
+        ...             ; do the work
         pla
         tax             ; restore X
         pla             ; restore A
@@ -345,7 +345,7 @@ The next example is a handler called by the UART receive interrupt. It writes th
 > 03F0: 22 01 04 00 00 00 00 00 24 F4 40 03 00 00 00 00
 > ```
 >
-> `22` at `$03F0` is the pushed P: B (bit 4) is 0, I (bit 2) is 0, bit 5 is 1, and Z is 1. `01` at `$03F1` is the finish mark the handler set. `04` at `$03F2` shows that I was 1 inside the handler.
+> `22` at `$03F0` is the pushed P: B (bit 4) is 0, I (bit 2) is 0, bit 5 is 1, and Z is 1. `01` at `$03F1` is the done flag the handler set. `04` at `$03F2` shows that I was 1 inside the handler.
 
 ### 6.3.6 Interrupts in Glow65
 
@@ -358,7 +358,7 @@ The vectors are in ROM at `$FFFA` to `$FFFF` and cannot be rewritten. The monito
 
 At reset, the monitor points both at a routine that contains only RTI. To use your own handler, write its address there.
 
-The UART interrupt is enabled by bit 7 of the control register (written at `$A000`). While it is enabled and there is unread received data, an IRQ request is raised. Bit 7 of the status register (read at `$A000`) is the mark that an interrupt is being requested. Reading `$A001` lowers the request. NMI is raised with the NMI button on the panel.
+The UART interrupt is enabled by bit 7 of the control register (written at `$A000`). While it is enabled and there is unread received data, an IRQ request is raised. Bit 7 of the status register (read at `$A000`) is 1 while an interrupt is being requested. Reading `$A001` lowers the request. NMI is raised with the NMI button on the panel.
 
 > **What you can try in Glow65**
 >
@@ -371,7 +371,7 @@ The UART interrupt is enabled by bit 7 of the control register (written at `$A00
 > 03F0: CA E9 0D 00 00 00 00 00 24 F4 3A 03 00 00 00 00
 > ```
 >
-> The handler, called by the interrupt, echoes the characters. `$03F0` and `$03F1` hold a value the main program counted in the meantime, and it changes with each run. `0D` at `$03F2` is the mark that Enter was received.
+> The handler, called by the interrupt, echoes the characters. `$03F0` and `$03F1` hold a value the main program counted in the meantime, and it changes with each run. `0D` at `$03F2` is the sign that Enter was received.
 
 ### 6.3.7 Watching Interrupts on the Panel
 
@@ -410,7 +410,7 @@ The UART interrupt is enabled by bit 7 of the control register (written at `$A00
 >
 > Figure 6-8 The 3rd STEP. P (`$26`) has been pushed to `$01FB`
 >
-> ![The panel at the 6th STEP. PC is F41E, SP is FA, and INSTRUCTION AT PC is JMP at 03F8, indirect](../ja/images/06-gui-nmi-entered.png)
+> ![The panel at the 6th STEP. PC is F41E, SP is FA, and INSTRUCTION AT PC is JMP (03F8)](../ja/images/06-gui-nmi-entered.png)
 >
 > Figure 6-9 The acceptance is complete. PC is `$F41E` (the monitor's `JMP ($03F8)`) and SP is `$FA` (3 bytes pushed)
 >

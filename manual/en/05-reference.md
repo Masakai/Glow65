@@ -6,6 +6,8 @@
 
 This chapter is a reference to the 151 official opcodes (56 instructions) of the 6502, grouped by function. For each instruction it gives the operation, the flags it affects, an opcode table, and usage examples. The instructions are split into one file per group.
 
+The table of 151 opcodes in this chapter covers the NMOS 6502 only. The instructions and modes added by the 65C02 are in [5.7 Instructions Added by the 65C02](05-7-65c02.md).
+
 ## How to Read This Chapter
 
 ### Instruction Syntax
@@ -69,6 +71,7 @@ When it calculates an address, the real 6502 performs extra reads (dummy reads) 
 | [5.4 Logic, Shift, and Bit Test](05-4-logic-shift.md) | AND, ORA, EOR, BIT, ASL, LSR, ROL, ROR |
 | [5.5 Branch and Jump](05-5-branch-jump.md) | BCC, BCS, BEQ, BNE, BMI, BPL, BVC, BVS, JMP, JSR, RTS, BRK, RTI |
 | [5.6 Stack and Flag Operations](05-6-stack-flags.md) | PHA, PLA, PHP, PLP, CLC, SEC, CLI, SEI, CLD, SED, CLV, NOP |
+| [5.7 Instructions Added by the 65C02](05-7-65c02.md) | BRA, PHX, PHY, PLX, PLY, STZ, TRB, TSB, WAI, STP, BBR, BBS, RMB, SMB, and the new modes |
 
 ## List of All 56 Instructions
 
@@ -137,7 +140,7 @@ When it calculates an address, the real 6502 performs extra reads (dummy reads) 
 
 The 105 opcodes other than the 151 official ones are not official instructions. Glow65 executes them as a 1-byte, 2-cycle NOP that has no operand. On a real NMOS 6502, each undefined opcode behaves differently, but Glow65 does not reproduce this.
 
-Instructions added by the 65C02 (`BRA`, `STZ`, `PHX`, and others) are not covered in this chapter.
+On the 65C02, the opcodes that were undefined are all NOPs. The instructions added by the 65C02 (`BRA`, `STZ`, `PHX`, and others) are in [5.7 Instructions Added by the 65C02](05-7-65c02.md).
 
 > **What you can try in Glow65**
 >

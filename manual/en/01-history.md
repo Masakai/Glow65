@@ -2,19 +2,19 @@
 
 [English](01-history.md) | [日本語](../ja/01-history.md)
 
-The 6502 is an 8-bit CPU (central processing unit, the part that executes a program's instructions) announced in 1975. The CPUs of the Apple II, the Commodore PET 2001, and the Family Computer (Famicom, sold as the NES outside Japan) are either a 6502 or a derivative of it.
+The 6502 is an 8-bit CPU (central processing unit, the part that executes a program's instructions) announced in 1975. The CPUs of the Apple II, the Commodore PET 2001, and the Family Computer are either a 6502 or a derivative of it.
 
 Numbers such as [1] refer to the sources at the end of the chapter.
 
 ## 1.1 1975: The $25 CPU
 
-MOS Technology of the United States announced the 6502 in September 1975 at the WESCON trade show in San Francisco [2][3]. The price was $25 per chip [3].
+MOS Technology of the United States announced the 6502 in September 1975 at the WESCON trade show in San Francisco [3]. The price was $25 per chip [3].
 
-The design team was led by Chuck Peddle and Bill Mensch [2][3]. Peddle led the team, and Mensch is said to have designed the chip [3].
+The chip was designed by a team that included Chuck Peddle and Bill Mensch [2][3]. Peddle is said to have led the team, and Mensch to have designed the chip [3].
 
-Both had been engineers at Motorola, whose company sold a CPU called the 6800. Peddle's proposal for a cheaper CPU was not accepted. In August 1974, Peddle and several other engineers left Motorola and moved to MOS Technology [3][4].
+The two had been engineers at Motorola, which sold a CPU called the 6800. Peddle's proposal for a cheaper CPU was not accepted. In August 1974, Peddle and several other engineers left Motorola and moved to MOS Technology [3][4].
 
-In November 1975, Motorola sued MOS Technology, claiming that former employees had used Motorola's technology. The case was settled in April 1976, and MOS Technology stopped selling the 6501, which had the same pin layout as the 6800 [4]. Sales of the 6502 continued.
+In November 1975, Motorola sued MOS Technology, claiming that former employees had used Motorola's technology. The case was settled in the spring of 1976, and MOS Technology stopped selling the 6501, which had the same pin layout as the 6800 [4]. Sales of the 6502 continued.
 
 ## 1.2 Specifications of the 6502
 
@@ -28,7 +28,7 @@ The specifications of the 6502 are as follows [1].
 | Zero page | The first 256 bytes, where the upper byte of the address is 00 |
 | Clock | 1 MHz (the assumption behind the timing tables in this manual) |
 
-1 MHz means the clock ticks 1 million times per second. Later versions ran at 2 MHz or 3 MHz [3]. The chip has about 3,500 transistors.
+1 MHz means the clock ticks 1 million times per second. Later versions ran at 2 MHz or 3 MHz [3]. The chip has about 3,500 transistors [3][5].
 
 > **Column: How to Count the Transistors**
 >
@@ -36,7 +36,7 @@ The specifications of the 6502 are as follows [1].
 
 > **What you can try in Glow65**
 >
-> The panel LEDs show the 16-bit address bus (A0 to A15) and the 8-bit data bus (D0 to D7). There are also LEDs for PC, SP, A, X, Y, and the status flags. The monitor command `D 0000 00FF` displays the whole zero page. `L 0300 0308` reads the contents of memory as instructions. The steps are in [Tutorial Chapter 1](../../tutorial/README.md).
+> The panel LEDs show the 16-bit address bus (A0 to A15) and the 8-bit data bus (D0 to D7). There are also LEDs for PC, SP, A, X, Y, and the status flags. The monitor command `D 0000 00FF` displays the whole zero page. `L 0300 0308` reads the contents of memory as instructions (disassembles them). The steps are in [Tutorial Chapter 1](../../tutorial/README.md).
 >
 > ![The Glow65 front panel and terminal. The top has the address bus, data bus, PC, SP, A, X, Y, and status LEDs; the bottom is the terminal](../../docs/assets/frontpanel.png)
 >
@@ -52,7 +52,7 @@ The Apple II outputs video as an NTSC composite signal. Text is 40 columns by 24
 
 > **Column: The Odd Clock of 1.023 MHz**
 >
-> The Apple II clock is not exactly 1 MHz. An NTSC television signal contains a color signal of about 3.579545 MHz. The Apple II clock is 2/7 of that value. To be exact it is 1.022727 MHz, which is rounded to 1.023 MHz. The value comes from the same reference as the video circuit [7].
+> The Apple II clock is not exactly 1 MHz. An NTSC television signal contains a color signal of about 3.579545 MHz. The Apple II clock is 2/7 of that value. To be exact it is 1.022727 MHz, which is rounded to 1.023 MHz. The value is derived from the same reference as the video circuit [6].
 
 ## 1.4 Commodore PET 2001
 
@@ -63,9 +63,9 @@ The answer to "when did it go on sale?" depends on the standard you use.
 | Standard | Date |
 |---|---|
 | Exhibition | January 1977, a prototype shown at the Winter CES (a consumer electronics trade show) |
-| Shipping | About 100 units first in October 1977. To ordinary buyers in December 1977 |
+| Shipping | The first 100 or so units in October 1977. Ordinary buyers received it in December 1977 |
 
-Compared with the Apple II shipping (June 1977), the PET was shown first, but the Apple II shipped first [7][9].
+The Apple II shipped in June 1977. Compared with it, the PET was shown first, but the Apple II shipped first [7][9].
 
 The PET has the screen, keyboard, and cassette tape unit built into one case. The screen is monochrome, 40 columns by 25 rows. Some models had a small buzzer for sound, and some did not. The ROM holds BASIC, the KERNAL (which handles basic input and output), and the character shapes [9].
 
@@ -73,7 +73,7 @@ The PET has the screen, keyboard, and cassette tape unit built into one case. Th
 
 Nintendo's Family Computer (Famicom) went on sale in 1983 [12]. The release date was July 15, and the price was 14,800 yen [10]. Its CPU is the Ricoh RP2A03, a chip that combines a core compatible with the 6502 and circuits such as the one that produces sound [10][11].
 
-In an interview with a former Ricoh engineer (Toyofumi Takahashi), the 2A03 is described as "a chip with a 6502 CPU core and sound" [14]. A different group built the CPU core, and Takahashi was in charge of the sound circuit. Ricoh made the CPU together with the 2C02, a chip for image processing, and supplied them to Nintendo [14].
+In an interview with a Ricoh engineer (Toyofumi Takahashi), the 2A03 is described as "a chip with a 6502 CPU core and sound" [14]. A different group built the CPU core, and Takahashi was in charge of the sound circuit. Ricoh made the CPU together with the 2C02, a chip for image processing, and supplied them to Nintendo [14].
 
 The Famicom CPU does not have the decimal mode of the 6502 (a feature that calculates numbers while keeping them in decimal) [15].
 
@@ -106,13 +106,13 @@ CMOS is a way of making transistors that uses little power.
 
 > **Column: The 6507 with Fewer Address Pins**
 >
-> The CPU of the Atari 2600 is the 6507, a 6502 with some of its pins removed. The 6502 has 40 pins, and the 6507 has 28. The address pins drop from 16 to 13, so it can specify only up to 2 to the 13th power, or 8,192 bytes (8KB). It also has no interrupt pins. It was a CPU made cheaply by cutting pins. The inside of the chip is the same as the 6502 [16].
+> The CPU of the Atari 2600 is the 6507, a 6502 with some of its pins removed. The 6502 has 40 pins, and the 6507 has 28. The address pins drop from 16 to 13, so it can specify only up to 2 to the 13th power, or 8,192 bytes (8KB). It also has no interrupt pins. It was a CPU made cheaply by cutting pins. The inside of the chip is the same as the 6502 [16][27].
 
 ## 1.7 A 6502 You Can Buy Today
 
 The 6502 family is still on sale. WDC (Western Design Center) lists the W65C02S on its official page. It comes in three packages: 40-pin DIP, 44-pin PLCC, and 44-pin QFP, and the official page points to distributors such as Mouser and Jameco [25].
 
-The 6502 is an inexpensive CPU that was announced at $25. It has about 3,500 transistors, and MOS Technology published a hardware manual [1][3]. Derivatives were also made to suit different uses, including the 6507, 6510, 2A03, 65C02, 65816, and HuC6280.
+The 6502 is an inexpensive CPU that was announced at $25. It has about 3,500 transistors [3][5], and MOS Technology published a hardware manual [1]. Derivatives were also made to suit different uses, including the 6507, 6510, 2A03, 65C02, 65816, and HuC6280.
 
 ## 1.8 What Glow65 Has and Does Not Have
 
@@ -126,9 +126,9 @@ Glow65 is an emulator of a fictional single-board computer, made for learning th
 | Input | Keyboard (uppercase only) [8] | Built-in keyboard [9] | Game pads (two, fixed to the console) [26] | Keyboard input from the terminal (through the UART) |
 | Sound | 1-bit speaker [8] | A small buzzer only (some models have none) [9] | 5 channels [26] | None |
 | External storage | Cassette tape [8] | Built-in cassette unit [9] | None built in [26] | None. BASIC `SAVE` and `LOAD` cannot be used. File loading (File → Load Program) is a feature where the emulator writes directly into RAM |
-| Software in ROM | Integer BASIC, machine-code monitor (8KB) [8] | BASIC, KERNAL, character shapes [9] | Game cartridges (the program chip is often up to 32KB) [26] | Monitor (`$F000-$FFFF`) and Microsoft BASIC (`$C000-$EFFF`) |
+| Software in ROM | Integer BASIC, machine-code monitor (8KB) [8] | BASIC, KERNAL, character shapes [9] | Game cartridges (the program chip is up to 32KB) [26] | Monitor (`$F000-$FFFF`) and Microsoft BASIC (`$C000-$EFFF`) |
 
-The BASIC in Glow65 is Microsoft's BASIC for the 6502 (v1.1 from 1978), converted for this board.
+The BASIC in Glow65 is Microsoft's BASIC for the 6502 (v1.1 from 1978) [28], converted for this board.
 
 The goal of Glow65 is to let you watch how the CPU works, not to reproduce real hardware. It does not reproduce the extra dummy reads and dummy writes of the real chip, so the bus display differs slightly from an actual 6502.
 
@@ -160,5 +160,7 @@ The goal of Glow65 is to let you watch how the CPU works, not to reproduce real 
 24. Wikipedia, "Super Nintendo Entertainment System": https://en.wikipedia.org/wiki/Super_Nintendo_Entertainment_System
 25. Western Design Center, "W65C02S": https://www.westerndesigncenter.com/wdc/w65c02s-chip.php
 26. Wikipedia, "Nintendo Entertainment System": https://en.wikipedia.org/wiki/Nintendo_Entertainment_System
+27. Wikipedia, "MOS Technology 6507": https://en.wikipedia.org/wiki/MOS_Technology_6507
+28. Microsoft, "BASIC-M6502" (source code of Microsoft BASIC for the 6502): https://github.com/microsoft/BASIC-M6502
 
 Next chapter: [2. Computer Basics →](02-basics.md)

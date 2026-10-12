@@ -157,7 +157,7 @@ Figure 4-4 Zero page (`LDA $10`).
 
 ### Zero Page,X
 
-The address used is the operand plus the value of X. It is used, for example, to read data lined up like an array, one item after another.
+The address used is the operand plus the value of X. Use it to read data lined up like an array, one item after another.
 
 | Item | Content |
 |---|---|
@@ -224,7 +224,7 @@ Figure 4-6 Zero page,Y (`LDX $10,Y`). The result goes into X.
 
 ## 4.5 Absolute Modes
 
-Any address in the 64 KB can be specified with a 2-byte operand. The operand is little-endian (low byte first).
+Any address in the 64 KB address space can be specified with a 2-byte operand. The operand is little-endian (low byte first).
 
 ### Absolute
 
@@ -392,7 +392,7 @@ The NMOS 6502 has a quirk in this mode. It appears when the pointer is at the la
 
 ## 4.7 Indexed Indirect
 
-You place a table of addresses (2 bytes each) in the zero page. The instruction takes the X-th address from the table and uses the contents of that address. It is written `(zp,X)`.
+You place a table of addresses (2 bytes each) in the zero page. The instruction takes the address that X selects from the table and uses the contents of that address. It is written `(zp,X)`.
 
 | Item | Content |
 |---|---|
@@ -420,7 +420,7 @@ X selects which entry of the table to use. An address is 2 bytes, so X is increa
 
 ## 4.8 Indirect Indexed
 
-The 2-byte address in the zero page is the base, and the value of Y is added to it. It is written `(zp),Y`. You can use it by putting the start address of an array in memory into the zero page and choosing an element with Y.
+The 2-byte address in the zero page is the base, and the value of Y is added to it. It is written `(zp),Y`. For example, put the start address of an array in memory into the zero page, and choose an element with Y.
 
 | Item | Content |
 |---|---|
@@ -463,7 +463,7 @@ Figure 4-13 Relative (`BNE`). With a distance of `$02`, the jump target is `$030
 
 The distance is measured not from the start of the instruction but from the position after the instruction has been read. `D0 02` is a 2-byte instruction, so if it is at `$0302`, the PC after reading it is `$0304`. If the distance is `$FB` (-5), going back 5 from `$0304` gives `$02FF`.
 
-If the condition does not hold, the CPU does not branch and goes on to the next instruction. The cycles needed are 2 when the condition does not hold, 3 when it holds, and 4 when it holds and the jump goes to another page.
+If the condition does not hold, the CPU does not branch and goes on to the next instruction. The instruction takes 2 cycles when the condition does not hold, 3 when it holds, and 4 when it holds and the jump goes to another page.
 
 > **What you can try in Glow65**
 >

@@ -6,7 +6,7 @@
 
 These instructions change the flow of execution. The conditional branches (BCC, BCS, BEQ, BNE, BMI, BPL, BVC, BVS) look at a flag and jump by a distance measured from the address of the next instruction. JMP jumps to the given address without any condition.
 
-JSR and RTS call and return from a subroutine (a small program that is called and used). BRK and RTI are the entrance and exit of an interrupt. These use the stack.
+JSR and RTS call and return from a subroutine (a small program that other code calls). BRK and RTI are the entrance and exit of an interrupt. These use the stack.
 
 ![A branch instruction adds a distance to the address of the next instruction to find the target](images/05-branch.svg)
 
@@ -20,7 +20,7 @@ Figure 5-4 JSR and RTS. The pushed return address is the address of the last byt
 
 Figure 5-5 BRK and RTI.
 
-Branch instructions do not change the flags. The distance is a signed 1-byte value, from -128 to +127. A branch takes 2 cycles when the condition is false, 3 when it is true, and 4 when it is true and the target is on another page [1].
+Branch instructions do not change the flags. The distance is a signed 1-byte value, from -128 to +127. A branch takes 2 cycles when the condition is false, 3 when it is true, and 4 when it is true and the target is on another page[1].
 
 <a id="bcc"></a>
 
@@ -334,7 +334,7 @@ The indirect mode (`JMP ($nnnn)`) has a quirk on the NMOS 6502 when the pointer 
 
 ### JSR (Jump to Subroutine)
 
-Pushes the address of the next instruction minus 1 (the address of the last byte of the JSR) onto the stack, and jumps to the given address. The high byte is pushed first, then the low byte [1]. The flags do not change.
+Pushes the address of the next instruction minus 1 (the address of the last byte of the JSR) onto the stack, and jumps to the given address. The high byte is pushed first, then the low byte[1]. The flags do not change.
 
 **Flags affected**
 
@@ -390,7 +390,7 @@ The subroutine reads the return address that was pushed onto the stack. The JSR 
 
 ### RTS (Return from Subroutine)
 
-Pulls the return address from the stack, adds 1, and puts it in PC [1]. Execution returns to the instruction after the JSR. The flags do not change.
+Pulls the return address from the stack, adds 1, and puts it in PC[1]. Execution returns to the instruction after the JSR. The flags do not change.
 
 **Flags affected**
 
@@ -473,7 +473,7 @@ The interrupt handler at `$0340`:
 
 The byte after `BRK` is a signature byte and is not used. The return address is `$0306`, the address after the signature byte. The handler sets X to `$77` and returns with RTI, so `LDY #$55` runs next.
 
-BRK is a 1-byte instruction, but PC advances by 2 bytes. The following byte can serve as a signature that shows the kind of BRK.
+BRK is a 1-byte instruction, but PC advances by 2 bytes. The following byte can serve as a signature that shows which kind of BRK it is.
 
 The Glow65 monitor jumps from the vector at `$FFFE` and `$FFFF` to the handler address stored in RAM at `$03FA` and `$03FB`. In this example, `E 03FA 40 03` sets the handler address to `$0340`. Interrupts are explained in Chapter 6.
 
@@ -481,7 +481,7 @@ The Glow65 monitor jumps from the vector at `$FFFE` and `$FFFF` to the handler a
 
 ### RTI (Return from Interrupt)
 
-Pulls P, the low byte of PC, and the high byte of PC from the stack, in this order, and returns from the interrupt. Unlike RTS, it does not add 1 to PC. B (bit 4) of P is not taken in.
+Pulls P, the low byte of PC, and the high byte of PC from the stack, in this order, and returns from the interrupt. Unlike RTS, it does not add 1 to PC. RTI does not load B (bit 4) of P.
 
 **Flags affected**
 
@@ -521,7 +521,7 @@ In the `BRK` example, the handler's last `RTI` returns to `$0306`, the address a
 > 03F0: 03 00 00 00 00 00 00 00 24 F4 24 F4 00 00 00 00
 > ```
 >
-> The offset `$FC` in `D0 FC` is -4. Counting back 4 from the next instruction, `$0308`, gives `$0304`.
+> The distance `$FC` in `D0 FC` is -4. Counting back 4 from the next instruction, `$0308`, gives `$0304`.
 
 > **What you can try in Glow65**
 >

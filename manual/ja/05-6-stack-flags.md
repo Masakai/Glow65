@@ -453,6 +453,6 @@ NOP は、プログラムの途中を一時的に空ける、実行時間を調�
 
 ---
 
-[← 5.5 分岐とジャンプ](05-5-branch-jump.md) &nbsp;·&nbsp; [章の入口](05-reference.md)
+[← 5.5 分岐とジャンプ](05-5-branch-jump.md) &nbsp;·&nbsp; [5.7 65C02 の追加命令 →](05-7-65c02.md) &nbsp;·&nbsp; [章の入口](05-reference.md)
 
 次の章: [6. フラグ、スタック、割り込み →](06-flags-stack-interrupts.md)

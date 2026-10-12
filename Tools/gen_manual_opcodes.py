@@ -6,11 +6,14 @@
     python3 Tools/gen_manual_opcodes.py --check   # 書き換えが不要なら 0、差があれば 1 を返す
     --lang ja|en|all                              # 対象の言語(省略時は all)
 
-元データ: Sources/Core6502/OpcodeTable.swift の `table`(NMOS 6502 の公式 151 命令)。
+元データ: Sources/Core6502/OpcodeTable.swift の `table`(NMOS 6502 の公式 151 命令)と、
+`table65C02`(65C02。05-7-65c02.md の表に使う。NMOS から増えた、または変わったオペコードだけを載せる)。
 マーカー:
     <!-- opcodes:LDA --> ... <!-- /opcodes:LDA -->   オペコード表
     <!-- flags:LDA -->   ... <!-- /flags:LDA -->     フラグ表
     <!-- list -->        ... <!-- /list -->          全命令の一覧(05-reference.md)
+    <!-- list65 -->      ... <!-- /list65 -->        65C02 で加わる命令の一覧(05-7-65c02.md)
+    05-7-65c02.md では、opcodes:BRA のように、命令ごとのオペコード表(65C02 の新規・変更分)を使う。
 標準ライブラリのみを使う。
 """
 import os
@@ -30,6 +33,7 @@ GROUPS = {
     "branch-jump": ("05-5-branch-jump.md", "分岐とジャンプ"),
     "stack-flags": ("05-6-stack-flags.md", "スタックとフラグ操作"),
 }
+FILE_65C02 = "05-7-65c02.md"
 
 # フラグ表の列。N V D I Z C の順。記号: ○ 結果で変わる / - 変わらない / 0 1 そのまま設定 / M7 M6 メモリのビット / 復元 スタックから戻す
 FL = ["N", "V", "D", "I", "Z", "C"]
@@ -106,26 +110,33 @@ INSTR = [
 ]
 
 MODE_ORDER = ["implied", "accumulator", "immediate", "zeroPage", "zeroPageX", "zeroPageY", "absolute",
-              "absoluteX", "absoluteY", "indirect", "indexedIndirect", "indirectIndexed", "relative"]
+              "absoluteX", "absoluteY", "indirect", "indexedIndirect", "indirectIndexed", "relative",
+              "zeroPageIndirect", "absoluteIndexedIndirect", "zeroPageRelative"]
 MODE_NAME = {
     "implied": "インプライド", "accumulator": "アキュムレータ", "immediate": "イミディエイト",
     "zeroPage": "ゼロページ", "zeroPageX": "ゼロページ X", "zeroPageY": "ゼロページ Y",
     "absolute": "アブソリュート", "absoluteX": "アブソリュート X", "absoluteY": "アブソリュート Y",
     "indirect": "インダイレクト", "indexedIndirect": "インデックスト・インダイレクト",
     "indirectIndexed": "インダイレクト・インデックスト", "relative": "リラティブ",
+    "zeroPageIndirect": "ゼロページ・インダイレクト", "absoluteIndexedIndirect": "アブソリュート X・インダイレクト",
+    "zeroPageRelative": "ゼロページ・リラティブ",
 }
 MODE_SYNTAX = {
     "implied": "{m}", "accumulator": "{m} A", "immediate": "{m} #$nn", "zeroPage": "{m} $nn",
     "zeroPageX": "{m} $nn,X", "zeroPageY": "{m} $nn,Y", "absolute": "{m} $nnnn", "absoluteX": "{m} $nnnn,X",
     "absoluteY": "{m} $nnnn,Y", "indirect": "{m} ($nnnn)", "indexedIndirect": "{m} ($nn,X)",
     "indirectIndexed": "{m} ($nn),Y", "relative": "{m} label",
+    "zeroPageIndirect": "{m} ($nn)", "absoluteIndexedIndirect": "{m} ($nnnn,X)", "zeroPageRelative": "{m} $nn,label",
 }
 MODE_BYTES = {"implied": 1, "accumulator": 1, "immediate": 2, "zeroPage": 2, "zeroPageX": 2, "zeroPageY": 2,
               "relative": 2, "indexedIndirect": 2, "indirectIndexed": 2, "absolute": 3, "absoluteX": 3,
-              "absoluteY": 3, "indirect": 3}
+              "absoluteY": 3, "indirect": 3, "zeroPageIndirect": 2, "absoluteIndexedIndirect": 3,
+              "zeroPageRelative": 3}
 # Operation.addsCycleOnPageCross に対応
 PAGE_CROSS_OPS = {"adc", "and", "bit", "cmp", "eor", "lda", "ldx", "ldy", "ora", "sbc"}
 PAGE_CROSS_MODES = {"absoluteX", "absoluteY", "indirectIndexed"}
+SHIFT_OPS = {"asl", "lsr", "rol", "ror"}  # 65C02 では abs,X もページ跨ぎで 1 サイクル増える
+BRANCH_MODES = {"relative", "zeroPageRelative"}
 
 # 言語別の設定。ja の出力は従来と同じでなければならない。
 LANG = {
@@ -138,6 +149,8 @@ LANG = {
         "restored": "復元",
         "page_cross": "{c}+",
         "branch": "{c} (+1,+2)",
+        "branch_always": "{c} (+1)",
+        "nop_head": ["バイト数", "サイクル数", "オペコード"],
     },
     "en": {
         "mode_name": {
@@ -146,6 +159,8 @@ LANG = {
             "absolute": "Absolute", "absoluteX": "Absolute,X", "absoluteY": "Absolute,Y",
             "indirect": "Indirect", "indexedIndirect": "Indexed indirect `(zp,X)`",
             "indirectIndexed": "Indirect indexed `(zp),Y`", "relative": "Relative",
+            "zeroPageIndirect": "Zero page indirect `(zp)`", "absoluteIndexedIndirect": "Absolute,X indirect `(abs,X)`",
+            "zeroPageRelative": "Zero page relative",
         },
         "opcode_head": ["Addressing mode", "Syntax", "Opcode", "Bytes", "Cycles"],
         "list_head": ["Mnemonic", "Name", "Function", "Flags affected"],
@@ -153,6 +168,8 @@ LANG = {
         "restored": "Restored",
         "page_cross": "{c}+",
         "branch": "{c} (+1, +2)",
+        "branch_always": "{c} (+1)",
+        "nop_head": ["Bytes", "Cycles", "Opcodes"],
     },
 }
 
@@ -201,11 +218,15 @@ def load_table():
     return result
 
 
-def cycles_text(op, mode, cyc, lang="ja"):
+def cycles_text(op, mode, cyc, lang="ja", cmos=False):
     c = LANG[lang]
-    if mode == "relative":
+    if cmos and op.lower() == "bra":
+        return c["branch_always"].format(c=cyc + 1)  # いつも分岐するので 3 サイクル。別ページなら +1
+    if mode in BRANCH_MODES:
         return c["branch"].format(c=cyc)
     if op.lower() in PAGE_CROSS_OPS and mode in PAGE_CROSS_MODES:
+        return c["page_cross"].format(c=cyc)
+    if cmos and op.lower() in SHIFT_OPS and mode == "absoluteX":
         return c["page_cross"].format(c=cyc)
     return str(cyc)
 
@@ -245,6 +266,125 @@ def list_table(lang="ja"):
     return "\n".join(out)
 
 
+# ---- 65C02(05-7-65c02.md)----
+
+ASSIGN_RE = re.compile(r"t\[0x([0-9A-F]{2})\] = Instruction\(op: \.(\w+), mode: \.(\w+), cycles: (\d+)\)")
+
+
+def load_65c02():
+    """NMOS の表と 65C02 の表から、NMOS と違うオペコードだけを [(コード, op, モード, サイクル)] で返す。"""
+    src = open(SWIFT, encoding="utf-8").read()
+    i1, i2 = src.index("static let table:"), src.index("static let table65C02")
+    nmos = {int(m[0], 16): (m[1], m[2], int(m[3])) for m in ASSIGN_RE.findall(src[i1:i2])}
+    c02 = dict(nmos)
+    for m in ASSIGN_RE.findall(src[i2:]):
+        c02[int(m[0], 16)] = (m[1], m[2], int(m[3]))
+    assert len(c02) == 256, "65C02 は 256 オペコードすべてを定義するはず"
+    assert all(v[0] != "illegal" for v in c02.values()), "65C02 に未定義が残っている"
+    return [(code, *c02[code]) for code in range(256) if nmos.get(code) != c02[code]]
+
+
+def mnemonic65(code, op):
+    """RMB/SMB/BBR/BBS は、オペコードの bit4-6 を番号にして RMB0 のように書く。"""
+    if op in ("rmb", "smb", "bbr", "bbs"):
+        return f"{op.upper()}{(code >> 4) & 7}"
+    return op.upper()
+
+
+NEW_MNEMONICS = ["BRA", "PHX", "PHY", "PLX", "PLY", "STZ", "TRB", "TSB", "WAI", "STP", "BBR", "BBS", "RMB", "SMB"]
+ZPIND_ORDER = ["ORA", "AND", "EOR", "ADC", "STA", "LDA", "CMP", "SBC"]
+SORT_ORDER = ZPIND_ORDER + ["ASL", "LSR", "ROL", "ROR"]
+
+
+def blocks65(delta):
+    """差分のオペコードを、05-7-65c02.md の表(マーカー名)に振り分ける。漏れと重複は許さない。"""
+    blocks = {mn: [r for r in delta if r[1] == mn.lower()] for mn in NEW_MNEMONICS}
+    blocks["INC"] = [r for r in delta if r[1] == "inc"]
+    blocks["DEC"] = [r for r in delta if r[1] == "dec"]
+    blocks["ZPIND"] = [r for r in delta if r[2] == "zeroPageIndirect"]
+    blocks["BIT"] = [r for r in delta if r[1] == "bit"]
+    blocks["JMP"] = [r for r in delta if r[1] == "jmp"]
+    blocks["SHIFT"] = [r for r in delta if r[1] in SHIFT_OPS]
+    blocks["NOP"] = [r for r in delta if r[1] == "nop"]
+    used = [r[0] for rows in blocks.values() for r in rows]
+    assert len(used) == len(set(used)), "同じオペコードが 2 つの表に入っている"
+    assert set(used) == {r[0] for r in delta}, "表に入っていない差分オペコードがある"
+    return blocks
+
+
+def row_key(r):
+    code, op, mode, cyc = r
+    mn = mnemonic65(code, op)
+    return (MODE_ORDER.index(mode), SORT_ORDER.index(mn) if mn in SORT_ORDER else 0, code)
+
+
+def opcode_table65(rows, lang="ja"):
+    c = LANG[lang]
+    out = ["| " + " | ".join(c["opcode_head"]) + " |", "|---|---|---|---|---|"]
+    for code, op, mode, cyc in sorted(rows, key=row_key):
+        syn = MODE_SYNTAX[mode].format(m=mnemonic65(code, op))
+        out.append(f"| {c['mode_name'][mode]} | `{syn}` | `${code:02X}` | {MODE_BYTES[mode]} | "
+                   f"{cycles_text(op, mode, cyc, lang, cmos=True)} |")
+    return "\n".join(out)
+
+
+def nop_table65(rows, lang="ja"):
+    """未定義だったオペコードが NOP になったもの。バイト数とサイクル数が同じものをまとめる。"""
+    c = LANG[lang]
+    groups = {}
+    for code, op, mode, cyc in rows:
+        groups.setdefault((MODE_BYTES[mode], cyc), []).append(code)
+    out = ["| " + " | ".join(c["nop_head"]) + " |", "|---|---|---|"]
+    for (nbytes, cyc), codes in sorted(groups.items()):
+        out.append(f"| {nbytes} | {cyc} | " + ", ".join(f"`${x:02X}`" for x in sorted(codes)) + " |")
+    return "\n".join(out)
+
+
+# 65C02 で加わる命令: (ニーモニック, 英語名, 日本語名, 機能(日本語), 機能(英語), フラグ)
+INSTR65 = [
+    ("BRA", "Branch Always", "いつも分岐", "いつも分岐する", "Always branches", fl("")),
+    ("PHX", "Push X Register", "X を積む", "X をスタックに積む", "Pushes X onto the stack", fl("")),
+    ("PHY", "Push Y Register", "Y を積む", "Y をスタックに積む", "Pushes Y onto the stack", fl("")),
+    ("PLX", "Pull X Register", "X に取り出す", "スタックから X に取り出す", "Pulls X from the stack", fl("NZ")),
+    ("PLY", "Pull Y Register", "Y に取り出す", "スタックから Y に取り出す", "Pulls Y from the stack", fl("NZ")),
+    ("STZ", "Store Zero", "0 を書く", "メモリに 0 を書く", "Writes 0 to memory", fl("")),
+    ("TRB", "Test and Reset Bits", "ビットを調べて 0 にする",
+     "A とメモリを AND して Z を決め、A の 1 のビットをメモリで 0 にする",
+     "ANDs A with memory to set Z, then clears in memory the bits that are 1 in A", fl("Z")),
+    ("TSB", "Test and Set Bits", "ビットを調べて 1 にする",
+     "A とメモリを AND して Z を決め、A の 1 のビットをメモリで 1 にする",
+     "ANDs A with memory to set Z, then sets in memory the bits that are 1 in A", fl("Z")),
+    ("WAI", "Wait for Interrupt", "割り込みを待つ", "割り込みが来るまで止まる", "Waits until an interrupt arrives", fl("")),
+    ("STP", "Stop the Clock", "停止", "RESET まで止まる", "Stops until RESET", fl("")),
+    ("BBR", "Branch on Bit Reset", "ビットが 0 なら分岐", "ゼロページの値のビット n が 0 のとき分岐する",
+     "Branches if bit n of a zero page value is 0", fl("")),
+    ("BBS", "Branch on Bit Set", "ビットが 1 なら分岐", "ゼロページの値のビット n が 1 のとき分岐する",
+     "Branches if bit n of a zero page value is 1", fl("")),
+    ("RMB", "Reset Memory Bit", "メモリのビットを 0 にする", "ゼロページの値のビット n を 0 にする",
+     "Clears bit n of a zero page value", fl("")),
+    ("SMB", "Set Memory Bit", "メモリのビットを 1 にする", "ゼロページの値のビット n を 1 にする",
+     "Sets bit n of a zero page value", fl("")),
+]
+# フラグ表のマーカー名 -> フラグ。INSTR65 のほか、INC A、DEC A、BIT の新モードの分
+FLAGS65 = {mn: fl_ for mn, _, _, _, _, fl_ in INSTR65}
+FLAGS65["INC"] = fl("NZ")
+FLAGS65["DEC"] = fl("NZ")
+FLAGS65["BIT"] = fl({"N": "M7", "V": "M6", "Z": "○"})
+FLAGS65["BIT-IMM"] = fl("Z")
+
+
+def list_table65(lang="ja"):
+    c = LANG[lang]
+    out = ["| " + " | ".join(c["list_head"]) + " |", "|---|---|---|---|"]
+    for mn, eng, jp, func_ja, func_en, flags in INSTR65:
+        if lang == "ja":
+            out.append(f"| [{mn}](#{mn.lower()}) | {eng}({jp}) | {func_ja} | {flag_summary(flags)} |")
+        else:
+            slug = f"{mn.lower()}-{eng.lower().replace(' ', '-')}"
+            out.append(f"| [{mn}](#{slug}) | {eng} | {func_en} | {flag_summary(flags, lang)} |")
+    return "\n".join(out)
+
+
 def replace_block(text, tag, content):
     """<!-- tag --> と <!-- /tag --> の間を content に置き換える。マーカーがなければ None。"""
     pat = re.compile(r"(<!-- " + re.escape(tag) + r" -->)\n(?:.*?\n)?(<!-- /" + re.escape(tag) + r" -->)", re.S)
@@ -253,16 +393,18 @@ def replace_block(text, tag, content):
     return pat.sub(lambda m: m.group(1) + "\n" + content + "\n" + m.group(2), text, count=1)
 
 
-def process(lang, check, table):
+def process(lang, check, table, delta):
     manual = MANUAL_DIR[lang]
     ja = lang == "ja"
     problems = []
     files = {}
+    originals = {}
 
     def get(fname):
         if fname not in files:
             path = os.path.join(manual, fname)
             files[fname] = open(path, encoding="utf-8").read() if os.path.exists(path) else None
+            originals[fname] = files[fname]
         return files[fname]
 
     def apply(fname, tag, content):
@@ -284,12 +426,20 @@ def process(lang, check, table):
         apply(fname, f"flags:{mn}", flag_table(flags, lang))
     apply("05-reference.md", "list", list_table(lang))
 
+    blocks = blocks65(delta)
+    for key, rows in blocks.items():
+        content = nop_table65(rows, lang) if key == "NOP" else opcode_table65(rows, lang)
+        apply(FILE_65C02, f"opcodes:{key}", content)
+    for key, flags in FLAGS65.items():
+        apply(FILE_65C02, f"flags:{key}", flag_table(flags, lang))
+    apply(FILE_65C02, "list65", list_table65(lang))
+
     if check:
         for p in problems:
             print(p)
         return 1 if problems else 0
     for fname, text in files.items():
-        if text is not None:
+        if text is not None and text != originals[fname]:  # 変わらないファイルは書かない(他の作業と衝突させない)
             with open(os.path.join(manual, fname), "w", encoding="utf-8") as f:
                 f.write(text)
     hard = [p for p in problems if "がない" in p]
@@ -311,9 +461,11 @@ def main():
     assert sum(len(v) for v in table.values()) == 151, "公式命令は 151 個のはず"
     assert {i[0] for i in INSTR} == set(table), "ニーモニックの集合が表と一致しない"
     assert set(FUNC_EN) == set(table), "FUNC_EN が命令と一致しない"
+    delta = load_65c02()
+    assert {mn for mn, *_ in INSTR65} == set(NEW_MNEMONICS), "INSTR65 と NEW_MNEMONICS が一致しない"
     rc = 0
     for lg in (["ja", "en"] if lang == "all" else [lang]):
-        rc |= process(lg, check, table)
+        rc |= process(lg, check, table, delta)
     return rc
 
 

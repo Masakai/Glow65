@@ -108,7 +108,7 @@ However, I/O addresses behave differently from ordinary memory.
 >
 > Even addresses are the status, `02` (only the transmit-ready bit is 1). Odd addresses are the data, `00` (no received data).
 
-`D` reads every address in the range. Reading an odd address takes out received data, if there is any, and removes it. To observe I/O, have a program read the status and the data, write the results to memory, and then look at them with `D`.
+`D` reads every address in the range. Reading an odd address takes out the received byte, if there is one, and removes it from the UART. To observe I/O, have a program read the status and the data, write the results to memory, and then look at them with `D`.
 
 ## 7.3 UART
 
@@ -186,7 +186,7 @@ getc:   lda $A000
 > 03F0: 83 51 02 00 00 00 00 00 24 F4 24 F4 00 00 00 00
 > ```
 >
-> The status is `83`. IRQ (bit 7) is 1, the mark that an interrupt is being requested. After the data is read, the status goes back to `02`.
+> The status is `83`. IRQ (bit 7) is 1, which means an interrupt is being requested. After the data is read, the status goes back to `02`.
 
 > **What you can try in Glow65**
 >
@@ -233,7 +233,7 @@ Receiving with interrupts is covered in [6.3.6](06-flags-stack-interrupts.md) an
 
 ## 7.4 Monitor Routines
 
-The monitor lines up `JMP` instructions to 5 routines, starting at `$F000` in ROM (the jump table). Even if the routine bodies move, these addresses do not change. Call them with `JSR`.
+The monitor keeps a table of five `JMP` instructions in ROM, starting at `$F000` (the jump table). Each one jumps to a routine. Even if the routine bodies move, these addresses do not change. Call them with `JSR`.
 
 | Address | Name | Input | Output | Action |
 |---|---|---|---|---|

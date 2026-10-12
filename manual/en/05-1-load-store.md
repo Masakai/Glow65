@@ -85,7 +85,7 @@ Loads a value from memory into X. N and Z change according to the value. The ind
 
 X becomes `$05`.
 
-Before: memory `$0013` holds `$5A`.
+Setup: memory `$0013` holds `$5A`.
 
 ```
         LDY #$03
@@ -158,7 +158,7 @@ Writes the value of A to memory. Neither A nor the flags change.
 
 **Examples**
 
-Before: memory `$0400` holds `$00`.
+Setup: memory `$0400` holds `$00`.
 
 ```
         LDA #$55
@@ -167,7 +167,7 @@ Before: memory `$0400` holds `$00`.
 
 A (`$55`) is written to `$0400`.
 
-Before: memory `$0403` holds `$00`.
+Setup: memory `$0403` holds `$00`.
 
 ```
         LDA #$55
@@ -205,7 +205,7 @@ Writes the value of X to memory. It has a zero page,Y mode.
 
 **Examples**
 
-Before: memory `$0010` holds `$00`.
+Setup: memory `$0010` holds `$00`.
 
 ```
         LDX #$07
@@ -240,7 +240,7 @@ Writes the value of Y to memory. It has a zero page,X mode.
 
 **Examples**
 
-Before: memory `$0400` holds `$00`.
+Setup: memory `$0400` holds `$00`.
 
 ```
         LDY #$09
