@@ -8,7 +8,7 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 ![status](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey) ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<p align="center"><img src="documents/images/frontpanel.png" alt="The Glow65 front panel with LEDs, switches and a terminal running Microsoft BASIC" width="860"></p>
+<p align="center"><img src="docs/assets/frontpanel.png" alt="The Glow65 front panel with LEDs, switches and a terminal running Microsoft BASIC" width="860"></p>
 
 ## What it is
 
@@ -205,7 +205,8 @@ documents/designs/    Design document (Japanese)
 - Dummy reads and writes (for example the extra read when an index crosses a page) are not reproduced, so the cycle-by-cycle bus view differs slightly from real hardware.
 - The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
 - BASIC `SAVE` and `LOAD` are not available.
-- Not everything in BASIC has been tested (for example `GET`, `WAIT`, `USR`, `ON GOTO`).
+- Not everything in BASIC has been tested (for example `GET`, `WAIT`, `ON GOTO`). `USR` is covered by [tutorial chapter 5](tutorial/05-usr.md) and its tests.
+- No built app is distributed. Build it from source as described above.
 
 ## License
 

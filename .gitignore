@@ -11,3 +11,10 @@ ROM/monitor.map
 brag-output*/
 .claude/
 __pycache__/
+*.o
+*.lst
+*.map
+*.lbl
+.vscode/
+.idea/
+.env*

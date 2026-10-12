@@ -8,7 +8,7 @@ macOS 向けの 6502 ワンボードマイコン エミュレータ(Swift 製)�
 
 ![status](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey) ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<p align="center"><img src="documents/images/frontpanel.png" alt="LED とスイッチを備えた Glow65 のフロントパネルと、Microsoft BASIC が動く端末" width="860"></p>
+<p align="center"><img src="docs/assets/frontpanel.png" alt="LED とスイッチを備えた Glow65 のフロントパネルと、Microsoft BASIC が動く端末" width="860"></p>
 
 ## 概要
 
@@ -205,7 +205,8 @@ documents/designs/    設計書(日本語)
 - ダミーリード/ダミーライト(インデックスがページを跨ぐときの余分な読み出しなど)は再現していません。そのため、サイクル単位のバス表示は実機と少し異なります。
 - 割り込み源は NMI ボタンと UART の受信割り込みだけです。割り込みの受け付けは、実機の 7 サイクルではなく5つのバスアクセスで表示されます(ダミーリードは再現しません)。
 - BASIC の `SAVE` と `LOAD` は使えません。
-- BASIC の全機能は試験していません(`GET`、`WAIT`、`USR`、`ON GOTO` など)。
+- BASIC の全機能は試験していません(`GET`、`WAIT`、`ON GOTO` など)。`USR` は[チュートリアル第5章](tutorial/05-usr.ja.md)とそのテストで扱っています。
+- ビルド済みのアプリは配布していません。上の手順で、ソースからビルドしてください。
 
 ## ライセンス
 
