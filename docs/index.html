@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Glow65 — See the 6502 think</title>
-<meta name="description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel. Runs Microsoft BASIC.">
+<meta name="description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel. Runs Microsoft BASIC and GAME65G, an interpreter for the GAME language.">
 <meta property="og:title" content="Glow65 — See the 6502 think">
 <meta property="og:description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel.">
 <meta property="og:type" content="website">
@@ -131,6 +131,7 @@ footer a{color:var(--mute)}
     <ul>
       <li><a href="#video"><span lang="en">Video</span><span lang="ja">動画</span></a></li>
       <li><a href="#features"><span lang="en">Features</span><span lang="ja">特長</span></a></li>
+      <li><a href="#game">GAME65G</a></li>
       <li><a href="#how"><span lang="en">How it works</span><span lang="ja">仕組み</span></a></li>
       <li><a href="#start"><span lang="en">Get started</span><span lang="ja">使い方</span></a></li>
       <li><a href="https://github.com/Masakai/Glow65/blob/main/manual/README.md"><span lang="en">Manual</span><span lang="ja">マニュアル</span></a></li>
@@ -147,8 +148,8 @@ footer a{color:var(--mute)}
     <h1>GLOW65</h1>
     <p class="tag"><span lang="en">See the 6502 <em>think</em>.</span><span lang="ja">6502 が<em>考える</em>様子を、LED で見る。</span></p>
     <p class="lead">
-      <span lang="en">A macOS emulator with an on-screen front panel whose LEDs light up like an old computer's: address bus, data bus, registers and flags. You can watch the CPU one bus access at a time. It runs Microsoft BASIC.</span>
-      <span lang="ja">昔のコンピュータのように LED が光る画面上のフロントパネルを持った macOS 用エミュレータ。アドレスバス、データバス、レジスタ、フラグが光り、CPU の動きをバスアクセス 1 回ずつ見られます。Microsoft BASIC も動きます。</span>
+      <span lang="en">A macOS emulator with an on-screen front panel whose LEDs light up like an old computer's: address bus, data bus, registers and flags. You can watch the CPU one bus access at a time. It runs Microsoft BASIC, and GAME65G, an interpreter for the GAME language.</span>
+      <span lang="ja">昔のコンピュータのように LED が光る画面上のフロントパネルを持った macOS 用エミュレータ。アドレスバス、データバス、レジスタ、フラグが光り、CPU の動きをバスアクセス 1 回ずつ見られます。Microsoft BASIC と、GAME 言語のインタプリタ GAME65G も動きます。</span>
     </p>
     <div class="cta">
       <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="ja">使ってみる</span></a>
@@ -197,6 +198,33 @@ footer a{color:var(--mute)}
   </div>
 </section>
 
+<section id="game">
+  <div class="wrap">
+    <div class="kicker reveal">GAME65G</div>
+    <h2 class="reveal"><span lang="en">A second language: GAME.</span><span lang="ja">もう 1 つの言語、GAME。</span></h2>
+    <p class="sub reveal"><span lang="en">GAME is a language written in symbols, published by 大西博 in the Japanese magazine ASCII in 1978. GAME65G, an interpreter for it, was written for Glow65 from the published specification. It lives in ROM at $8000. Type <code>T</code> in the monitor to start it.</span><span lang="ja">GAME は、大西博氏が 1978 年に月刊アスキーで発表した、記号で書く言語です。そのインタプリタ GAME65G を、公開された仕様をもとに Glow65 のために書きました。ROM の $8000 に入っていて、モニタで <code>T</code> を入力すると起動します。</span></p>
+    <div class="two">
+      <div class="box reveal">
+        <h3><span lang="en">Programs made of symbols</span><span lang="ja">記号で書くプログラム</span></h3>
+        <p><span lang="en"><code>?=</code> prints a number, <code>I=1,5</code> … <code>@=I+1</code> is a loop, and <code>#=1</code> runs the program.</span><span lang="ja"><code>?=</code> は数の表示、<code>I=1,5</code> … <code>@=I+1</code> はループ、<code>#=1</code> は実行です。</span></p>
+<pre><span class="c">&gt;</span>10 I=1,5 ?=I*I .=1 @=I+1
+<span class="c">&gt;</span>#=1
+1 4 9 16 25</pre>
+        <p style="margin-top:12px"><span lang="en">Guide: <a href="https://github.com/Masakai/Glow65/blob/main/GAME65G.md">GAME65G.md</a></span><span lang="ja">使い方: <a href="https://github.com/Masakai/Glow65/blob/main/GAME65G.ja.md">GAME65G.ja.md</a></span></p>
+      </div>
+      <div class="box reveal">
+        <h3><span lang="en">Star Trek in 357 lines</span><span lang="ja">357 行の Star Trek</span></h3>
+        <p><span lang="en">An example program after the Star Trek computer games of the 1970s: scans, phasers, photon torpedoes, shields, damage and repair, starbases, and a library computer.</span><span lang="ja">1970 年代の Star Trek のコンピュータゲームにならったプログラム例です。スキャン、フェイザー、光子魚雷、シールド、損傷と修理、宇宙基地、ライブラリコンピュータがあります。</span></p>
+        <p><span lang="en">Send a program written as text with <b>File → Send Text File…</b>, or paste it with Command-V.</span><span lang="ja">テキストで書いたプログラムは、<b>File → Send Text File…</b> で送るか、⌘V で貼り付けます。</span></p>
+        <p><span lang="en">Examples: <a href="https://github.com/Masakai/Glow65/blob/main/examples/README.md">examples/</a></span><span lang="ja">プログラム例: <a href="https://github.com/Masakai/Glow65/blob/main/examples/README.ja.md">examples/</a></span></p>
+      </div>
+    </div>
+    <div class="shots">
+      <figure class="shot reveal"><img src="assets/game65g.png" alt="Star Trek running on GAME65G in the Glow65 app: a short range scan in the terminal" loading="lazy"><figcaption><span lang="en">Star Trek (examples/startrek.gam) running on GAME65G in the app. The program was sent with the launch option --send-text, which does the same as File → Send Text File, and the keys were typed by a script.</span><span lang="ja">アプリの GAME65G で動く Star Trek(examples/startrek.gam)。プログラムは起動オプション --send-text(File → Send Text File… と同じ処理)で送り、キーはスクリプトで入力しました。</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
 <section id="how">
   <div class="wrap">
     <div class="kicker reveal"><span lang="en">How it works</span><span lang="ja">仕組み</span></div>
@@ -208,6 +236,7 @@ footer a{color:var(--mute)}
         <table>
           <tr><th>ADDRESS</th><th><span lang="en">CONTENTS</span><span lang="ja">内容</span></th></tr>
           <tr><td>$0000–$7FFF</td><td>RAM 32 KB</td></tr>
+          <tr><td>$8000–$9FFF</td><td><span lang="en">GAME65G (GAME language interpreter)</span><span lang="ja">GAME65G(GAME 言語のインタプリタ)</span></td></tr>
           <tr><td>$A000 / $A001</td><td><span lang="en">UART status · data (6850-style)</span><span lang="ja">UART 状態・データ(6850 風)</span></td></tr>
           <tr><td>$C000–$EFFF</td><td>Microsoft BASIC</td></tr>
           <tr><td>$F000–$FFFF</td><td><span lang="en">Monitor ROM, vectors</span><span lang="ja">モニタ ROM、ベクタ</span></td></tr>
@@ -242,6 +271,7 @@ swift run Glow65App</pre>
       <li><span lang="en">Click the terminal, then flip the <b>POWER</b> switch up. The monitor starts.</span><span lang="ja">端末をクリックして、<b>POWER</b> スイッチを上げます。モニタが起動します。</span></li>
       <li><span lang="en">Type <code>B</code> and press Return to start BASIC. Press Return for the two prompts.</span><span lang="ja"><code>B</code> と入力して Return。BASIC が起動します。2 つの質問は Return で既定値になります。</span></li>
       <li><span lang="en">Type a program, <code>RUN</code> it, and slow the SPEED switch down to watch it run.</span><span lang="ja">プログラムを入力して <code>RUN</code>。SPEED を下げると、実行の様子が見えます。</span></li>
+      <li><span lang="en">Or type <code>T</code> in the monitor to start GAME65G, and send <code>examples/startrek.gam</code> with <b>File → Send Text File…</b>. Enter <code>#=1</code> to play.</span><span lang="ja">モニタで <code>T</code> を入力すると GAME65G が起動します。<b>File → Send Text File…</b> で <code>examples/startrek.gam</code> を送り、<code>#=1</code> で遊べます。</span></li>
       <li><span lang="en">To run your own machine code, follow the <a href="https://github.com/Masakai/Glow65/blob/main/tutorial/README.md">tutorial</a>: an LED counter, 16-bit addition with the carry flag, printing text through the UART, an echo program that reads the keyboard, calling machine code from BASIC with USR, interrupts (the NMI button and a UART receive IRQ), and switching to the 65C02 (one program written for both CPUs).</span><span lang="ja">自作の機械語を動かすには、<a href="https://github.com/Masakai/Glow65/blob/main/tutorial/README.ja.md">チュートリアル</a>へ。LED カウンタ、キャリーフラグを使う 16 ビットの足し算、UART で文字を出す例、キーボードを読むエコー、BASIC から機械語を呼ぶ USR、NMI ボタンと UART 受信 IRQ の割り込み、同じプログラムを 6502 と 65C02 の両方向けに書く 65C02 への切り替えの 7 章です。</span></li>
       <li><span lang="en">To learn how the 6502 works, read the manual (<a href="https://github.com/Masakai/Glow65/blob/main/manual/en/README.md">English</a> / <a href="https://github.com/Masakai/Glow65/blob/main/manual/ja/README.md">日本語</a>): the history of the 6502, bits and bytes, the CPU, addressing modes, all 151 instructions, flags, the stack, interrupts, and the memory map.</span><span lang="ja">6502 の仕組みを読んで学ぶには、マニュアル(<a href="https://github.com/Masakai/Glow65/blob/main/manual/ja/README.md">日本語</a> / <a href="https://github.com/Masakai/Glow65/blob/main/manual/en/README.md">English</a>)へ。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。</span></li>
     </ol>
@@ -254,7 +284,8 @@ swift run Glow65App</pre>
       <div class="kicker"><span lang="en">Credits</span><span lang="ja">クレジット</span></div>
       <h2><span lang="en">Related resources</span><span lang="ja">関連リソース</span></h2>
       <table>
-        <tr><td><span lang="en">Original</span><span lang="ja">自作</span></td><td><span lang="en">6502 CPU core, board, monitor ROM, front panel, app, BASIC conversion script (MIT License)</span><span lang="ja">6502 CPU コア、ボード、モニタ ROM、フロントパネル、アプリ、BASIC 変換スクリプト(MIT License)</span></td></tr>
+        <tr><td><span lang="en">Original</span><span lang="ja">自作</span></td><td><span lang="en">6502 CPU core, board, monitor ROM, GAME65G, front panel, app, BASIC conversion script (MIT License)</span><span lang="ja">6502 CPU コア、ボード、モニタ ROM、GAME65G、フロントパネル、アプリ、BASIC 変換スクリプト(MIT License)</span></td></tr>
+        <tr><td><span lang="en">Language</span><span lang="ja">言語</span></td><td><span lang="en">The GAME language by 大西博 (ASCII magazine, 1978). GAME65G was written from its published specification. It is not GAME65 by 鈴木仁志 (1979) and uses none of its code.</span><span lang="ja">GAME 言語は大西博氏の作(月刊アスキー、1978 年)。GAME65G は公開された仕様から書いたもので、鈴木仁志氏の GAME65(1979 年)とは別物です。そのコードは使っていません。</span></td></tr>
         <tr><td><span lang="en">Included</span><span lang="ja">同梱</span></td><td>Microsoft BASIC for 6502 v1.1 — © Microsoft Corporation, MIT License · <a href="https://github.com/microsoft/BASIC-M6502">microsoft/BASIC-M6502</a></td></tr>
         <tr><td><span lang="en">Built with</span><span lang="ja">ビルドに使用</span></td><td>cc65 (zlib License) · Swift · SwiftUI</td></tr>
         <tr><td><span lang="en">Verified by</span><span lang="ja">検証に使用</span></td><td><span lang="en">Klaus Dormann's 6502 functional test and 65C02 extended opcodes test (GPLv3, not included)</span><span lang="ja">Klaus Dormann の 6502 機能テストと 65C02 拡張オペコードテスト(GPLv3、同梱しない)</span></td></tr>
