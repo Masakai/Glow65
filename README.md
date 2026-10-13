@@ -12,10 +12,10 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 ## What it is
 
-Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UART), and ROM holding a small monitor and Microsoft BASIC. The window has two parts:
+Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UART), and ROM holding a small monitor, Microsoft BASIC, and GAME65G, an interpreter for the GAME language. The window has two parts:
 
 - **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, NMI, RUN/STOP, STEP, STEP MODE and SPEED.
-- **Terminal.** Connected to the UART. Use it to talk to the monitor and BASIC.
+- **Terminal.** Connected to the UART. Use it to talk to the monitor, BASIC, and GAME65G.
 
 The panel is for watching the CPU work. At 1 kHz and below, each bus access is shown one at a time. At 100 kHz and above, LED brightness is the fraction of accesses in which the bit was 1, which imitates the glow of an old panel's LEDs. The extra dummy reads and writes of real hardware are not reproduced, so the bus view differs slightly from a real 6502.
 
@@ -29,7 +29,8 @@ Glow65 is **not** entirely original work.
 
 | Part | Origin |
 |---|---|
-| 6502 CPU core, board, monitor ROM, front panel, app, BASIC conversion script | Written for this project (MIT License) |
+| 6502 CPU core, board, monitor ROM, GAME65G, front panel, app, BASIC conversion script | Written for this project (MIT License) |
+| GAME language specification | GAME by 大西博 (ASCII magazine, 1978). GAME65G was written from the published specification. It is not GAME65 by 鈴木仁志 (1979) and uses none of its code |
 | Microsoft BASIC for 6502 v1.1 | Copyright (c) Microsoft Corporation, MIT License. Source: [microsoft/BASIC-M6502](https://github.com/microsoft/BASIC-M6502) |
 | cc65 (assembler and linker) | Used to build the ROMs. zlib License. Not included |
 | Klaus Dormann's 6502 functional test | Used to verify the CPU. GPLv3. Not included |
@@ -57,6 +58,7 @@ cd Glow65
 
 brew install cc65
 Tools/build_monitor.sh     # builds ROM/monitor.bin
+Tools/build_game65g.sh     # builds ROM/game65g.bin
 Tools/build_basic.sh       # converts and builds ROM/basic/build/basic.bin
 
 swift run Glow65App         # front panel app
@@ -81,6 +83,17 @@ RUN
 ```
 
 Without `basic.bin` the app still starts, with the monitor only.
+
+Type `T` in the monitor to start GAME65G, an interpreter for the GAME language. See [GAME65G.md](GAME65G.md) for how to use it.
+
+```
+GAME65G V1.0
+BASED ON GAME LANGUAGE (ASCII 1978)
+>10 I=1,5 ?=I*I .=1 @=I+1
+>#=1
+1 4 9 16 25
+>
+```
 
 ### Command-line version
 
@@ -134,13 +147,14 @@ For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on a
 | `$0300-$03F7` | (inside RAM) free for your programs |
 | `$03F8-$03F9` | (inside RAM) NMI handler address (the monitor jumps through it) |
 | `$03FA-$03FB` | (inside RAM) IRQ and BRK handler address (same) |
-| `$0400-$7FFF` | (inside RAM) BASIC programs and variables |
+| `$0400-$7FFF` | (inside RAM) BASIC or GAME65G programs and variables |
+| `$8000-$9FFF` | GAME65G (about 2.7 KB used) |
 | `$A000` | UART status (bit 0: receive ready, bit 1: transmit empty, bit 7: interrupt request) / control (bit 7: enable the receive interrupt) |
 | `$A001` | UART data |
 | `$C000-$EFFF` | Microsoft BASIC (about 8.6 KB used) |
 | `$F000-$FFFF` | Monitor ROM and vectors |
 
-The UART is a minimal MC6850-style device. It answers on all of `$A000-$A0FF`: even addresses are the status/control register and odd addresses are the data register. Other addresses that nothing is connected to (for example `$8000-$9FFF`) read as `$FF`, and writes are ignored.
+The UART is a minimal MC6850-style device. It answers on all of `$A000-$A0FF`: even addresses are the status/control register and odd addresses are the data register. Other addresses that nothing is connected to (for example `$A100-$BFFF`) read as `$FF`, and writes are ignored.
 
 The monitor has a fixed jump table that BASIC and your programs can call:
 
@@ -161,6 +175,7 @@ The monitor has a fixed jump table that BASIC and your programs can call:
 | `L aaaa [bbbb]` | Disassemble (16 instructions if the end is omitted) |
 | `G aaaa` | Call the routine at `aaaa` (returns to the monitor on RTS) |
 | `B` | Start BASIC |
+| `T` | Start GAME65G |
 | `?` | Help |
 
 ## How BASIC is built
@@ -193,6 +208,7 @@ Sources/Glow65/        Board: bus, UART, machine, runner, front panel state
 Sources/glow65-cli/    Command-line front end
 Sources/Glow65App/     SwiftUI app: front panel, terminal, startup banner
 ROM/monitor.s         Monitor ROM source (ca65)
+ROM/game65g/          GAME65G source (ca65) and linker config
 ROM/basic/            BASIC: upstream source, prelude, linker config
 Tools/                Build and conversion scripts (assemble.sh builds your own programs)
 manual/               Manual: eight chapters (English and Japanese), diagram generators
@@ -207,7 +223,7 @@ documents/designs/    Design document (Japanese)
 - On the 65C02, dummy reads and writes are not reproduced either, as on the 6502. The decimal-mode V flag on the 65C02 follows the NMOS rule and matches Bruce Clark's published description for the 65C02 but is not verified against real hardware.
 - Dummy reads and writes (for example the extra read when an index crosses a page) are not reproduced, so the cycle-by-cycle bus view differs slightly from real hardware.
 - The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
-- BASIC `SAVE` and `LOAD` are not available.
+- BASIC `SAVE` and `LOAD` are not available. GAME65G has no LOAD or SAVE either.
 - Not everything in BASIC has been tested (for example `GET`, `WAIT`, `ON GOTO`). `USR` is covered by [tutorial chapter 5](tutorial/05-usr.md) and its tests.
 - No built app is distributed. Build it from source as described above.
 

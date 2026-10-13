@@ -8,6 +8,7 @@
 ;   L aaaa [bbbb]    逆アセンブル(終了アドレス省略時は16命令。65C02 なら追加の命令も表示)
 ;   G aaaa           JSR で実行(RTS で戻るとモニタに戻る)
 ;   B                BASIC をコールドスタート($C000)
+;   T                GAME65G をコールドスタート($8000)
 ;   ?                ヘルプ
 
         .setcpu "6502"
@@ -17,6 +18,7 @@ UART_CTRL = $A000       ; bit0=RDRF, bit1=TDRE
 UART_DATA = $A001
 BUF       = $0200       ; 行入力バッファ
 BASIC     = $C000       ; BASIC のコールドスタート
+GAME      = $8000       ; GAME65G のコールドスタート
 NMIVEC    = $03F8       ; NMI のハンドラアドレス(RAM。ユーザーが書き換える)
 IRQVEC    = $03FA       ; IRQ/BRK のハンドラアドレス(同上)
 
@@ -272,7 +274,7 @@ CMDLOOP:
         bne :+
         jmp BASIC
 :       cmp #'?'
-        jne ERR
+        jne CMD_T               ; T は末尾に置く(RESET や NMI_ISR の番地を動かさないため)
         lda #<HelpText
         ldy #>HelpText
         jsr PRSTR
@@ -609,6 +611,11 @@ IRQ_ISR:
 DEFISR:
         rti
 
+CMD_T:
+        cmp #'T'
+        jne ERR
+        jmp GAME
+
         .segment "RODATA"
 Banner:
         .byte $0D, $0A, "GLOW65 MONITOR  (? = HELP)", $0D, $0A, 0
@@ -617,7 +624,8 @@ HelpText:
         .byte "E AAAA BB ..   WRITE", $0D, $0A
         .byte "L AAAA [BBBB]  LIST", $0D, $0A
         .byte "G AAAA         GO", $0D, $0A
-        .byte "B              BASIC", $0D, $0A, 0
+        .byte "B              BASIC", $0D, $0A
+        .byte "T              GAME65G", $0D, $0A, 0
 
 ; ---- 逆アセンブラの表 ----
 ; MNEM、OPMN、OPMODE、OPMN65、OPMODE65 は Tools/gen_disasm_tables.py が CPU コアの表から生成する。

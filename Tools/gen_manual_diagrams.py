@@ -1155,7 +1155,7 @@ def f7_map(sc):
              ("rom", "$C000-$EFFF", L("BASIC の ROM", "BASIC ROM"), 72),
              ("none", "$A100-$BFFF", L("何もつながっていない", "Nothing connected"), 50),
              ("io", "$A000-$A0FF", "UART", 40),
-             ("none", "$8000-$9FFF", L("何もつながっていない", "Nothing connected"), 50),
+             ("rom", "$8000-$9FFF", L("GAME65G の ROM", "GAME65G ROM"), 50),
              ("ram", "$0000-$7FFF", L("RAM(32KB)", "RAM (32KB)"), 228)]
     ram_top = ram_bot = 0
     for kind, a, n, h in mains:
@@ -1163,7 +1163,7 @@ def f7_map(sc):
         if a.startswith("$0000"):
             ram_top, ram_bot = y, y + h
         y += h
-    subs = [("$0400-$7FFF", L("BASIC のプログラムと変数", "BASIC program, variables"), 62),
+    subs = [("$0400-$7FFF", L("BASIC、GAME65G 用", "BASIC, GAME65G"), 62),
             ("$03F8-$03FB", L("割り込みベクタ(RAM)", "Interrupt vectors (RAM)"), 30),
             ("$0300-$03F7", L("ユーザープログラム用", "User programs"), 38),
             ("$0200-$027F", L("モニタの行入力バッファ", "Monitor line buffer"), 38),

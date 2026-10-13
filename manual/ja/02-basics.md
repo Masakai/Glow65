@@ -251,7 +251,8 @@ Glow65 のアドレス空間は、次のように使います(README の「メ�
 | `$0300-$03F7` | RAM の中 | 自作プログラム用に空けてある領域 |
 | `$03F8-$03F9` | RAM の中 | NMI ハンドラのアドレス |
 | `$03FA-$03FB` | RAM の中 | IRQ と BRK のハンドラのアドレス |
-| `$0400-$7FFF` | RAM の中 | BASIC のプログラムと変数 |
+| `$0400-$7FFF` | RAM の中 | BASIC か GAME65G のプログラムと変数 |
+| `$8000-$9FFF` | ROM | GAME65G |
 | `$A000` | I/O | UART の状態と制御 |
 | `$A001` | I/O | UART のデータ |
 | `$C000-$EFFF` | ROM | Microsoft BASIC(約 8.6KB を使用) |
@@ -266,8 +267,8 @@ UART は、端末とやり取りするための装置です。`$A001` に書い�
 > 何もつながっていないアドレスは、`$FF` になります。
 >
 > ```
-> *D 8000 800F
-> 8000: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+> *D B000 B00F
+> B000: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 > ```
 >
 > ROM への書き込みは、無視されます。`$F000` は ROM で、モニタの先頭の `JMP`(`$4C`)が入っています。

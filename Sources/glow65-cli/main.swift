@@ -5,7 +5,8 @@ import Glow65
 
 // 使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02]
 // --load は電源投入後に RAM へ生のバイナリを書き込む(例: --load tutorial/counter.bin@0300)。
-// 既定では ROM/monitor.bin を $F000、ROM/basic/build/basic.bin(あれば)を $C000 に読み込む。終了は Ctrl-\。
+// 既定では ROM/monitor.bin を $F000、ROM/basic/build/basic.bin(あれば)を $C000、
+// ROM/game65g.bin(あれば)を $8000 に読み込む。終了は Ctrl-\。
 
 var romSpecs: [String] = []
 var loadSpecs: [String] = []
@@ -49,15 +50,18 @@ if romSpecs.isEmpty {
     if FileManager.default.fileExists(atPath: "ROM/basic/build/basic.bin") {
         romSpecs.append("ROM/basic/build/basic.bin@C000")
     }
+    if FileManager.default.fileExists(atPath: "ROM/game65g.bin") {
+        romSpecs.append("ROM/game65g.bin@8000")
+    }
 }
 
 let machine = Machine(cpuModel: cpuModel)
 for spec in romSpecs {
     do {
         let image = try ProgramImage.load(spec: spec)
-        // ROM 領域($C000-$FFFF)に収まらないイメージは、クラッシュさせずに断る
-        guard image.address >= MemoryMap.romBase, Int(image.address) + image.bytes.count <= 0x10000 else {
-            FileHandle.standardError.write(Data("ROM 領域($C000-$FFFF)に収まらない: \(spec)\n".utf8))
+        // ROM 領域($8000-$9FFF、$C000-$FFFF)に収まらないイメージは、クラッシュさせずに断る
+        guard MemoryMap.romContains(address: image.address, count: image.bytes.count) else {
+            FileHandle.standardError.write(Data("ROM 領域($8000-$9FFF、$C000-$FFFF)に収まらない: \(spec)\n".utf8))
             exit(1)
         }
         machine.bus.loadROM(image.bytes, at: image.address)

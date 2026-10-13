@@ -9,6 +9,7 @@ APP="dist/Glow65.app"
 
 # ROM がなければ作る(BASIC は cc65 がある場合だけ)
 [ -f ROM/monitor.bin ] || Tools/build_monitor.sh
+[ -f ROM/game65g.bin ] || Tools/build_game65g.sh
 if [ ! -f ROM/basic/build/basic.bin ]; then
     if command -v ca65 >/dev/null 2>&1; then
         Tools/build_basic.sh
@@ -23,7 +24,7 @@ BIN="$(swift build -c release --show-bin-path)/Glow65App"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/ROM/basic/build"
 cp "$BIN" "$APP/Contents/MacOS/Glow65App"
-cp ROM/monitor.bin "$APP/Contents/Resources/ROM/"
+cp ROM/monitor.bin ROM/game65g.bin "$APP/Contents/Resources/ROM/"
 [ -f ROM/basic/build/basic.bin ] && cp ROM/basic/build/basic.bin "$APP/Contents/Resources/ROM/basic/build/"
 cp Tools/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 # サンプルプログラムと、そのソースを同梱する(File → Load Program… で選べる)

@@ -24,7 +24,8 @@ jobs:
         run: |
           python3 Tools/gen_disasm_tables.py
           Tools/build_monitor.sh
-          git diff --exit-code -- ROM/monitor.bin ROM/disasm_tables.inc
+          Tools/build_game65g.sh
+          git diff --exit-code -- ROM/monitor.bin ROM/disasm_tables.inc ROM/game65g.bin
           Tools/build_basic.sh
 
       - name: ビルド

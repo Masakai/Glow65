@@ -126,7 +126,7 @@ Glow65 is an emulator of a fictional single-board computer, made for learning th
 | Input | Keyboard (uppercase only) [8] | Built-in keyboard [9] | Game pads (two, fixed to the console) [26] | Keyboard input from the terminal (through the UART) |
 | Sound | 1-bit speaker [8] | A small buzzer only (some models have none) [9] | 5 channels [26] | None |
 | External storage | Cassette tape [8] | Built-in cassette unit [9] | None built in [26] | None. BASIC `SAVE` and `LOAD` cannot be used. File loading (File → Load Program) is a feature where the emulator writes directly into RAM |
-| Software in ROM | Integer BASIC, machine-code monitor (8KB) [8] | BASIC, KERNAL, character shapes [9] | Game cartridges (the program chip is up to 32KB) [26] | Monitor (`$F000-$FFFF`) and Microsoft BASIC (`$C000-$EFFF`) |
+| Software in ROM | Integer BASIC, machine-code monitor (8KB) [8] | BASIC, KERNAL, character shapes [9] | Game cartridges (the program chip is up to 32KB) [26] | Monitor (`$F000-$FFFF`), Microsoft BASIC (`$C000-$EFFF`), and GAME65G (`$8000-$9FFF`) |
 
 The BASIC in Glow65 is Microsoft's BASIC for the 6502 (v1.1 from 1978) [28], converted for this board.
 

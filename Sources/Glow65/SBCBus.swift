@@ -7,12 +7,25 @@ public enum MemoryMap {
     public static let uartEnd: UInt16 = 0xA0FF
     public static let romBase: UInt16 = 0xC000   // $C000-$FFFF
     public static let romSize = 0x4000
+    public static let gameROMBase: UInt16 = 0x8000  // $8000-$9FFF(GAME65G)
+    public static let gameROMSize = 0x2000
+
+    /// `address` から `count` バイトが、ROM のどちらかの領域に収まるか。
+    public static func romContains(address: UInt16, count: Int) -> Bool {
+        let start = Int(address)
+        let end = start + count
+        let low = Int(gameROMBase)
+        let high = Int(romBase)
+        return (start >= low && end <= low + gameROMSize) || (start >= high && end <= high + romSize)
+    }
 }
 
-/// 本ボードのバス。RAM、UART、ROM を配置し、未割り当て領域は `$FF` を返す。
+/// 本ボードのバス。RAM、UART、ROM(2 領域)を配置し、未割り当て領域は `$FF` を返す。
 public final class SBCBus: Bus {
     public private(set) var ram: [UInt8]
     public private(set) var rom: [UInt8]
+    /// `$8000-$9FFF` の ROM(GAME65G)。
+    public private(set) var gameROM: [UInt8]
     public let uart: UART
     /// フロントパネル用のバス監視。nil のときは監視しない。
     public var probe: PanelProbe?
@@ -21,6 +34,7 @@ public final class SBCBus: Bus {
         self.uart = uart
         ram = [UInt8](repeating: 0, count: MemoryMap.ramSize)
         rom = [UInt8](repeating: 0xFF, count: MemoryMap.romSize)
+        gameROM = [UInt8](repeating: 0xFF, count: MemoryMap.gameROMSize)
     }
 
     @inline(__always)
@@ -35,6 +49,8 @@ public final class SBCBus: Bus {
         switch address {
         case 0x0000..<0x8000:
             return ram[Int(address)]
+        case 0x8000..<0xA000:
+            return gameROM[Int(address - MemoryMap.gameROMBase)]
         case MemoryMap.uartBase...MemoryMap.uartEnd:
             return address & 1 == 0 ? uart.readStatus() : uart.readData()
         case MemoryMap.romBase...0xFFFF:
@@ -61,17 +77,23 @@ public final class SBCBus: Bus {
         }
     }
 
-    /// ROM 領域にイメージを書き込む。`address` は CPU から見たアドレス($C000-$FFFF)。
+    /// ROM 領域にイメージを書き込む。`address` は CPU から見たアドレス($8000-$9FFF か $C000-$FFFF)。
     public func loadROM(_ image: [UInt8], at address: UInt16 = MemoryMap.romBase) {
-        let offset = Int(address) - Int(MemoryMap.romBase)
-        precondition(offset >= 0 && offset + image.count <= rom.count, "ROM 領域に収まらない")
-        rom.replaceSubrange(offset..<(offset + image.count), with: image)
+        precondition(MemoryMap.romContains(address: address, count: image.count), "ROM 領域に収まらない")
+        if address >= MemoryMap.romBase {
+            let offset = Int(address - MemoryMap.romBase)
+            rom.replaceSubrange(offset..<(offset + image.count), with: image)
+        } else {
+            let offset = Int(address - MemoryMap.gameROMBase)
+            gameROM.replaceSubrange(offset..<(offset + image.count), with: image)
+        }
     }
 
     /// 副作用のない読み出し(パネルの表示用)。バス監視にも UART にも触れず、I/O は `$FF` を返す。
     public func peek(_ address: UInt16) -> UInt8 {
         switch address {
         case 0x0000..<0x8000: return ram[Int(address)]
+        case 0x8000..<0xA000: return gameROM[Int(address - MemoryMap.gameROMBase)]
         case MemoryMap.romBase...0xFFFF: return rom[Int(address - MemoryMap.romBase)]
         default: return 0xFF
         }

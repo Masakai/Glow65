@@ -12,10 +12,10 @@ macOS 向けの 6502 ワンボードマイコン エミュレータ(Swift 製)�
 
 ## 概要
 
-Glow65 は、架空の 6502 ボードをエミュレートします。構成は CPU、RAM 32KB、シリアルポート(UART)、小さなモニタと Microsoft BASIC を載せた ROM です。ウインドウは2つの部分でできています。
+Glow65 は、架空の 6502 ボードをエミュレートします。構成は CPU、RAM 32KB、シリアルポート(UART)、小さなモニタと Microsoft BASIC と GAME 言語のインタプリタ GAME65G を載せた ROM です。ウインドウは2つの部分でできています。
 
 - **フロントパネル**: アドレスバス、データバス、PC、SP、A、X、Y、ステータスフラグ、バス信号の LED と、PC の位置の命令(逆アセンブルしたもの)の表示。スイッチは POWER、RESET、NMI、RUN/STOP、STEP、STEP MODE、SPEED。
-- **端末**: UART につながり、モニタと BASIC を操作します。
+- **端末**: UART につながり、モニタ、BASIC、GAME65G を操作します。
 
 パネルは CPU の動きを観察するためのものです。1kHz 以下では、バスアクセスを1つずつ表示します。100kHz 以上では、各ビットが 1 だったアクセスの割合を LED の明るさにするので、昔のパネルの LED の光り方を模した残光が出ます。実機にある余分なダミーリード/ダミーライトは再現していないため、バスの表示は実際の 6502 と少し異なります。
 
@@ -29,7 +29,8 @@ Glow65 は**全体が独自実装ではありません**。
 
 | 部分 | 出どころ |
 |---|---|
-| 6502 CPU コア、ボード、モニタ ROM、フロントパネル、アプリ、BASIC 変換スクリプト | このプロジェクトのために書いたもの(MIT License) |
+| 6502 CPU コア、ボード、モニタ ROM、GAME65G、フロントパネル、アプリ、BASIC 変換スクリプト | このプロジェクトのために書いたもの(MIT License) |
+| GAME 言語の仕様 | 大西博氏の GAME(月刊アスキー 1978 年)。GAME65G は公開された仕様から書いたもので、鈴木仁志氏の GAME65(1979 年)とは別物。そのコードは使っていない |
 | Microsoft BASIC for 6502 v1.1 | Copyright (c) Microsoft Corporation、MIT License。入手元は [microsoft/BASIC-M6502](https://github.com/microsoft/BASIC-M6502) |
 | cc65(アセンブラとリンカ) | ROM のビルドに使用。zlib License。同梱しない |
 | Klaus Dormann の 6502 機能テスト | CPU の検証に使用。GPLv3。同梱しない |
@@ -57,6 +58,7 @@ cd Glow65
 
 brew install cc65
 Tools/build_monitor.sh     # ROM/monitor.bin を生成
+Tools/build_game65g.sh     # ROM/game65g.bin を生成
 Tools/build_basic.sh       # 変換して ROM/basic/build/basic.bin を生成
 
 swift run Glow65App         # フロントパネルのアプリ
@@ -81,6 +83,17 @@ RUN
 ```
 
 `basic.bin` がなくても、アプリはモニタだけで起動します。
+
+モニタで `T` を入力すると、GAME 言語のインタプリタ GAME65G が起動します。使い方は [GAME65G.ja.md](GAME65G.ja.md) にあります。
+
+```
+GAME65G V1.0
+BASED ON GAME LANGUAGE (ASCII 1978)
+>10 I=1,5 ?=I*I .=1 @=I+1
+>#=1
+1 4 9 16 25
+>
+```
 
 ### コマンドライン版
 
@@ -134,13 +147,14 @@ HALT LED は、RUN/STOP スイッチが STOP のときに点きます。65C02 �
 | `$0300-$03F7` | (RAM の中)自作プログラム用に空けてある領域 |
 | `$03F8-$03F9` | (RAM の中)NMI ハンドラのアドレス(モニタがここ経由で飛ぶ) |
 | `$03FA-$03FB` | (RAM の中)IRQ と BRK のハンドラのアドレス(同上) |
-| `$0400-$7FFF` | (RAM の中)BASIC のプログラムと変数 |
+| `$0400-$7FFF` | (RAM の中)BASIC か GAME65G のプログラムと変数 |
+| `$8000-$9FFF` | GAME65G(約 2.7KB を使用) |
 | `$A000` | UART 状態(bit0: 受信可、bit1: 送信可、bit7: 割り込み要求)/制御(bit7: 受信割り込みの許可) |
 | `$A001` | UART データ |
 | `$C000-$EFFF` | Microsoft BASIC(約 8.6KB を使用) |
 | `$F000-$FFFF` | モニタ ROM とベクタ |
 
-UART は MC6850 風の最小構成です。`$A000-$A0FF` の全体に応答し、偶数番地が状態と制御、奇数番地がデータです。何もつながっていないアドレス(たとえば `$8000-$9FFF`)を読むと `$FF` が返り、書き込みは無視されます。
+UART は MC6850 風の最小構成です。`$A000-$A0FF` の全体に応答し、偶数番地が状態と制御、奇数番地がデータです。何もつながっていないアドレス(たとえば `$A100-$BFFF`)を読むと `$FF` が返り、書き込みは無視されます。
 
 モニタには固定のジャンプテーブルがあり、BASIC やユーザープログラムから呼べます。
 
@@ -161,6 +175,7 @@ UART は MC6850 風の最小構成です。`$A000-$A0FF` の全体に応答し�
 | `L aaaa [bbbb]` | 逆アセンブル(終了アドレスを省くと 16 命令) |
 | `G aaaa` | `aaaa` のルーチンを呼ぶ(RTS でモニタに戻る) |
 | `B` | BASIC を起動 |
+| `T` | GAME65G を起動 |
 | `?` | ヘルプ |
 
 ## BASIC のビルド方法
@@ -193,6 +208,7 @@ Sources/Glow65/        ボード: バス、UART、マシン、実行制御、パ
 Sources/glow65-cli/    コマンドライン版
 Sources/Glow65App/     SwiftUI アプリ: フロントパネル、端末、起動バナー
 ROM/monitor.s         モニタ ROM のソース(ca65)
+ROM/game65g/          GAME65G のソース(ca65)とリンカ設定
 ROM/basic/            BASIC: 原典、マクロ、リンカ設定
 Tools/                ビルドと変換のスクリプト(assemble.sh は自作プログラムのビルド用)
 manual/               マニュアル: 8 章(日本語と英語)、図の生成スクリプト
@@ -207,7 +223,7 @@ documents/designs/    設計書(日本語)
 - 65C02 でも、6502 と同じくダミーリード/ダミーライトは再現しません。65C02 の 10進モードの V フラグは NMOS と同じ規則で、Bruce Clark の公開資料の記述とは一致しますが、実機との照合はしていません。
 - ダミーリード/ダミーライト(インデックスがページを跨ぐときの余分な読み出しなど)は再現していません。そのため、サイクル単位のバス表示は実機と少し異なります。
 - 割り込み源は NMI ボタンと UART の受信割り込みだけです。割り込みの受け付けは、実機の 7 サイクルではなく5つのバスアクセスで表示されます(ダミーリードは再現しません)。
-- BASIC の `SAVE` と `LOAD` は使えません。
+- BASIC の `SAVE` と `LOAD` は使えません。GAME65G にも LOAD と SAVE はありません。
 - BASIC の全機能は試験していません(`GET`、`WAIT`、`ON GOTO` など)。`USR` は[チュートリアル第5章](tutorial/05-usr.ja.md)とそのテストで扱っています。
 - ビルド済みのアプリは配布していません。上の手順で、ソースからビルドしてください。
 

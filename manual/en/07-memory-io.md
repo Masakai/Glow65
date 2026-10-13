@@ -19,7 +19,7 @@ The number of addresses given to a part is the size of that part. Some addresses
 | Address | Part | Contents |
 |---|---|---|
 | `$0000-$7FFF` | RAM | 32KB |
-| `$8000-$9FFF` | None | Nothing is connected |
+| `$8000-$9FFF` | ROM | GAME65G (about 2.7KB used) |
 | `$A000-$A0FF` | UART | Even addresses are status and control, odd addresses are data |
 | `$A100-$BFFF` | None | Nothing is connected |
 | `$C000-$EFFF` | ROM | Microsoft BASIC (about 8.6KB used) |
@@ -35,21 +35,21 @@ When the power is turned on, all of RAM becomes 0. The RESET switch keeps the co
 
 > **What you can try in Glow65**
 >
-> Read the end of RAM right after power-on, the unconnected `$8000` and `$A100`, and the start of ROM at `$F000`. Try writing to ROM with `E`.
+> Read the end of RAM right after power-on, the unconnected `$A100` and `$B000`, and the start of ROM at `$F000`. Try writing to ROM with `E`.
 >
 > ```
 > *D 7FF0 7FFF
 > 7FF0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> *D 8000 800F
-> 8000: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 > *D A100 A10F
 > A100: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+> *D B000 B00F
+> B000: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 > *E F000 00
 > *D F000 F00F
 > F000: 4C 0F F0 4C 28 F0 4C 37 F0 4C 4B F1 4C 1A F0 AD
 > ```
 >
-> `$7FF0` is filled with 0. `$8000` and `$A100` are all `FF`. Even after `E F000 00`, `$F000` is still `4C` (the `JMP` instruction).
+> `$7FF0` is filled with 0. `$A100` and `$B000` are all `FF`. Even after `E F000 00`, `$F000` is still `4C` (the `JMP` instruction).
 
 The UART takes 256 addresses, `$A000` to `$A0FF`. Only the lowest bit of the address chooses between status and control (even) and data (odd). As a result, the two registers appear repeated 128 times each (**mirrors**). This is simple decoding that selects a part by looking at only a rough part of the address.
 
@@ -74,13 +74,13 @@ The RAM from `$0000` to `$7FFF` is divided up by purpose.
 
 | Address | Use |
 |---|---|
-| `$0000-$00FF` | Zero page. Can be addressed with a 1-byte address. The monitor uses `$F0-$FF`. BASIC keeps the USR vector (`$0A-$0C`) and the vector for the integer and floating-point conversion routines (`$06-$09`), among other things |
+| `$0000-$00FF` | Zero page. Can be addressed with a 1-byte address. The monitor uses `$F0-$FF`. BASIC keeps the USR vector (`$0A-$0C`) and the vector for the integer and floating-point conversion routines (`$06-$09`), among other things. GAME65G uses `$00-$2C`, and `$80-$B3` for the variables A-Z |
 | `$0100-$01FF` | The stack (Chapter 6) |
 | `$0200-$027F` | The monitor's line input buffer |
 | `$0300-$03F7` | 248 bytes for user programs |
 | `$03F8-$03F9` | Address of the NMI handler (low byte first) |
 | `$03FA-$03FB` | Address of the IRQ and BRK handler (low byte first) |
-| `$0400-$7FFF` | BASIC programs and variables |
+| `$0400-$7FFF` | BASIC programs and variables. GAME65G uses `$0400-$05FF` for its input buffers, second stack, and type-ahead buffer, and stores its program from `$0600` |
 
 How BASIC uses the zero page is described in [tutorial chapter 5](../../tutorial/05-usr.md).
 
@@ -319,6 +319,7 @@ The monitor commands are as follows.
 | `L aaaa [bbbb]` | Disassemble (16 instructions if the end address is omitted) |
 | `G aaaa` | Call the routine at `aaaa` (returns to the monitor with RTS) |
 | `B` | Start BASIC |
+| `T` | Start GAME65G |
 | `?` | Help |
 
 ## 7.5 The Vector Area
@@ -329,7 +330,7 @@ The last 6 bytes of ROM (`$FFFA` to `$FFFF`) are the vectors for NMI, reset, and
 
 The answers and explanations are in the next section.
 
-**Problem 1** What part is read, and what do you get, when you read each of these addresses? (1) `$0300` (2) `$A0F5` (3) `$9000` (4) `$F000`
+**Problem 1** What part is read, and what do you get, when you read each of these addresses? (1) `$0300` (2) `$A0F5` (3) `$B000` (4) `$F000`
 
 **Problem 2** Which UART registers are `$A0A0` and `$A0A1`?
 
@@ -350,7 +351,7 @@ The answers and explanations are in the next section.
 ## 7.7 Answers and Explanations
 
 **Problem 1** (1) RAM. The value you wrote can be read back (`$00` right after power-on). (2) The UART data register. `$00` if there is no received data. (3) Nothing is connected. `$FF`. (4) The monitor ROM. The start of the jump table, `$4C` (`JMP`).
-- (1) `$0300` is inside `$0000-$7FFF`. (2) `$A0F5` is inside `$A000-$A0FF`, and it is odd, so it is data. (3) `$8000-$9FFF` is unconnected. (4) `$F000` is ROM, and `D` shows `4C`.
+- (1) `$0300` is inside `$0000-$7FFF`. (2) `$A0F5` is inside `$A000-$A0FF`, and it is odd, so it is data. (3) `$B000` is inside `$A100-$BFFF`, which is unconnected. (4) `$F000` is ROM, and `D` shows `4C`.
 
 **Problem 2** `$A0A0` is status when read and control when written. `$A0A1` is received data when read and transmit data when written.
 - The UART appears as mirrors in `$A000-$A0FF`. Even addresses are status and control, and odd addresses are data.

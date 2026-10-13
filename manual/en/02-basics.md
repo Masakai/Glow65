@@ -251,7 +251,8 @@ The Glow65 address space is used as follows (the same content as the "Memory map
 | `$0300-$03F7` | Inside RAM | Area left free for your own programs |
 | `$03F8-$03F9` | Inside RAM | Address of the NMI handler |
 | `$03FA-$03FB` | Inside RAM | Address of the IRQ and BRK handler |
-| `$0400-$7FFF` | Inside RAM | BASIC programs and variables |
+| `$0400-$7FFF` | Inside RAM | BASIC or GAME65G programs and variables |
+| `$8000-$9FFF` | ROM | GAME65G |
 | `$A000` | I/O | UART status and control |
 | `$A001` | I/O | UART data |
 | `$C000-$EFFF` | ROM | Microsoft BASIC (about 8.6KB used) |
@@ -266,8 +267,8 @@ The UART is a device for exchanging data with a terminal. A byte written to `$A0
 > An address with nothing connected reads as `$FF`.
 >
 > ```
-> *D 8000 800F
-> 8000: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+> *D B000 B00F
+> B000: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
 > ```
 >
 > A write to ROM is ignored. `$F000` is ROM and holds the monitor's first `JMP` (`$4C`).

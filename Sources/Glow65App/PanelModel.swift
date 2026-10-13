@@ -169,6 +169,11 @@ final class PanelModel: ObservableObject {
         } else {
             romError = "BASIC ROM(ROM/basic/build/basic.bin)がない。Tools/build_basic.sh で生成する。"
         }
+        // GAME65G も任意
+        if let gameURL = Self.findROM("ROM/game65g.bin"),
+           let game = try? Data(contentsOf: gameURL) {
+            runner.machine.bus.loadROM([UInt8](game), at: 0x8000)
+        }
     }
 
     private static func findROM(_ relativePath: String) -> URL? {

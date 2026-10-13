@@ -135,6 +135,7 @@ These are available in the Glow65 65C02 mode. Each links to its heading in secti
 | Command `L` | Disassemble | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
 | Command `G` | Call a routine | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
 | Command `B` | Start BASIC | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
+| Command `T` | Start GAME65G | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
 | Command `?` | Help | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
 | Routine `$F000` CHRIN | Read one character (waits) | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
 | Routine `$F003` CHROUT | Send one character | [7.4 Monitor Routines](07-memory-io.md#74-monitor-routines) |
@@ -154,7 +155,7 @@ These are available in the Glow65 65C02 mode. Each links to its heading in secti
 | `$0300-$03F7` | For user programs | [7.1.3 How RAM Is Used](07-memory-io.md#713-how-ram-is-used) |
 | `$03F8-$03FB` | Addresses of the NMI, IRQ, and BRK handlers (RAM) | [6.3.6 Interrupts in Glow65](06-flags-stack-interrupts.md#636-interrupts-in-glow65) |
 | `$0400-$7FFF` | BASIC programs and variables | [7.1.3 How RAM Is Used](07-memory-io.md#713-how-ram-is-used) |
-| `$8000-$9FFF` | Nothing connected | [7.1.2 The Glow65 Memory Map](07-memory-io.md#712-the-glow65-memory-map) |
+| `$8000-$9FFF` | GAME65G ROM | [7.1.2 The Glow65 Memory Map](07-memory-io.md#712-the-glow65-memory-map) |
 | `$A000` `$A001` | UART status and control, data | [7.3 UART](07-memory-io.md#73-uart) |
 | `$A000-$A0FF` | UART (mirrors) | [7.1.2 The Glow65 Memory Map](07-memory-io.md#712-the-glow65-memory-map) |
 | `$A100-$BFFF` | Nothing connected | [7.1.2 The Glow65 Memory Map](07-memory-io.md#712-the-glow65-memory-map) |
