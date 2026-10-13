@@ -318,8 +318,10 @@ final class Game65GTests: XCTestCase {
             send(m, "20 ?=99\r", cycles: 300_000)
             out.bytes.removeAll()
             send(m, "0\r#=1\r??=$ABCD\r", cycles: 3_000_000)
-            XCTAssertEqual(out.text, "0\n10 I=1,20 ?=I .=1 @=I+1\n20 ?=99\n>#=1\n"
-                + (1...20).map { "\($0) " }.joined() + "99\n>??=$ABCD\nABCD\n>", "\(model)")
+            var numbers = ""
+            for i in 1...20 { numbers += "\(i) " }
+            let expected: String = "0\n10 I=1,20 ?=I .=1 @=I+1\n20 ?=99\n>#=1\n" + numbers + "99\n>??=$ABCD\nABCD\n>"
+            XCTAssertEqual(out.text, expected, "\(model)")
         }
     }
 
@@ -358,7 +360,17 @@ final class Game65GTests: XCTestCase {
             "30 / @=I+1",
             "#=1",
         ], model: .nmos6502, cycles: 5_000_000)
-        let rows = (1...9).map { i in (1...9).map { j in String(repeating: " ", count: 3 - String(i * j).count) + String(i * j) }.joined() }
+        // 古いコンパイラ(CI の macos-14)でも型推論が終わるよう、式を分けて型を書く
+        func cell(_ value: Int) -> String {
+            let digits = String(value)
+            return String(repeating: " ", count: 3 - digits.count) + digits
+        }
+        var rows: [String] = []
+        for i in 1...9 {
+            var row = ""
+            for j in 1...9 { row += cell(i * j) }
+            rows.append(row)
+        }
         XCTAssertEqual(text, "#=1\n" + rows.joined(separator: "\n") + "\n>")
         XCTAssertTrue(text.contains("  1  2  3  4  5  6  7  8  9\n"))
         XCTAssertTrue(text.contains("  9 18 27 36 45 54 63 72 81\n>"))
