@@ -202,6 +202,8 @@ The program keeps drawing random numbers until you press a key, so the answer de
 60 "OK " ?=C / #=-1
 ```
 
+Longer programs, including a Star Trek game, are in [examples/](examples/README.md).
+
 ## Memory use
 
 | Range | Use |

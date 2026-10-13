@@ -202,6 +202,8 @@ ERR 20
 60 "OK " ?=C / #=-1
 ```
 
+Star Trek など、もっと長いプログラムは [examples/](examples/README.ja.md) にあります。
+
 ## メモリの使い方
 
 | 範囲 | 用途 |

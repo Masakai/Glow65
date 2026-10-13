@@ -84,7 +84,7 @@ RUN
 
 `basic.bin` がなくても、アプリはモニタだけで起動します。
 
-モニタで `T` を入力すると、GAME 言語のインタプリタ GAME65G が起動します。使い方は [GAME65G.ja.md](GAME65G.ja.md) にあります。
+モニタで `T` を入力すると、GAME 言語のインタプリタ GAME65G が起動します。使い方は [GAME65G.ja.md](GAME65G.ja.md) に、Star Trek などのプログラム例は [examples/](examples/README.ja.md) にあります。
 
 ```
 GAME65G V1.0
@@ -219,6 +219,7 @@ ROM/game65g/          GAME65G のソース(ca65)とリンカ設定
 ROM/basic/            BASIC: 原典、マクロ、リンカ設定
 Tools/                ビルドと変換のスクリプト(assemble.sh は自作プログラムのビルド用)
 manual/               マニュアル: 8 章(日本語と英語)、図の生成スクリプト
+examples/             GAME65G のプログラム例(Star Trek)
 tutorial/             チュートリアル: 7章(LED カウンタ、足し算、UART、エコー、USR、割り込み、65C02)とサンプルプログラム
 Tests/                単体テストと結合テスト
 documents/designs/    設計書(日本語)

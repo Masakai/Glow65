@@ -84,7 +84,7 @@ RUN
 
 Without `basic.bin` the app still starts, with the monitor only.
 
-Type `T` in the monitor to start GAME65G, an interpreter for the GAME language. See [GAME65G.md](GAME65G.md) for how to use it.
+Type `T` in the monitor to start GAME65G, an interpreter for the GAME language. See [GAME65G.md](GAME65G.md) for how to use it, and [examples/](examples/README.md) for example programs, including a Star Trek game.
 
 ```
 GAME65G V1.0
@@ -219,6 +219,7 @@ ROM/game65g/          GAME65G source (ca65) and linker config
 ROM/basic/            BASIC: upstream source, prelude, linker config
 Tools/                Build and conversion scripts (assemble.sh builds your own programs)
 manual/               Manual: eight chapters (English and Japanese), diagram generators
+examples/             GAME65G example programs (Star Trek)
 tutorial/             Tutorial: seven chapters (LED counter, addition, UART, echo, USR, interrupts, 65C02) with sample programs
 Tests/                Unit and integration tests
 documents/designs/    Design document (Japanese)
