@@ -78,6 +78,7 @@ final class PanelModel: ObservableObject {
     /// - `--power-on-after <秒>`: 指定の秒数後に電源を入れる。
     /// - `--input <文字列>`: 文字列を入力する(`\r` は CR)。既定では起動の 1 秒後に一括で送る。
     /// - `--input-after <秒>`: 入力を始めるまでの秒数。
+    /// - `--send-text <ファイル>`: テキストファイルを送る(File → Send Text File… と同じ)。`--input` のあと。
     /// - `--type-delay <秒>`: 1 文字ごとの間隔(指定すると打鍵のように 1 文字ずつ送る)。
     /// - `--cpu <6502|65c02>`: 載せる CPU(既定は 6502。不正な値は無視する)。
     /// - `--script <台本>`: 操作を時刻どおりに自動実行する(下の `runScript` を参照)。
@@ -110,6 +111,12 @@ final class PanelModel: ObservableObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + when) { [weak self] in
                     self?.typed(byte)
                 }
+            }
+        }
+        if let path = value("--send-text") {
+            let start = (value("--input-after").flatMap(Double.init) ?? 1.0) + 0.5
+            DispatchQueue.main.asyncAfter(deadline: .now() + start) { [weak self] in
+                self?.sendTextFile(URL(fileURLWithPath: path))
             }
         }
     }
@@ -270,6 +277,48 @@ final class PanelModel: ObservableObject {
         }
         do {
             load(try ProgramImage.load(path: url.path, address: address))
+        } catch {
+            statusMessage = "Could not read \(url.lastPathComponent)."
+        }
+    }
+
+    // MARK: テキストの送信
+
+    /// テキストを、端末から打ったように UART へ送る(改行は CR にする)。電源が入っているときだけ受け付ける。
+    @discardableResult
+    func sendText(_ bytes: [UInt8]) -> Bool {
+        guard isPowerOn else {
+            statusMessage = "Power is off. Flip POWER on first, then send the text."
+            return false
+        }
+        bytes.forEach(runner.sendInput)
+        return true
+    }
+
+    /// クリップボードの文字列を送る(Edit → Paste、⌘V)。
+    func pasteFromClipboard() {
+        guard let text = NSPasteboard.general.string(forType: .string) else { return }
+        sendText(TextTransfer.bytes(from: text))
+    }
+
+    /// テキストファイルを選び、その内容を送る(BASIC や GAME65G のプログラムを入れるため)。
+    func presentSendTextPanel() {
+        let panel = NSOpenPanel()
+        panel.title = "Send Text File"
+        panel.message = "Choose a text file. Its contents are typed into the terminal, with line ends sent as Return."
+        panel.prompt = "Send"
+        panel.canChooseDirectories = false
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        sendTextFile(url)
+    }
+
+    func sendTextFile(_ url: URL) {
+        do {
+            let bytes = try TextTransfer.bytes(contentsOf: url)
+            if sendText(bytes) {
+                statusMessage = "Sent \(url.lastPathComponent) (\(bytes.count) bytes) to the terminal."
+            }
         } catch {
             statusMessage = "Could not read \(url.lastPathComponent)."
         }

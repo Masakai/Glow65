@@ -1,6 +1,7 @@
 import Core6502
 import Glow65
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - 部品
 
@@ -279,6 +280,8 @@ struct FrontPanelView: View {
 struct TerminalView: View {
     @ObservedObject var terminal: TerminalModel
     let onKey: (UInt8) -> Void
+    /// Edit → Paste(⌘V)
+    let onPaste: () -> Void
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -301,6 +304,7 @@ struct TerminalView: View {
         .focusEffectDisabled()
         .onAppear { focused = true }
         .onTapGesture { focused = true }
+        .onPasteCommand(of: [.plainText]) { _ in onPaste() }
         .onKeyPress(phases: [.down, .repeat]) { press in
             if press.key == .return { onKey(0x0D); return .handled }
             if press.key == .delete { onKey(0x08); return .handled }

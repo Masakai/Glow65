@@ -31,6 +31,15 @@ BASED ON GAME LANGUAGE (ASCII 1978)
 - Statements are separated by spaces. Do not put spaces inside an expression: `?=A+1` is correct, and `?=A + 1` is not.
 - Keys typed while a program is running or listing are kept (up to 64 characters) and used by the next input.
 
+## Sending a program
+
+GAME65G has no LOAD or SAVE. A program written in a text file is sent as if it were typed into the terminal. Line ends arrive as Return.
+
+- App: choose the file with **File → Send Text File…** (Shift-Command-O). Text on the clipboard can be pasted with Command-V.
+- CLI: `glow65-cli --input 't\r' --send-text prog.txt`. This types `T` in the monitor, then sends the file.
+
+A line with the same number replaces the old one, so clear the program with `&=0` before sending if you want a clean start.
+
 ## Entering and running a program
 
 | Input | Action |

@@ -26,6 +26,8 @@ struct Glow65App: App {
             CommandGroup(after: .newItem) {
                 Button("Load Program…") { model.presentLoadPanel() }
                     .keyboardShortcut("o")
+                Button("Send Text File…") { model.presentSendTextPanel() }
+                    .keyboardShortcut("o", modifiers: [.command, .shift])
             }
         }
     }
@@ -49,7 +51,9 @@ struct ContentView: View {
                     Text(message).foregroundStyle(Color(white: 0.7)).font(.callout)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                TerminalView(terminal: model.terminal) { model.typed($0) }
+                TerminalView(terminal: model.terminal,
+                             onKey: { model.typed($0) },
+                             onPaste: { model.pasteFromClipboard() })
             }
             .padding(14)
             .background(Color(white: 0.07))

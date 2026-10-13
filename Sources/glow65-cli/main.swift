@@ -4,7 +4,11 @@ import Core6502
 import Glow65
 
 // 使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02]
+//                   [--input 文字列]... [--send-text ファイル]...
 // --load は電源投入後に RAM へ生のバイナリを書き込む(例: --load tutorial/counter.bin@0300)。
+// --input は文字列を(\r は CR)、--send-text はテキストファイルを、端末から打ったように送る。
+// 改行は CR にする。モニタが起動してから(UART の初期化が済んでから)、指定した順に送る。
+// 例: glow65-cli --input 't\r' --send-text examples/startrek.gam
 // 既定では ROM/monitor.bin を $F000、ROM/basic/build/basic.bin(あれば)を $C000、
 // ROM/game65g.bin(あれば)を $8000 に読み込む。終了は Ctrl-\。
 
@@ -12,8 +16,9 @@ var romSpecs: [String] = []
 var loadSpecs: [String] = []
 var megahertz = 1.0
 var cpuModel = CPUModel.nmos6502
+var textToSend: [UInt8] = []
 
-let usage = "使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02]"
+let usage = "使い方: glow65-cli [--rom ファイル@16進アドレス]... [--load ファイル@16進アドレス]... [--mhz N] [--cpu 6502|65c02] [--input 文字列]... [--send-text ファイル]..."
 
 /// 使い方の誤りを表示して、終了コード 2 で終わる。
 func fail(_ message: String) -> Never {
@@ -30,6 +35,17 @@ while let arg = args.popFirst() {
     case "--load":
         guard let spec = args.popFirst() else { fail("--load にはファイル@アドレスを指定する") }
         loadSpecs.append(spec)
+    case "--input":
+        guard let value = args.popFirst() else { fail("--input には文字列を指定する") }
+        textToSend += TextTransfer.bytes(from: value.replacingOccurrences(of: "\\r", with: "\r"))
+    case "--send-text":
+        guard let path = args.popFirst() else { fail("--send-text にはファイルを指定する") }
+        do {
+            textToSend += try TextTransfer.bytes(contentsOf: URL(fileURLWithPath: path))
+        } catch {
+            FileHandle.standardError.write(Data("テキストファイルを読めない: \(path): \(error)\n".utf8))
+            exit(1)
+        }
     case "--mhz":
         guard let value = args.popFirst(), let mhz = Double(value), mhz > 0 else {
             fail("--mhz には正の数を指定する")
@@ -136,8 +152,14 @@ for spec in loadSpecs {
 let sliceSeconds = 0.01
 let cyclesPerSlice = Int(megahertz * 1_000_000 * sliceSeconds)
 var deadline = Date().timeIntervalSinceReferenceDate
+var slices = 0
 while !quit.isSet {
     machine.run(cycles: cyclesPerSlice)
+    // モニタの RESET 処理が UART の受信キューを消すので、0.1 秒分進めてから送る
+    slices += 1
+    if slices == 10 {
+        for byte in textToSend { machine.uart.receive(byte) }
+    }
     deadline += sliceSeconds
     let wait = deadline - Date().timeIntervalSinceReferenceDate
     if wait > 0 {

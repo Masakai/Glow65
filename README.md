@@ -103,9 +103,16 @@ swift run glow65-cli --mhz 2            # change the clock
 swift run glow65-cli --rom file.bin@C000
 swift run glow65-cli --load tutorial/counter.bin@0300   # a program for RAM, loaded after power-on
 swift run glow65-cli --cpu 65c02        # run as a 65C02 (default: 6502)
+swift run glow65-cli --input 't\r' --send-text prog.txt  # type a string, then a text file
 ```
 
 `--rom` replaces the default ROMs, so list every ROM you need (for example both `ROM/monitor.bin@F000` and `ROM/basic/build/basic.bin@C000`). Quit with Ctrl-\\. Ctrl-C is passed to the program (BASIC uses it to break).
+
+`--input` (`\r` is Return) and `--send-text` are sent in the order given, once the monitor has started. Line ends become Return.
+
+### Sending a program
+
+A program written as text can be sent to BASIC or GAME65G through the terminal. In the app, choose a file with **File → Send Text File…** (Shift-Command-O), or paste the clipboard with Command-V. Line ends become Return, tabs become spaces, and non-ASCII characters become `?`.
 
 ### CPU type: 6502 or 65C02
 
@@ -136,7 +143,7 @@ The HALT LED is on while the RUN/STOP switch is at STOP. On a 65C02 it is also o
 
 To load your own program, use **File → Load Program…** (⌘O) after turning POWER on, or the launch option `--load file.bin@0300`. Build a binary from assembly with `Tools/assemble.sh` (needs cc65).
 
-For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on and types the given text. `--no-splash` skips the startup banner. `--script "3:poweron;5:input=g 0300\r;10:speed=10"` runs a timed script of operations (`poweron`, `poweroff`, `reset`, `run`, `stop`, `step`, `nmi`, `speed=<Hz>`, `mode=cycle|instr`, `input=<text>`), which is handy for screen recordings.
+For automated checks, `Glow65App --power-on --input 'd f000 f00f\r'` powers on and types the given text. `--send-text file` then sends a text file. `--no-splash` skips the startup banner. `--script "3:poweron;5:input=g 0300\r;10:speed=10"` runs a timed script of operations (`poweron`, `poweroff`, `reset`, `run`, `stop`, `step`, `nmi`, `speed=<Hz>`, `mode=cycle|instr`, `input=<text>`), which is handy for screen recordings.
 
 ## Memory map
 

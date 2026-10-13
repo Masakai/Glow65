@@ -103,9 +103,16 @@ swift run glow65-cli --mhz 2            # クロックを変える
 swift run glow65-cli --rom file.bin@C000
 swift run glow65-cli --load tutorial/counter.bin@0300   # RAM に置くプログラム(電源投入後に読み込む)
 swift run glow65-cli --cpu 65c02        # 65C02 として動かす(既定は 6502)
+swift run glow65-cli --input 't\r' --send-text prog.txt  # 文字列とテキストファイルを、打ったように送る
 ```
 
 `--rom` を指定すると既定の ROM は読み込まれません。必要な ROM をすべて並べてください(例: `ROM/monitor.bin@F000` と `ROM/basic/build/basic.bin@C000`)。終了は Ctrl-\\ です。Ctrl-C はプログラムに渡されます(BASIC の中断に使われます)。
+
+`--input`(`\r` は Return)と `--send-text` は、モニタが起動してから、指定した順に送ります。改行は Return になります。
+
+### プログラムを送る
+
+BASIC と GAME65G には、テキストで書いたプログラムを端末から送れます。アプリでは **File → Send Text File…**(⇧⌘O)でファイルを選ぶか、⌘V でクリップボードの文字列を貼り付けます。改行は Return になり、タブは空白、ASCII 以外の文字は `?` になります。
 
 ### CPU の種類(6502 / 65C02)
 
@@ -136,7 +143,7 @@ HALT LED は、RUN/STOP スイッチが STOP のときに点きます。65C02 �
 
 自作のプログラムを読み込むには、POWER を入れたあとに **File → Load Program…**(⌘O)を使うか、起動オプション `--load file.bin@0300` を使います。アセンブリから生のバイナリを作るには `Tools/assemble.sh` を使います(cc65 が必要)。
 
-動作確認用に、`Glow65App --power-on --input 'd f000 f00f\r'` は電源を入れて文字列を入力します。`--no-splash` は起動バナーを出しません。`--script "3:poweron;5:input=g 0300\r;10:speed=10"` は、操作を時刻どおりに自動実行します(`poweron`、`poweroff`、`reset`、`run`、`stop`、`step`、`nmi`、`speed=<Hz>`、`mode=cycle|instr`、`input=<文字列>`)。画面収録に便利です。
+動作確認用に、`Glow65App --power-on --input 'd f000 f00f\r'` は電源を入れて文字列を入力します。`--send-text ファイル` は、その後にテキストファイルを送ります。`--no-splash` は起動バナーを出しません。`--script "3:poweron;5:input=g 0300\r;10:speed=10"` は、操作を時刻どおりに自動実行します(`poweron`、`poweroff`、`reset`、`run`、`stop`、`step`、`nmi`、`speed=<Hz>`、`mode=cycle|instr`、`input=<文字列>`)。画面収録に便利です。
 
 ## メモリマップ
 
