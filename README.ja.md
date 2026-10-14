@@ -132,7 +132,7 @@ xcodegen -s iOS/project.yml
 open iOS/Glow65iPad.xcodeproj                       # iPad かシミュレータを選んで Run
 ```
 
-- パネルは、狭い画面に合わせて縮みます。端末は、画面のキーボード(端末をタップ)と外付けキーボード(Ctrl+文字、Esc を含む)で入力できます。
+- パネルは、狭い画面に合わせて縮みます。端末は、画面のキーボード(端末をタップ)と外付けキーボード(ユニバーサルコントロールで共有した Mac のキーボードを含む)で入力できます。
 - ⋯ メニューに、Load Program…、Send Text File…、Paste、Send Example があります。チュートリアルのプログラムと GAME65G の例は、アプリに同梱しています。
 - iPad を推奨します。iPhone でも動きますが、パネルは固定の幅で描いて縮めるので、小さく表示されます(iPhone Pro Max の縦向きで約 40%)。
 - `iOS/Local.xcconfig`、生成されたプロジェクト、`Info.plist` は、git で管理しません。

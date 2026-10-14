@@ -132,7 +132,7 @@ xcodegen -s iOS/project.yml
 open iOS/Glow65iPad.xcodeproj                       # choose an iPad or a simulator, then Run
 ```
 
-- The panel shrinks to fit narrow screens. The terminal accepts an on-screen keyboard (tap the terminal) and a hardware keyboard, including Ctrl+letter and Esc.
+- The panel shrinks to fit narrow screens. The terminal accepts an on-screen keyboard (tap the terminal) and a hardware keyboard (including a Mac keyboard shared with Universal Control).
 - The ⋯ menu has Load Program…, Send Text File…, Paste and Send Example. The tutorial programs and the GAME65G example are included in the app.
 - An iPad is recommended. It also runs on an iPhone, but the panel is drawn at a fixed width and scaled down, so it is small (about 40% of its size in portrait on an iPhone Pro Max).
 - `iOS/Local.xcconfig`, the generated project and `Info.plist` are not tracked by git.
