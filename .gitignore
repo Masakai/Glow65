@@ -19,3 +19,6 @@ __pycache__/
 .idea/
 .env*
 dist/
+iOS/Local.xcconfig
+iOS/Info.plist
+.playwright-mcp/

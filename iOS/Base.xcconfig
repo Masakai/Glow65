@@ -1,0 +1,3 @@
+// 共通の設定。署名に使うチームは、同じ場所の Local.xcconfig(git 管理外)に書く。
+// Local.xcconfig.example をコピーして、DEVELOPMENT_TEAM を自分のチーム ID にする。
+#include? "Local.xcconfig"

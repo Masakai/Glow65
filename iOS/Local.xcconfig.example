@@ -1,0 +1,2 @@
+// このファイルを Local.xcconfig という名前でコピーして、自分の Apple Developer のチーム ID を書く。
+DEVELOPMENT_TEAM = XXXXXXXXXX

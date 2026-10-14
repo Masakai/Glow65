@@ -1,4 +1,9 @@
+#if canImport(AppKit)
 import AppKit
+#endif
+#if canImport(UIKit)
+import UIKit
+#endif
 import Core6502
 import Foundation
 import Glow65
@@ -250,6 +255,21 @@ final class PanelModel: ObservableObject {
         }
     }
 
+    /// 選んだバイナリを、16 進で書かれたアドレス(`$` 付きも可)に読み込む。
+    func loadProgram(at url: URL, addressText: String) {
+        guard let address = UInt16(addressText.trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: "$", with: ""), radix: 16) else {
+            statusMessage = "\"\(addressText)\" is not a hexadecimal address."
+            return
+        }
+        do {
+            load(try ProgramImage.load(path: url.path, address: address))
+        } catch {
+            statusMessage = "Could not read \(url.lastPathComponent)."
+        }
+    }
+
+#if os(macOS)
     /// ファイル選択パネルを開き、選んだバイナリを指定アドレスに読み込む。
     func presentLoadPanel() {
         let panel = NSOpenPanel()
@@ -270,17 +290,9 @@ final class PanelModel: ObservableObject {
         panel.isAccessoryViewDisclosed = true
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        guard let address = UInt16(field.stringValue.trimmingCharacters(in: .whitespaces)
-            .replacingOccurrences(of: "$", with: ""), radix: 16) else {
-            statusMessage = "\"\(field.stringValue)\" is not a hexadecimal address."
-            return
-        }
-        do {
-            load(try ProgramImage.load(path: url.path, address: address))
-        } catch {
-            statusMessage = "Could not read \(url.lastPathComponent)."
-        }
+        loadProgram(at: url, addressText: field.stringValue)
     }
+#endif
 
     // MARK: テキストの送信
 
@@ -297,10 +309,15 @@ final class PanelModel: ObservableObject {
 
     /// クリップボードの文字列を送る(Edit → Paste、⌘V)。
     func pasteFromClipboard() {
+#if os(macOS)
         guard let text = NSPasteboard.general.string(forType: .string) else { return }
+#else
+        guard let text = UIPasteboard.general.string else { return }
+#endif
         sendText(TextTransfer.bytes(from: text))
     }
 
+#if os(macOS)
     /// テキストファイルを選び、その内容を送る(BASIC や GAME65G のプログラムを入れるため)。
     func presentSendTextPanel() {
         let panel = NSOpenPanel()
@@ -312,6 +329,7 @@ final class PanelModel: ObservableObject {
         guard panel.runModal() == .OK, let url = panel.url else { return }
         sendTextFile(url)
     }
+#endif
 
     func sendTextFile(_ url: URL) {
         do {

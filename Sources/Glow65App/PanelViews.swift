@@ -283,6 +283,9 @@ struct TerminalView: View {
     /// Edit → Paste(⌘V)
     let onPaste: () -> Void
     @FocusState private var focused: Bool
+#if os(iOS)
+    @State private var focusRequest = 0
+#endif
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -299,6 +302,12 @@ struct TerminalView: View {
         .padding(10)
         .background(Color.black)
         .clipShape(RoundedRectangle(cornerRadius: 8))
+#if os(iOS)
+        .background(KeyboardCatcher(onKey: onKey, focusRequest: focusRequest))
+        .contentShape(Rectangle())
+        .onTapGesture { focusRequest += 1 }
+        .onAppear { focusRequest += 1 }
+#else
         .focusable()
         .focused($focused)
         .focusEffectDisabled()
@@ -322,5 +331,6 @@ struct TerminalView: View {
             }
             return handled ? .handled : .ignored
         }
+#endif
     }
 }

@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Glow65",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v14), .iOS(.v17)],
     products: [
         .library(name: "Core6502", targets: ["Core6502"]),
         .library(name: "Glow65", targets: ["Glow65"]),

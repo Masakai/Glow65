@@ -76,6 +76,36 @@ def build_master() -> Image.Image:
     return img
 
 
+def build_ios_master() -> Image.Image:
+    """iOS 用。角丸も影も付けず、全面を塗る(角の丸めは OS が行う)。透明は使わない。"""
+    img = Image.new("RGB", (SIZE, SIZE))
+    d = ImageDraw.Draw(img)
+    for y in range(SIZE):
+        k = y / SIZE
+        d.line([(0, y), (SIZE, y)], fill=(int(30 - 14 * k), int(38 - 18 * k), int(58 - 26 * k)))
+    base = img.convert("RGBA")
+    glow = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    leds = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    gdraw, ldraw = ImageDraw.Draw(glow), ImageDraw.Draw(leds)
+    left, right = 150, SIZE - 150
+    step = (right - left) / 7
+    r = 46
+    for (_, bits, color), cy in zip(ROWS, [330, 512, 694]):
+        for i, bit in enumerate(bits):
+            cx = left + step * i
+            if bit:
+                gdraw.ellipse((cx - r * 1.9, cy - r * 1.9, cx + r * 1.9, cy + r * 1.9), fill=color + (170,))
+                ldraw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=color + (255,))
+                hi = tuple(min(255, c + 90) for c in color)
+                ldraw.ellipse((cx - r * 0.55, cy - r * 0.62, cx + r * 0.15, cy + r * 0.05), fill=hi + (255,))
+            else:
+                ldraw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=DIM + (255,))
+                ldraw.ellipse((cx - r, cy - r, cx + r, cy + r), outline=(255, 255, 255, 22), width=3)
+    base.alpha_composite(glow.filter(ImageFilter.GaussianBlur(34)))
+    base.alpha_composite(leds)
+    return base.convert("RGB")
+
+
 def main() -> None:
     out = Path(__file__).resolve().parent / "AppIcon.icns"
     master = build_master()
@@ -87,6 +117,10 @@ def main() -> None:
             master.resize((base * 2, base * 2), Image.LANCZOS).save(iconset / f"icon_{base}x{base}@2x.png")
         subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(out)], check=True)
     print(f"生成: {out}")
+    ios = out.parent.parent / "iOS/Assets.xcassets/AppIcon.appiconset/icon-1024.png"
+    ios.parent.mkdir(parents=True, exist_ok=True)
+    build_ios_master().save(ios)
+    print(f"生成: {ios}")
 
 
 if __name__ == "__main__":
