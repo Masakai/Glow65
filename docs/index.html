@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Glow65 — See the 6502 think</title>
-<meta name="description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel. Runs Microsoft BASIC and GAME65G, an interpreter for the GAME language.">
+<meta name="description" content="A 6502 emulator for learning, with a macOS and iPad GUI whose LEDs light up like an old computer's front panel. Runs Microsoft BASIC and GAME65G, an interpreter for the GAME language.">
 <meta property="og:title" content="Glow65 — See the 6502 think">
 <meta property="og:description" content="A 6502 emulator for learning, with a macOS GUI whose LEDs light up like an old computer's front panel.">
 <meta property="og:type" content="website">
@@ -148,14 +148,14 @@ footer a{color:var(--mute)}
     <h1>GLOW65</h1>
     <p class="tag"><span lang="en">See the 6502 <em>think</em>.</span><span lang="ja">6502 が<em>考える</em>様子を、LED で見る。</span></p>
     <p class="lead">
-      <span lang="en">A macOS emulator with an on-screen front panel whose LEDs light up like an old computer's: address bus, data bus, registers and flags. You can watch the CPU one bus access at a time. It runs Microsoft BASIC, and GAME65G, an interpreter for the GAME language.</span>
-      <span lang="ja">昔のコンピュータのように LED が光る画面上のフロントパネルを持った macOS 用エミュレータ。アドレスバス、データバス、レジスタ、フラグが光り、CPU の動きをバスアクセス 1 回ずつ見られます。Microsoft BASIC と、GAME 言語のインタプリタ GAME65G も動きます。</span>
+      <span lang="en">An emulator for macOS and iPad with an on-screen front panel whose LEDs light up like an old computer's: address bus, data bus, registers and flags. You can watch the CPU one bus access at a time. It runs Microsoft BASIC, and GAME65G, an interpreter for the GAME language.</span>
+      <span lang="ja">昔のコンピュータのように LED が光る画面上のフロントパネルを持った、macOS と iPad 用のエミュレータ。アドレスバス、データバス、レジスタ、フラグが光り、CPU の動きをバスアクセス 1 回ずつ見られます。Microsoft BASIC と、GAME 言語のインタプリタ GAME65G も動きます。</span>
     </p>
     <div class="cta">
       <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="ja">使ってみる</span></a>
       <a class="btn" href="https://github.com/Masakai/Glow65"><span lang="en">View on GitHub</span><span lang="ja">GitHub で見る</span> ↗</a>
     </div>
-    <div class="badges"><span>macOS 14+</span><span>Swift</span><span>MIT License</span><span>6502 / 65C02</span></div>
+    <div class="badges"><span>macOS 14+</span><span>iPadOS 17+</span><span>Swift</span><span>MIT License</span><span>6502 / 65C02</span></div>
 
   </div>
 </header>
@@ -171,8 +171,8 @@ footer a{color:var(--mute)}
         <source src="assets/glow65-ja.mp4" type="video/mp4">
       </video>
       <p>
-        <span lang="en">Promo video, about 25 seconds, with sound. The screens are recordings of the real app, with the operations run by a script. The narration is AI-generated (Gemini TTS).</span>
-        <span lang="ja">紹介動画(約 25 秒、音声あり)。画面は実際のアプリの録画で、操作はスクリプトで自動実行しています。ナレーションは AI 音声(Gemini TTS)です。</span>
+        <span lang="en">Promo video, about 28 seconds, with sound. The macOS screens are recordings of the real app, and the iPad screen is a recording of the iPad Simulator. The operations were run by a script. The narration is AI-generated (Gemini TTS).</span>
+        <span lang="ja">紹介動画(約 28 秒、音声あり)。macOS の画面は実際のアプリの録画、iPad の画面は iPad シミュレータの録画で、操作はスクリプトで自動実行しています。ナレーションは AI 音声(Gemini TTS)です。</span>
       </p>
     </div>
   </div>
@@ -265,12 +265,16 @@ brew install cc65
 Tools/build_monitor.sh &amp;&amp; Tools/build_basic.sh
 
 <span class="c"># run the front panel app</span>
-swift run Glow65App</pre>
+swift run Glow65App
+
+<span class="c"># or build Glow65.app (ad hoc signed, not notarized)</span>
+Tools/build_app.sh</pre>
     </div>
     <ol class="steps reveal">
       <li><span lang="en">Click the terminal, then flip the <b>POWER</b> switch up. The monitor starts.</span><span lang="ja">端末をクリックして、<b>POWER</b> スイッチを上げます。モニタが起動します。</span></li>
-      <li><span lang="en">Type <code>B</code> and press Return to start BASIC. Press Return for the two prompts.</span><span lang="ja"><code>B</code> と入力して Return。BASIC が起動します。2 つの質問は Return で既定値になります。</span></li>
+      <li><span lang="en">Type <code>B</code> and press Return to start BASIC. Press Return for the two prompts. Lowercase works too: BASIC and the monitor turn it into capitals (text inside quotes, <code>REM</code> and <code>DATA</code> stay as typed).</span><span lang="ja"><code>B</code> と入力して Return。BASIC が起動します。2 つの質問は Return で既定値になります。小文字でも入力できます(モニタと BASIC が大文字にします。引用符の中、<code>REM</code>、<code>DATA</code> は、打ったままです)。</span></li>
       <li><span lang="en">Type a program, <code>RUN</code> it, and slow the SPEED switch down to watch it run.</span><span lang="ja">プログラムを入力して <code>RUN</code>。SPEED を下げると、実行の様子が見えます。</span></li>
+      <li><span lang="en">On an iPad (an iPad is recommended; an iPhone runs it with a small panel): copy <code>iOS/Local.xcconfig.example</code> to <code>iOS/Local.xcconfig</code> and write your Apple Developer team ID, then run <code>xcodegen -s iOS/project.yml</code> and open <code>iOS/Glow65iPad.xcodeproj</code> in Xcode. Tap the terminal to bring up the on-screen keyboard. Load Program, Send Text File and the bundled samples are in the ⋯ menu.</span><span lang="ja">iPad で動かす場合(iPad を推奨します。iPhone でも動きますが、パネルは小さくなります)は、<code>iOS/Local.xcconfig.example</code> を <code>iOS/Local.xcconfig</code> にコピーして Apple Developer のチーム ID を書き、<code>xcodegen -s iOS/project.yml</code> を実行して、<code>iOS/Glow65iPad.xcodeproj</code> を Xcode で開きます。端末をタップすると画面のキーボードが出ます。Load Program、Send Text File、同梱のサンプルは、⋯ メニューにあります。</span></li>
       <li><span lang="en">Or type <code>T</code> in the monitor to start GAME65G, and send <code>examples/startrek.gam</code> with <b>File → Send Text File…</b>. Enter <code>#=1</code> to play.</span><span lang="ja">モニタで <code>T</code> を入力すると GAME65G が起動します。<b>File → Send Text File…</b> で <code>examples/startrek.gam</code> を送り、<code>#=1</code> で遊べます。</span></li>
       <li><span lang="en">To run your own machine code, follow the <a href="https://github.com/Masakai/Glow65/blob/main/tutorial/README.md">tutorial</a>: an LED counter, 16-bit addition with the carry flag, printing text through the UART, an echo program that reads the keyboard, calling machine code from BASIC with USR, interrupts (the NMI button and a UART receive IRQ), and switching to the 65C02 (one program written for both CPUs).</span><span lang="ja">自作の機械語を動かすには、<a href="https://github.com/Masakai/Glow65/blob/main/tutorial/README.ja.md">チュートリアル</a>へ。LED カウンタ、キャリーフラグを使う 16 ビットの足し算、UART で文字を出す例、キーボードを読むエコー、BASIC から機械語を呼ぶ USR、NMI ボタンと UART 受信 IRQ の割り込み、同じプログラムを 6502 と 65C02 の両方向けに書く 65C02 への切り替えの 7 章です。</span></li>
       <li><span lang="en">To learn how the 6502 works, read the manual (<a href="https://github.com/Masakai/Glow65/blob/main/manual/en/README.md">English</a> / <a href="https://github.com/Masakai/Glow65/blob/main/manual/ja/README.md">日本語</a>): the history of the 6502, bits and bytes, the CPU, addressing modes, all 151 instructions, flags, the stack, interrupts, and the memory map.</span><span lang="ja">6502 の仕組みを読んで学ぶには、マニュアル(<a href="https://github.com/Masakai/Glow65/blob/main/manual/ja/README.md">日本語</a> / <a href="https://github.com/Masakai/Glow65/blob/main/manual/en/README.md">English</a>)へ。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。</span></li>

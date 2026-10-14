@@ -39,7 +39,7 @@ See [NOTICE.md](NOTICE.md) for details.
 
 ## Requirements
 
-- macOS 14 or later
+- macOS 14 or later (the iPad app: iPadOS 17 or later, and [XcodeGen](https://github.com/yonaskolb/XcodeGen))
 - Xcode (Swift 5.9 or later)
 - [cc65](https://cc65.github.io/) to build the ROMs: `brew install cc65`
 - Python 3 (standard library only) to convert the BASIC source
@@ -68,7 +68,7 @@ Tools/build_app.sh          # builds dist/Glow65.app (with the ROMs, sample prog
 `dist/Glow65.app` is signed ad hoc (no developer ID) and is not notarized. Build it on your own Mac and open it from there. If you pass the app to another Mac, macOS asks for permission on the first launch.
 
 1. Click the terminal area, then flip the **POWER** switch up. The monitor starts.
-2. Type `B` and press Return to start BASIC.
+2. Type `B` and press Return to start BASIC. Lowercase works too: the monitor and BASIC turn it into capitals. Text inside quotes, `REM` and `DATA` stay as typed.
 3. Press Return at `MEMORY SIZE?` and `TERMINAL WIDTH?` to accept the defaults.
 
 ```
@@ -121,6 +121,21 @@ The board runs an NMOS 6502 by default. Pass `--cpu 65c02` to `glow65-cli` or `G
 In the app, the **CPU** switch on the panel chooses between them. It works only while POWER is off, and it shows the selected CPU name. The monitor's `L` command detects the CPU at run time (it executes `INC A` and checks the result) and lists the 65C02 instructions only on a 65C02, for example `BBR0  $10,$0305` or `LDA   ($12)`. On a 6502 the same bytes are listed as `.BYTE`.
 
 Assembly for the 65C02 can be written with `.setcpu "65C02"` at the top of the source for `Tools/assemble.sh` (checked with ca65 V2.18: STZ, BRA, BBR0, RMB7, SMB3, WAI, STP and others assemble).
+
+## iPad
+
+`iOS/project.yml` describes an iPad app. It shares the front panel, terminal and emulator code with the macOS app. It needs Xcode 15 or later and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
+
+```bash
+cp iOS/Local.xcconfig.example iOS/Local.xcconfig   # write your Apple Developer team ID
+xcodegen -s iOS/project.yml
+open iOS/Glow65iPad.xcodeproj                       # choose an iPad or a simulator, then Run
+```
+
+- The panel shrinks to fit narrow screens. The terminal accepts an on-screen keyboard (tap the terminal) and a hardware keyboard, including Ctrl+letter and Esc.
+- The ⋯ menu has Load Program…, Send Text File…, Paste and Send Example. The tutorial programs and the GAME65G example are included in the app.
+- An iPad is recommended. It also runs on an iPhone, but the panel is drawn at a fixed width and scaled down, so it is small (about 40% of its size in portrait on an iPhone Pro Max).
+- `iOS/Local.xcconfig`, the generated project and `Info.plist` are not tracked by git.
 
 ## Front panel
 

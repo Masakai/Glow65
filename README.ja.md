@@ -39,7 +39,7 @@ Glow65 は**全体が独自実装ではありません**。
 
 ## 必要なもの
 
-- macOS 14 以降
+- macOS 14 以降(iPad 版は、iPadOS 17 以降と [XcodeGen](https://github.com/yonaskolb/XcodeGen))
 - Xcode(Swift 5.9 以降)
 - ROM のビルドに [cc65](https://cc65.github.io/): `brew install cc65`
 - BASIC ソースの変換に Python 3(標準ライブラリのみ)
@@ -68,7 +68,7 @@ Tools/build_app.sh          # dist/Glow65.app を生成(ROM、サンプルプロ
 `dist/Glow65.app` は ad hoc 署名(開発者 ID なし)で、公証はしていません。自分の Mac でビルドして、そこから開いてください。別の Mac へ渡すと、初回の起動で macOS が許可を求めます。
 
 1. 端末の領域をクリックして、**POWER** スイッチを上げます。モニタが起動します。
-2. `B` と入力して Return を押すと、BASIC が起動します。
+2. `B` と入力して Return を押すと、BASIC が起動します。小文字でも入力できます(モニタと BASIC が大文字にします)。引用符の中、`REM`、`DATA` は、打ったままです。
 3. `MEMORY SIZE?` と `TERMINAL WIDTH?` は、Return で既定値になります。
 
 ```
@@ -121,6 +121,21 @@ BASIC と GAME65G には、テキストで書いたプログラムを端末か�
 アプリでは、パネルの **CPU** スイッチで切り替えます。POWER が OFF のときだけ操作でき、選んでいる CPU の名前を表示します。モニタの `L` コマンドは、実行時に CPU の種類を判定して(`INC A` を実行して結果を調べます)、65C02 のときだけ 65C02 の命令を表示します(例: `BBR0  $10,$0305`、`LDA   ($12)`)。6502 では、同じバイトが `.BYTE` と表示されます。
 
 65C02 向けのプログラムは、ソースの先頭に `.setcpu "65C02"` と書くと `Tools/assemble.sh` で作れます(ca65 V2.18 で、STZ、BRA、BBR0、RMB7、SMB3、WAI、STP などがアセンブルできることを確認しました)。
+
+## iPad
+
+`iOS/project.yml` が、iPad 版のアプリを定義します。フロントパネル、端末、エミュレータのコードは、macOS 版と共通です。Xcode 15 以降と、[XcodeGen](https://github.com/yonaskolb/XcodeGen)(`brew install xcodegen`)が要ります。
+
+```bash
+cp iOS/Local.xcconfig.example iOS/Local.xcconfig   # Apple Developer のチーム ID を書く
+xcodegen -s iOS/project.yml
+open iOS/Glow65iPad.xcodeproj                       # iPad かシミュレータを選んで Run
+```
+
+- パネルは、狭い画面に合わせて縮みます。端末は、画面のキーボード(端末をタップ)と外付けキーボード(Ctrl+文字、Esc を含む)で入力できます。
+- ⋯ メニューに、Load Program…、Send Text File…、Paste、Send Example があります。チュートリアルのプログラムと GAME65G の例は、アプリに同梱しています。
+- iPad を推奨します。iPhone でも動きますが、パネルは固定の幅で描いて縮めるので、小さく表示されます(iPhone Pro Max の縦向きで約 40%)。
+- `iOS/Local.xcconfig`、生成されたプロジェクト、`Info.plist` は、git で管理しません。
 
 ## フロントパネル
 
