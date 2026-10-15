@@ -54,7 +54,7 @@ To learn how the 6502 works, read the [manual](manual/en/README.md): the history
 
 ## Download
 
-Download the latest `Glow65-x.y.z.zip` from [Releases](https://github.com/Masakai/Glow65/releases), unzip it, and open `Glow65.app`. It needs macOS 14 or later and runs on Apple Silicon and Intel Macs. It is signed with a Developer ID and notarized by Apple, so macOS opens it without a warning. There is no iPad or iPhone download. To run it on an iPad, build it from source (see [iPad](#ipad)).
+Download the latest `Glow65-x.y.z.zip` from [Releases](https://github.com/Masakai/Glow65/releases), unzip it, and open `Glow65.app`. It needs macOS 14 or later and runs on Apple Silicon and Intel Macs. It is signed with a Developer ID and notarized by Apple, so macOS opens it without a warning. There is no iPad download on this page yet. To run it on an iPad, build it from source (see [iPad](#ipad)).
 
 ## Quick start
 
@@ -140,7 +140,7 @@ open iOS/Glow65iPad.xcodeproj                       # choose an iPad or a simula
 
 - The panel shrinks to fit narrow screens. The terminal accepts an on-screen keyboard (tap the terminal) and a hardware keyboard (including a Mac keyboard shared with Universal Control).
 - The ⋯ menu has Load Program…, Send Text File…, Paste and Send Example. The tutorial programs and the GAME65G example are included in the app.
-- An iPad is recommended. It also runs on an iPhone, but the panel is drawn at a fixed width and scaled down, so it is small (about 40% of its size in portrait on an iPhone Pro Max).
+- The app is for iPad only. The panel is drawn at a fixed width and scaled down to fit narrow screens, which is why an iPhone is not supported.
 - `iOS/Local.xcconfig`, the generated project and `Info.plist` are not tracked by git.
 
 ## Front panel
@@ -254,7 +254,7 @@ documents/designs/    Design document (Japanese)
 - The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
 - BASIC `SAVE` and `LOAD` are not available. GAME65G has no LOAD or SAVE either.
 - Not everything in BASIC has been tested (for example `GET`, `WAIT`, `ON GOTO`). `USR` is covered by [tutorial chapter 5](tutorial/05-usr.md) and its tests.
-- The macOS app is distributed as a notarized zip on [Releases](https://github.com/Masakai/Glow65/releases). There is no iPad or iPhone build to download; build it from source as described above.
+- The macOS app is distributed as a notarized zip on [Releases](https://github.com/Masakai/Glow65/releases). There is no iPad build to download yet; build it from source as described above.
 
 ## License
 

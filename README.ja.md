@@ -54,7 +54,7 @@ Glow65 は学習用なので、最初に試すのは自作のプログラムで�
 
 ## ダウンロード
 
-[Releases](https://github.com/Masakai/Glow65/releases) から、最新の `Glow65-x.y.z.zip` をダウンロードして、展開し、`Glow65.app` を開きます。macOS 14 以降が必要で、Apple Silicon と Intel の Mac で動きます。Developer ID で署名し、Apple の公証を受けているので、警告なしに開けます。iPad と iPhone 用のダウンロードはありません。iPad で動かすには、ソースからビルドします([iPad](#ipad) を参照)。
+[Releases](https://github.com/Masakai/Glow65/releases) から、最新の `Glow65-x.y.z.zip` をダウンロードして、展開し、`Glow65.app` を開きます。macOS 14 以降が必要で、Apple Silicon と Intel の Mac で動きます。Developer ID で署名し、Apple の公証を受けているので、警告なしに開けます。iPad 用のダウンロードは、まだありません。iPad で動かすには、ソースからビルドします([iPad](#ipad) を参照)。
 
 ## クイックスタート
 
@@ -140,7 +140,7 @@ open iOS/Glow65iPad.xcodeproj                       # iPad かシミュレータ
 
 - パネルは、狭い画面に合わせて縮みます。端末は、画面のキーボード(端末をタップ)と外付けキーボード(ユニバーサルコントロールで共有した Mac のキーボードを含む)で入力できます。
 - ⋯ メニューに、Load Program…、Send Text File…、Paste、Send Example があります。チュートリアルのプログラムと GAME65G の例は、アプリに同梱しています。
-- iPad を推奨します。iPhone でも動きますが、パネルは固定の幅で描いて縮めるので、小さく表示されます(iPhone Pro Max の縦向きで約 40%)。
+- iPad 専用のアプリです。パネルは固定の幅で描いて、狭い画面に合わせて縮めるので、iPhone は対象にしていません。
 - `iOS/Local.xcconfig`、生成されたプロジェクト、`Info.plist` は、git で管理しません。
 
 ## フロントパネル
@@ -254,7 +254,7 @@ documents/designs/    設計書(日本語)
 - 割り込み源は NMI ボタンと UART の受信割り込みだけです。割り込みの受け付けは、実機の 7 サイクルではなく5つのバスアクセスで表示されます(ダミーリードは再現しません)。
 - BASIC の `SAVE` と `LOAD` は使えません。GAME65G にも LOAD と SAVE はありません。
 - BASIC の全機能は試験していません(`GET`、`WAIT`、`ON GOTO` など)。`USR` は[チュートリアル第5章](tutorial/05-usr.ja.md)とそのテストで扱っています。
-- macOS 版のアプリは、公証済みの zip を [Releases](https://github.com/Masakai/Glow65/releases) で配布しています。iPad と iPhone 用のダウンロードはありません。上の手順で、ソースからビルドしてください。
+- macOS 版のアプリは、公証済みの zip を [Releases](https://github.com/Masakai/Glow65/releases) で配布しています。iPad 用のダウンロードは、まだありません。上の手順で、ソースからビルドしてください。
 
 ## ライセンス
 
