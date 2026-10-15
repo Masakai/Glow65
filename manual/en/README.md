@@ -2,6 +2,8 @@
 
 [English](README.md) | [日本語](../ja/README.md)
 
+PDF (the manual and the tutorial): [English](../../docs/assets/Glow65-Manual-en.pdf) / [日本語](../../docs/assets/Glow65-Manual-ja.pdf)
+
 This manual is for reading and understanding. It explains the history of the 6502, how the CPU works, the instructions, and how memory is used, in that order.
 
 For learning by doing, see the [tutorial](../../tutorial/README.md), which is a separate document. In the tutorial you load short programs into Glow65, run them, and check the results on the LEDs and in the monitor. The manual covers the ideas and specifications behind them. You can read either one first.

@@ -50,7 +50,7 @@ Glow65 は**全体が独自実装ではありません**。
 
 Glow65 は学習用なので、最初に試すのは自作のプログラムです。[チュートリアル](tutorial/README.ja.md)は7章あります。[LED カウンタ](tutorial/README.ja.md)(アセンブルして、またはバイトを手入力して読み込み、実行し、CPU を遅くしてバスアクセスを1つずつ辿る)、[16 ビットの足し算とキャリーフラグ](tutorial/02-addition.ja.md)、[UART で文字を出す](tutorial/03-uart.ja.md)、[キーボードを読むエコー](tutorial/04-echo.ja.md)、[BASIC から機械語を呼ぶ USR](tutorial/05-usr.ja.md)、[割り込み](tutorial/06-interrupts.ja.md)(NMI ボタンと UART 受信 IRQ)、[65C02 への切り替え](tutorial/07-65c02.ja.md)(同じプログラムを両方の CPU 向けに書き、6502 が新しいオペコードをどう扱うかを見る)です。
 
-6502 の仕組みを読んで学ぶには、[マニュアル](manual/ja/README.md)を使います。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。[英語版](manual/en/README.md)もあります。
+6502 の仕組みを読んで学ぶには、[マニュアル](manual/ja/README.md)を使います。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。[英語版](manual/en/README.md)もあります。マニュアルとチュートリアルを 1 冊にした PDF 版は、[日本語](docs/assets/Glow65-Manual-ja.pdf)と[English](docs/assets/Glow65-Manual-en.pdf)をダウンロードできます。
 
 ## ダウンロード
 
