@@ -97,7 +97,7 @@ final class PanelModel: ObservableObject {
             do {
                 launchPrograms.append(try ProgramImage.load(spec: args[i + 1]))
             } catch {
-                statusMessage = "Could not load \(args[i + 1]): \(error)"
+                statusMessage = loc("Could not load %1$@: %2$@", args[i + 1], "\(error)")
             }
         }
         if let script = value("--script") { runScript(script) }
@@ -166,11 +166,11 @@ final class PanelModel: ObservableObject {
 
     private func loadROM() {
         guard let url = Self.findROM("ROM/monitor.bin") else {
-            romError = "ROM/monitor.bin が見つからない。Tools/build_monitor.sh を実行する。"
+            romError = loc("ROM/monitor.bin was not found. Run Tools/build_monitor.sh.")
             return
         }
         guard let data = try? Data(contentsOf: url) else {
-            romError = "ROM を読めない: \(url.path)"
+            romError = loc("Could not read the ROM: %1$@", url.path)
             return
         }
         runner.machine.bus.loadROM([UInt8](data), at: 0xF000)
@@ -179,7 +179,7 @@ final class PanelModel: ObservableObject {
            let basic = try? Data(contentsOf: basicURL) {
             runner.machine.bus.loadROM([UInt8](basic), at: 0xC000)
         } else {
-            romError = "BASIC ROM(ROM/basic/build/basic.bin)がない。Tools/build_basic.sh で生成する。"
+            romError = loc("BASIC ROM (ROM/basic/build/basic.bin) was not found. Run Tools/build_basic.sh to build it.")
         }
         // GAME65G も任意
         if let gameURL = Self.findROM("ROM/game65g.bin"),
@@ -235,7 +235,7 @@ final class PanelModel: ObservableObject {
     /// プログラムを RAM に読み込む。電源が入っているときだけ受け付ける。
     func load(_ image: ProgramImage) {
         guard isPowerOn else {
-            statusMessage = "Power is off. Flip POWER on first (powering on clears RAM), then load the program."
+            statusMessage = loc("Power is off. Flip POWER on first (powering on clears RAM), then load the program.")
             return
         }
         runner.loadProgram(image) { [weak self] result in
@@ -243,13 +243,13 @@ final class PanelModel: ObservableObject {
                 switch result {
                 case .success:
                     let addr = String(image.address, radix: 16, uppercase: true).leftPadded(to: 4)
-                    self?.statusMessage = "Loaded \(image.name) (\(image.bytes.count) bytes) at $\(addr). In the monitor, type G \(addr) to run it."
+                    self?.statusMessage = loc("Loaded %1$@ (%2$lld bytes) at $%3$@. In the monitor, type G %3$@ to run it.", image.name, image.bytes.count, addr)
                 case .failure(.outOfRAM):
-                    self?.statusMessage = "\(image.name) does not fit in RAM ($0000-$7FFF) at that address."
+                    self?.statusMessage = loc("%1$@ does not fit in RAM ($0000-$7FFF) at that address.", image.name)
                 case .failure(.poweredOff):
-                    self?.statusMessage = "Power is off. Flip POWER on first, then load the program."
+                    self?.statusMessage = loc("Power is off. Flip POWER on first, then load the program.")
                 case .failure:
-                    self?.statusMessage = "Could not load \(image.name)."
+                    self?.statusMessage = loc("Could not load %1$@.", image.name)
                 }
             }
         }
@@ -259,13 +259,13 @@ final class PanelModel: ObservableObject {
     func loadProgram(at url: URL, addressText: String) {
         guard let address = UInt16(addressText.trimmingCharacters(in: .whitespaces)
             .replacingOccurrences(of: "$", with: ""), radix: 16) else {
-            statusMessage = "\"\(addressText)\" is not a hexadecimal address."
+            statusMessage = loc("\"%1$@\" is not a hexadecimal address.", addressText)
             return
         }
         do {
             load(try ProgramImage.load(path: url.path, address: address))
         } catch {
-            statusMessage = "Could not read \(url.lastPathComponent)."
+            statusMessage = loc("Could not read %1$@.", url.lastPathComponent)
         }
     }
 
@@ -273,13 +273,13 @@ final class PanelModel: ObservableObject {
     /// ファイル選択パネルを開き、選んだバイナリを指定アドレスに読み込む。
     func presentLoadPanel() {
         let panel = NSOpenPanel()
-        panel.title = "Load Program"
-        panel.message = "Choose a raw binary (for example one built with Tools/assemble.sh)."
-        panel.prompt = "Load"
+        panel.title = loc("Load Program")
+        panel.message = loc("Choose a raw binary (for example one built with Tools/assemble.sh).")
+        panel.prompt = loc("Load")
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
 
-        let label = NSTextField(labelWithString: "Load at $")
+        let label = NSTextField(labelWithString: loc("Load at $"))
         let field = NSTextField(string: "0300")
         field.frame.size.width = 70
         let stack = NSStackView(views: [label, field])
@@ -300,7 +300,7 @@ final class PanelModel: ObservableObject {
     @discardableResult
     func sendText(_ bytes: [UInt8]) -> Bool {
         guard isPowerOn else {
-            statusMessage = "Power is off. Flip POWER on first, then send the text."
+            statusMessage = loc("Power is off. Flip POWER on first, then send the text.")
             return false
         }
         bytes.forEach(runner.sendInput)
@@ -321,9 +321,9 @@ final class PanelModel: ObservableObject {
     /// テキストファイルを選び、その内容を送る(BASIC や GAME65G のプログラムを入れるため)。
     func presentSendTextPanel() {
         let panel = NSOpenPanel()
-        panel.title = "Send Text File"
-        panel.message = "Choose a text file. Its contents are typed into the terminal, with line ends sent as Return."
-        panel.prompt = "Send"
+        panel.title = loc("Send Text File")
+        panel.message = loc("Choose a text file. Its contents are typed into the terminal, with line ends sent as Return.")
+        panel.prompt = loc("Send")
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
         guard panel.runModal() == .OK, let url = panel.url else { return }
@@ -335,10 +335,10 @@ final class PanelModel: ObservableObject {
         do {
             let bytes = try TextTransfer.bytes(contentsOf: url)
             if sendText(bytes) {
-                statusMessage = "Sent \(url.lastPathComponent) (\(bytes.count) bytes) to the terminal."
+                statusMessage = loc("Sent %1$@ (%2$lld bytes) to the terminal.", url.lastPathComponent, bytes.count)
             }
         } catch {
-            statusMessage = "Could not read \(url.lastPathComponent)."
+            statusMessage = loc("Could not read %1$@.", url.lastPathComponent)
         }
     }
 

@@ -17,6 +17,8 @@ Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UAR
 - **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, NMI, RUN/STOP, STEP, STEP MODE and SPEED.
 - **Terminal.** Connected to the UART. Use it to talk to the monitor, BASIC, and GAME65G.
 
+The menus and messages are in Japanese or English, following the system language. The labels on the panel (POWER, STEP, ADDRESS BUS and so on) stay in English, like the silkscreen of a real board.
+
 The panel is for watching the CPU work. At 1 kHz and below, each bus access is shown one at a time. At 100 kHz and above, LED brightness is the fraction of accesses in which the bit was 1, which imitates the glow of an old panel's LEDs. The extra dummy reads and writes of real hardware are not reproduced, so the bus view differs slightly from a real 6502.
 
 The startup banner (click the (i) button on the panel to show it again) lists what is and is not original work:

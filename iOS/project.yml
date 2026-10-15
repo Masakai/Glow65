@@ -22,6 +22,7 @@ targets:
     sources:
       - path: Glow65iPadApp.swift
       - path: Assets.xcassets
+      - path: ../Localization
       - path: ../Sources/Glow65App
         excludes:
           - Glow65App.swift   # macOS 専用(AppDelegate と @main)
@@ -34,6 +35,10 @@ targets:
       path: Info.plist
       properties:
         CFBundleDisplayName: Glow65
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations:
+          - en
+          - ja
         UILaunchScreen:
           UIColorName: LaunchBackground
         UISupportedInterfaceOrientations:

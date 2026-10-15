@@ -21,20 +21,20 @@ struct SplashView: View {
         let appearsAt: Double
     }
 
-    private let credits = [
-        Credit(id: 0, label: "ORIGINAL",
-               text: "6502 CPU core · board · monitor ROM · front panel · this app",
+    private var credits: [Credit] { [
+        Credit(id: 0, label: loc("ORIGINAL"),
+               text: loc("6502 CPU core · board · monitor ROM · front panel · this app"),
                appearsAt: 2.4),
-        Credit(id: 1, label: "INCLUDES",
-               text: "Microsoft BASIC for 6502 v1.1  © Microsoft Corporation  (MIT License)",
+        Credit(id: 1, label: loc("INCLUDES"),
+               text: loc("Microsoft BASIC for 6502 v1.1  © Microsoft Corporation  (MIT License)"),
                appearsAt: 3.2),
-        Credit(id: 2, label: "BUILT WITH",
+        Credit(id: 2, label: loc("BUILT WITH"),
                text: "cc65 (zlib License) · Swift · SwiftUI",
                appearsAt: 4.0),
-        Credit(id: 3, label: "VERIFIED BY",
-               text: "Klaus Dormann's 6502 functional test (GPLv3, not included)",
+        Credit(id: 3, label: loc("VERIFIED BY"),
+               text: loc("Klaus Dormann's 6502 functional test (GPLv3, not included)"),
                appearsAt: 4.8),
-    ]
+    ] }
 
     var body: some View {
         TimelineView(.animation) { context in
@@ -113,7 +113,7 @@ struct SplashView: View {
     }
 
     private func subtitle(t: Double) -> some View {
-        Text("6502 SINGLE-BOARD COMPUTER EMULATOR")
+        Text(loc("6502 SINGLE-BOARD COMPUTER EMULATOR"))
             .font(.system(size: 14, weight: .medium, design: .monospaced))
             .tracking(4 + (1 - ease((t - 1.3) / 1.0)) * 10)
             .foregroundStyle(Color(white: 0.75))
@@ -142,7 +142,7 @@ struct SplashView: View {
 
     private func prompt(t: Double) -> some View {
         let blink = 0.5 + 0.5 * sin(t * 4)
-        return Text("CLICK OR PRESS ANY KEY")
+        return Text(loc("CLICK OR PRESS ANY KEY"))
             .font(.system(size: 11, weight: .medium, design: .monospaced))
             .tracking(3)
             .foregroundStyle(Color(white: 0.6))

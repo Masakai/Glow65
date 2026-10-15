@@ -81,7 +81,7 @@ struct ContentView: View {
                             .foregroundStyle(Color(white: 0.6))
                     }
                     .buttonStyle(.plain)
-                    .help("About Glow65 / クレジットを表示")
+                    .help("About Glow65 / show credits")
                 }
                 .padding(22)
             }

@@ -35,6 +35,8 @@ cp Tools/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 mkdir -p "$APP/Contents/Resources/tutorial"
 cp tutorial/*.bin tutorial/*.s "$APP/Contents/Resources/tutorial/" 2>/dev/null || true
 cp LICENSE NOTICE.md "$APP/Contents/Resources/"
+# 画面の文言の訳(日本語・英語)
+cp -R Localization/en.lproj Localization/ja.lproj "$APP/Contents/Resources/"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -44,6 +46,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleName</key><string>Glow65</string>
     <key>CFBundleDisplayName</key><string>Glow65</string>
     <key>CFBundleIdentifier</key><string>io.github.masakai.glow65</string>
+    <key>CFBundleDevelopmentRegion</key><string>en</string>
+    <key>CFBundleLocalizations</key><array><string>en</string><string>ja</string></array>
     <key>CFBundleExecutable</key><string>Glow65App</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
