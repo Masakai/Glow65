@@ -35,17 +35,42 @@ def source_path(lang, key, name):
 TEXT = {
     "ja": {"title": "Glow65 マニュアル", "sub": "6502 を読んで学ぶ、動かして学ぶ", "about": "このマニュアルについて", "toc": "目次",
            "part1": "第 1 部 マニュアル", "part2": "第 2 部 チュートリアル",
+                      "colophon": """<section class="colophon"><h1>著作権表示とライセンス</h1>
+<p>Glow65 マニュアル(マニュアルとチュートリアル)<br>Copyright (c) 2026 masanorisakai</p>
+<p>この文書は、Glow65 のリポジトリ(https://github.com/Masakai/Glow65)の一部です。リポジトリ直下の <code>LICENSE</code> に書かれた MIT License で公開しています。許諾文は、このページの最後にあります。</p>
+<h2>第三者の著作物</h2>
+<ul>
+<li>Microsoft BASIC for 6502 v1.1: Copyright (c) Microsoft Corporation(MIT License)。Glow65 に同梱し、変換して使っています。https://github.com/microsoft/BASIC-M6502</li>
+<li>GAME 言語: 大西博氏が月刊アスキー(1978 年)で発表した言語です。GAME65G は、公開された仕様から書いた別の実装で、GAME65 のコードは使っていません。</li>
+<li>Klaus Dormann の 6502 機能テスト(GPLv3): 動作の検証に使っています。リポジトリにも、この文書にも含みません。</li>
+</ul>
+<p>この文書に出てくる会社名、製品名は、各社の商標または登録商標です。</p>
+<h2>MIT License</h2>
+<pre>%MIT%</pre></section>""",
            "part2_text": "短いプログラムを Glow65 に入れて動かし、LED とモニタで結果を確かめます。第 1 部のマニュアルが、その背景にある仕組みを説明します。どちらから読んでもかまいません。サンプルのプログラム(`.s`)は、リポジトリの `tutorial` ディレクトリにあります。",
            "foot": "https://github.com/Masakai/Glow65", "lang": "ja"},
     "en": {"title": "Glow65 Manual", "sub": "Learn the 6502 by reading, and by running", "about": "About this manual", "toc": "Contents",
            "part1": "Part 1: Manual", "part2": "Part 2: Tutorial",
+                      "colophon": """<section class="colophon"><h1>Copyright and License</h1>
+<p>Glow65 Manual (the manual and the tutorial)<br>Copyright (c) 2026 masanorisakai</p>
+<p>This document is part of the Glow65 repository (https://github.com/Masakai/Glow65). It is released under the MIT License given in the <code>LICENSE</code> file at the top of the repository. The license text is at the end of this page.</p>
+<h2>Third-party works</h2>
+<ul>
+<li>Microsoft BASIC for 6502 v1.1: Copyright (c) Microsoft Corporation (MIT License). It is bundled with Glow65 and converted for use. https://github.com/microsoft/BASIC-M6502</li>
+<li>The GAME language: published by Hiroshi Ohnishi in ASCII magazine (1978). GAME65G is a separate implementation written from the published specification. It does not use any GAME65 code.</li>
+<li>Klaus Dormann's 6502 functional test (GPLv3): used to verify the CPU. It is not included in the repository or in this document.</li>
+</ul>
+<p>Company and product names in this document are trademarks or registered trademarks of their owners.</p>
+<h2>MIT License</h2>
+<pre>%MIT%</pre></section>""",
            "part2_text": "You load short programs into Glow65, run them, and check the result on the LEDs and in the monitor. The manual in Part 1 explains the ideas behind them. You can read either part first. The sample programs (`.s`) are in the `tutorial` directory of the repository.",
            "foot": "https://github.com/Masakai/Glow65", "lang": "en"},
 }
 CSS = """
 @page { size: A4; margin: 20mm 17mm 22mm 17mm;
-  @bottom-center { content: counter(page); font: 9pt 'Helvetica Neue', sans-serif; color: #666; } }
-@page :first { @bottom-center { content: none; } }
+  @bottom-center { content: counter(page); font: 9pt 'Helvetica Neue', sans-serif; color: #666; }
+  @bottom-left { content: "(c) 2026 masanorisakai  /  MIT License"; font: 8pt 'Helvetica Neue', sans-serif; color: #888; } }
+@page :first { @bottom-center { content: none; } @bottom-left { content: none; } }
 html { font-size: 10pt; }
 body { font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.75; color: #1b1d22; }
@@ -80,6 +105,11 @@ nav.toc li.part { margin-top: 14pt; font-size: 12pt; font-weight: bold; color: #
 nav.toc li.l1 { margin-top: 7pt; font-weight: bold; }
 nav.toc li.l2 { margin-left: 14pt; font-size: 9pt; font-weight: normal; line-height: 1.5; }
 nav.toc { break-after: page; }
+.colophon { break-after: page; font-size: 9.5pt; line-height: 1.7; }
+.colophon h1 { font-size: 16pt; border-bottom: 2px solid #c8321f; padding-bottom: 6pt; }
+.colophon h2 { font-size: 11pt; border: none; padding: 0; margin: 14pt 0 4pt 0; }
+.colophon ul { padding-left: 16pt; margin: 4pt 0; }
+.colophon pre { font-family: Menlo, 'Hiragino Sans', monospace; font-size: 7.8pt; line-height: 1.45; white-space: pre-wrap; background: #f6f7f9; }
 """
 
 NAV_STRIP = re.compile(r"\[[^\]]*\]\([^)]*\)|&nbsp;|·|次の章:|前の章:|次へ:|前へ:|Next chapter:|Previous chapter:|Next:|Previous:|\s|\|")
@@ -216,6 +246,8 @@ def build(lang):
             toc.append(f'<li class="l{level}"><a href="#{hid}">{html.escape(text)}</a></li>')
     toc.append("</ul></nav>")
 
+    mit = (ROOT / "LICENSE").read_text(encoding="utf-8").strip()
+    colophon = t["colophon"].replace("%MIT%", html.escape(mit))
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     date = subprocess.run(["date", "+%Y-%m-%d"], capture_output=True, text=True).stdout.strip()
     cover = (f'<div class="cover"><div class="bar"></div><h1>{t["title"]}</h1><div class="sub">{t["sub"]}</div>'
@@ -224,7 +256,7 @@ def build(lang):
     part2 = f'<section class="chapter" id="part2--top"><h1>{t["part2"]}</h1>\n{part2_html}</section>'
 
     doc = (f'<!doctype html><html lang="{t["lang"]}"><head><meta charset="utf-8"><title>{t["title"]}</title>'
-           f"<style>{CSS}</style></head><body class=\"{lang}\">{cover}{''.join(toc)}{about}{''.join(manual_secs)}{part2}{''.join(tutorial_secs)}</body></html>")
+           f"<style>{CSS}</style></head><body class=\"{lang}\">{cover}{colophon}{''.join(toc)}{about}{''.join(manual_secs)}{part2}{''.join(tutorial_secs)}</body></html>")
 
     # リンクの確認: ページ内の #... が、すべて存在するか
     ids = set(re.findall(r'\bid="([^"]+)"', doc))
