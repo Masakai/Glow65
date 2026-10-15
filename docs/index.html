@@ -134,7 +134,7 @@ footer a{color:var(--mute)}
       <li><a href="#game">GAME65G</a></li>
       <li><a href="#how"><span lang="en">How it works</span><span lang="ja">仕組み</span></a></li>
       <li><a href="#start"><span lang="en">Get started</span><span lang="ja">使い方</span></a></li>
-      <li><a href="https://github.com/Masakai/Glow65/blob/main/manual/README.md"><span lang="en">Manual</span><span lang="ja">マニュアル</span></a></li>
+      <li><a href="#manual"><span lang="en">Manual</span><span lang="ja">マニュアル</span></a></li>
       <li><a href="#credits"><span lang="en">Credits</span><span lang="ja">クレジット</span></a></li>
     </ul>
     <button class="btn lang" id="langBtn" type="button" aria-label="Switch language">EN / 日本語</button>
@@ -280,6 +280,19 @@ Tools/build_app.sh</pre>
       <li><span lang="en">To run your own machine code, follow the <a href="https://github.com/Masakai/Glow65/blob/main/tutorial/README.md">tutorial</a>: an LED counter, 16-bit addition with the carry flag, printing text through the UART, an echo program that reads the keyboard, calling machine code from BASIC with USR, interrupts (the NMI button and a UART receive IRQ), and switching to the 65C02 (one program written for both CPUs).</span><span lang="ja">自作の機械語を動かすには、<a href="https://github.com/Masakai/Glow65/blob/main/tutorial/README.ja.md">チュートリアル</a>へ。LED カウンタ、キャリーフラグを使う 16 ビットの足し算、UART で文字を出す例、キーボードを読むエコー、BASIC から機械語を呼ぶ USR、NMI ボタンと UART 受信 IRQ の割り込み、同じプログラムを 6502 と 65C02 の両方向けに書く 65C02 への切り替えの 7 章です。</span></li>
       <li><span lang="en">To learn how the 6502 works, read the manual (<a href="https://github.com/Masakai/Glow65/blob/main/manual/en/README.md">English</a> / <a href="https://github.com/Masakai/Glow65/blob/main/manual/ja/README.md">日本語</a>): the history of the 6502, bits and bytes, the CPU, addressing modes, all 151 instructions, flags, the stack, interrupts, and the memory map. PDF (the manual and the tutorial): <a href="assets/Glow65-Manual-en.pdf" download>English</a> / <a href="assets/Glow65-Manual-ja.pdf" download>日本語</a>.</span><span lang="ja">6502 の仕組みを読んで学ぶには、マニュアル(<a href="https://github.com/Masakai/Glow65/blob/main/manual/ja/README.md">日本語</a> / <a href="https://github.com/Masakai/Glow65/blob/main/manual/en/README.md">English</a>)へ。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。 PDF 版(マニュアルとチュートリアル): <a href="assets/Glow65-Manual-ja.pdf" download>日本語</a> / <a href="assets/Glow65-Manual-en.pdf" download>English</a>。</span></li>
     </ol>
+  </div>
+</section>
+
+<section id="manual">
+  <div class="wrap">
+    <div class="kicker reveal"><span lang="en">Manual</span><span lang="ja">マニュアル</span></div>
+    <h2 class="reveal"><span lang="en">Download the manual as a PDF.</span><span lang="ja">マニュアルを PDF でダウンロード。</span></h2>
+    <p class="sub reveal"><span lang="en">The history of the 6502, bits and bytes, the CPU, addressing modes, all 151 instructions, flags, the stack, interrupts, the memory map, and a glossary and index, followed by seven tutorials. One PDF per language, with bookmarks.</span><span lang="ja">6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップ、用語集と索引に、チュートリアル 7 章を続けた 1 冊です。言語ごとに 1 つの PDF で、しおり(目次)付きです。</span></p>
+    <div class="cta reveal" style="margin-top:28px;justify-content:flex-start">
+      <a class="btn primary" href="assets/Glow65-Manual-ja.pdf" download><span lang="en">Japanese PDF (about 6 MB)</span><span lang="ja">日本語版 PDF(約 6 MB)</span></a>
+      <a class="btn primary" href="assets/Glow65-Manual-en.pdf" download><span lang="en">English PDF (about 4 MB)</span><span lang="ja">英語版 PDF(約 4 MB)</span></a>
+      <a class="btn" href="https://github.com/Masakai/Glow65/blob/main/manual/README.md"><span lang="en">Read online</span><span lang="ja">ブラウザで読む</span> ↗</a>
+    </div>
   </div>
 </section>
 
