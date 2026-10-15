@@ -50,6 +50,10 @@ Glow65 is for learning, so the first thing to try is your own program. The [tuto
 
 To learn how the 6502 works, read the [manual](manual/en/README.md): the history of the 6502, bits and bytes, the CPU, addressing modes, all 151 instructions, flags, the stack, interrupts, and the memory map. It is also available in [Japanese](manual/ja/README.md).
 
+## Download
+
+Download the latest `Glow65-x.y.z.zip` from [Releases](https://github.com/Masakai/Glow65/releases), unzip it, and open `Glow65.app`. It needs macOS 14 or later and runs on Apple Silicon and Intel Macs. It is signed with a Developer ID and notarized by Apple, so macOS opens it without a warning. There is no iPad or iPhone download. To run it on an iPad, build it from source (see [iPad](#ipad)).
+
 ## Quick start
 
 ```bash
@@ -65,7 +69,7 @@ swift run Glow65App         # front panel app
 Tools/build_app.sh          # builds dist/Glow65.app (with the ROMs, sample programs and icon)
 ```
 
-`dist/Glow65.app` is signed ad hoc (no developer ID) and is not notarized. Build it on your own Mac and open it from there. If you pass the app to another Mac, macOS asks for permission on the first launch.
+`Tools/build_app.sh` signs `dist/Glow65.app` ad hoc by default (no developer ID, not notarized). Open the one you built on your own Mac. If you pass that copy to another Mac, macOS asks for permission on the first launch. For other Macs, use the notarized zip on [Releases](https://github.com/Masakai/Glow65/releases).
 
 1. Click the terminal area, then flip the **POWER** switch up. The monitor starts.
 2. Type `B` and press Return to start BASIC. Lowercase works too: the monitor and BASIC turn it into capitals. Text inside quotes, `REM` and `DATA` stay as typed.
@@ -248,7 +252,7 @@ documents/designs/    Design document (Japanese)
 - The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
 - BASIC `SAVE` and `LOAD` are not available. GAME65G has no LOAD or SAVE either.
 - Not everything in BASIC has been tested (for example `GET`, `WAIT`, `ON GOTO`). `USR` is covered by [tutorial chapter 5](tutorial/05-usr.md) and its tests.
-- No built app is distributed. Build it from source as described above.
+- The macOS app is distributed as a notarized zip on [Releases](https://github.com/Masakai/Glow65/releases). There is no iPad or iPhone build to download; build it from source as described above.
 
 ## License
 

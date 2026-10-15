@@ -1,6 +1,8 @@
 #!/bin/bash
-# Glow65.app を dist/ に作る。署名は ad-hoc(開発者 ID なし)。配布用の公証はしない。
+# Glow65.app を dist/ に作る。既定の署名は ad-hoc(開発者 ID なし)で、公証はしない。
 # 使い方: Tools/build_app.sh      (swift と、BASIC を載せるなら cc65 が必要)
+# 環境変数: GLOW65_VERSION(版番号)、GLOW65_UNIVERSAL=1(Apple Silicon と Intel の両方を入れる)、
+#           GLOW65_SIGN_IDENTITY(署名の名前。指定すると Hardened Runtime とタイムスタンプを付ける)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -18,8 +20,10 @@ if [ ! -f ROM/basic/build/basic.bin ]; then
     fi
 fi
 
-swift build -c release --product Glow65App
-BIN="$(swift build -c release --show-bin-path)/Glow65App"
+ARCH_FLAGS=()
+[ "${GLOW65_UNIVERSAL:-0}" = 1 ] && ARCH_FLAGS=(--arch arm64 --arch x86_64)
+swift build -c release ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"} --product Glow65App
+BIN="$(swift build -c release ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"} --show-bin-path)/Glow65App"
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/ROM/basic/build"
@@ -53,7 +57,12 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-codesign --force --deep --sign - "$APP"
+IDENTITY="${GLOW65_SIGN_IDENTITY:--}"
+if [ "$IDENTITY" = "-" ]; then
+    codesign --force --deep --sign - "$APP"
+else
+    codesign --force --deep --options runtime --timestamp --sign "$IDENTITY" "$APP"
+fi
 codesign --verify --deep --strict "$APP"
 echo "作成: $APP"
 du -sh "$APP"

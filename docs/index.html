@@ -152,7 +152,8 @@ footer a{color:var(--mute)}
       <span lang="ja">昔のコンピュータのように LED が光る画面上のフロントパネルを持った、macOS と iPad 用のエミュレータ。アドレスバス、データバス、レジスタ、フラグが光り、CPU の動きをバスアクセス 1 回ずつ見られます。Microsoft BASIC と、GAME 言語のインタプリタ GAME65G も動きます。</span>
     </p>
     <div class="cta">
-      <a class="btn primary" href="#start"><span lang="en">Get started</span><span lang="ja">使ってみる</span></a>
+      <a class="btn primary" href="https://github.com/Masakai/Glow65/releases/latest"><span lang="en">Download for macOS</span><span lang="ja">macOS 版をダウンロード</span></a>
+      <a class="btn" href="#start"><span lang="en">Get started</span><span lang="ja">使ってみる</span></a>
       <a class="btn" href="https://github.com/Masakai/Glow65"><span lang="en">View on GitHub</span><span lang="ja">GitHub で見る</span> ↗</a>
     </div>
     <div class="badges"><span>macOS 14+</span><span>iPadOS 17+</span><span>Swift</span><span>MIT License</span><span>6502 / 65C02</span></div>
@@ -255,7 +256,7 @@ footer a{color:var(--mute)}
   <div class="wrap">
     <div class="kicker reveal"><span lang="en">Get started</span><span lang="ja">使い方</span></div>
     <h2 class="reveal"><span lang="en">From clone to BASIC in a few commands.</span><span lang="ja">clone から BASIC まで、わずかなコマンドで。</span></h2>
-    <p class="sub reveal"><span lang="en">Needs macOS 14+, Xcode, and cc65 (<code>brew install cc65</code>) to build the ROMs.</span><span lang="ja">macOS 14 以降、Xcode、ROM のビルド用に cc65(<code>brew install cc65</code>)が必要です。</span></p>
+    <p class="sub reveal"><span lang="en">The easy way: download the notarized app (macOS 14+) from <a href="https://github.com/Masakai/Glow65/releases/latest">Releases</a>. To build it yourself you need macOS 14+, Xcode, and cc65 (<code>brew install cc65</code>) for the ROMs.</span><span lang="ja">手軽なのは、<a href="https://github.com/Masakai/Glow65/releases/latest">Releases</a> から、公証済みのアプリ(macOS 14 以降)をダウンロードする方法です。自分でビルドするには、macOS 14 以降、Xcode、ROM のビルド用に cc65(<code>brew install cc65</code>)が必要です。</span></p>
     <div class="reveal" style="margin-top:30px">
 <pre id="code"><button class="btn copy" type="button" id="copyBtn">COPY</button><span class="c"># clone</span>
 git clone https://github.com/Masakai/Glow65.git &amp;&amp; cd Glow65
@@ -267,7 +268,7 @@ Tools/build_monitor.sh &amp;&amp; Tools/build_basic.sh
 <span class="c"># run the front panel app</span>
 swift run Glow65App
 
-<span class="c"># or build Glow65.app (ad hoc signed, not notarized)</span>
+<span class="c"># or build Glow65.app yourself (ad hoc signed by default)</span>
 Tools/build_app.sh</pre>
     </div>
     <ol class="steps reveal">

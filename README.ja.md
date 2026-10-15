@@ -50,6 +50,10 @@ Glow65 は学習用なので、最初に試すのは自作のプログラムで�
 
 6502 の仕組みを読んで学ぶには、[マニュアル](manual/ja/README.md)を使います。6502 の歴史、ビットとバイト、CPU、アドレッシングモード、151 命令、フラグ、スタック、割り込み、メモリマップを扱います。[英語版](manual/en/README.md)もあります。
 
+## ダウンロード
+
+[Releases](https://github.com/Masakai/Glow65/releases) から、最新の `Glow65-x.y.z.zip` をダウンロードして、展開し、`Glow65.app` を開きます。macOS 14 以降が必要で、Apple Silicon と Intel の Mac で動きます。Developer ID で署名し、Apple の公証を受けているので、警告なしに開けます。iPad と iPhone 用のダウンロードはありません。iPad で動かすには、ソースからビルドします([iPad](#ipad) を参照)。
+
 ## クイックスタート
 
 ```bash
@@ -65,7 +69,7 @@ swift run Glow65App         # フロントパネルのアプリ
 Tools/build_app.sh          # dist/Glow65.app を生成(ROM、サンプルプログラム、アイコン入り)
 ```
 
-`dist/Glow65.app` は ad hoc 署名(開発者 ID なし)で、公証はしていません。自分の Mac でビルドして、そこから開いてください。別の Mac へ渡すと、初回の起動で macOS が許可を求めます。
+`Tools/build_app.sh` は、`dist/Glow65.app` を既定で ad hoc 署名(開発者 ID なし、公証なし)にします。自分の Mac でビルドしたものを、その Mac で開いてください。別の Mac へ渡すと、初回の起動で macOS が許可を求めます。他の Mac には、[Releases](https://github.com/Masakai/Glow65/releases) の公証済みの zip を使ってください。
 
 1. 端末の領域をクリックして、**POWER** スイッチを上げます。モニタが起動します。
 2. `B` と入力して Return を押すと、BASIC が起動します。小文字でも入力できます(モニタと BASIC が大文字にします)。引用符の中、`REM`、`DATA` は、打ったままです。
@@ -248,7 +252,7 @@ documents/designs/    設計書(日本語)
 - 割り込み源は NMI ボタンと UART の受信割り込みだけです。割り込みの受け付けは、実機の 7 サイクルではなく5つのバスアクセスで表示されます(ダミーリードは再現しません)。
 - BASIC の `SAVE` と `LOAD` は使えません。GAME65G にも LOAD と SAVE はありません。
 - BASIC の全機能は試験していません(`GET`、`WAIT`、`ON GOTO` など)。`USR` は[チュートリアル第5章](tutorial/05-usr.ja.md)とそのテストで扱っています。
-- ビルド済みのアプリは配布していません。上の手順で、ソースからビルドしてください。
+- macOS 版のアプリは、公証済みの zip を [Releases](https://github.com/Masakai/Glow65/releases) で配布しています。iPad と iPhone 用のダウンロードはありません。上の手順で、ソースからビルドしてください。
 
 ## ライセンス
 

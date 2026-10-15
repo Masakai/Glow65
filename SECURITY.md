@@ -23,7 +23,7 @@ Include the version (commit), your macOS version, and steps to reproduce. This i
 
 ## Supported versions
 
-Only the latest commit on `main` is supported. There are no released binaries.
+Only the latest commit on `main` and the latest release on [Releases](https://github.com/Masakai/Glow65/releases) are supported.
 
 ---
 
@@ -50,4 +50,4 @@ https://github.com/Masakai/Glow65 の **Security → Report a vulnerability** �
 
 ## 対象のバージョン
 
-`main` の最新コミットだけが対象です。配布しているビルド済みのバイナリはありません。
+`main` の最新コミットと、[Releases](https://github.com/Masakai/Glow65/releases) の最新のリリースが対象です。
