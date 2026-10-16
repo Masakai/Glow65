@@ -54,7 +54,7 @@ To learn how the 6502 works, read the [manual](manual/en/README.md): the history
 
 ## Download
 
-Download the latest `Glow65-x.y.z.zip` from [Releases](https://github.com/Masakai/Glow65/releases), unzip it, and open `Glow65.app`. It needs macOS 14 or later and runs on Apple Silicon and Intel Macs. It is signed with a Developer ID and notarized by Apple, so macOS opens it without a warning. There is no iPad download on this page yet. To run it on an iPad, build it from source (see [iPad](#ipad)).
+Download the latest `Glow65-x.y.z.zip` from [Releases](https://github.com/Masakai/Glow65/releases), unzip it, and open `Glow65.app`. It needs macOS 14 or later and runs on Apple Silicon and Intel Macs. It is signed with a Developer ID and notarized by Apple, so macOS opens it without a warning. For iPad (iPadOS 17 or later), join the test on [TestFlight](https://testflight.apple.com/join/dajfu4VV). You need the TestFlight app from the App Store. The iPad app is a test version. You can also build it from source (see [iPad](#ipad)).
 
 ## Quick start
 
@@ -130,7 +130,7 @@ Assembly for the 65C02 can be written with `.setcpu "65C02"` at the top of the s
 
 ## iPad
 
-`iOS/project.yml` describes an iPad app. It shares the front panel, terminal and emulator code with the macOS app. It needs Xcode 15 or later and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
+To try the iPad app without building it, join the test on [TestFlight](https://testflight.apple.com/join/dajfu4VV). `iOS/project.yml` describes the iPad app. It shares the front panel, terminal and emulator code with the macOS app. It needs Xcode 15 or later and [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
 
 ```bash
 cp iOS/Local.xcconfig.example iOS/Local.xcconfig   # write your Apple Developer team ID
@@ -254,7 +254,7 @@ documents/designs/    Design document (Japanese)
 - The only interrupt sources are the NMI button and the UART receive interrupt. Interrupt entry shows five bus accesses, not the real 7 cycles (dummy reads are not reproduced).
 - BASIC `SAVE` and `LOAD` are not available. GAME65G has no LOAD or SAVE either.
 - Not everything in BASIC has been tested (for example `GET`, `WAIT`, `ON GOTO`). `USR` is covered by [tutorial chapter 5](tutorial/05-usr.md) and its tests.
-- The macOS app is distributed as a notarized zip on [Releases](https://github.com/Masakai/Glow65/releases). There is no iPad build to download yet; build it from source as described above.
+- The macOS app is distributed as a notarized zip on [Releases](https://github.com/Masakai/Glow65/releases). The iPad app is a test version on [TestFlight](https://testflight.apple.com/join/dajfu4VV). You can also build it from source as described above.
 
 ## License
 
