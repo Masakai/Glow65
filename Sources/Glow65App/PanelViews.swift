@@ -163,6 +163,41 @@ struct SpeedSelector: View {
     }
 }
 
+/// G SPEED の選択。モニタの G で RAM のプログラムを起動したとき、この速度に切り替える。
+struct GoSpeedSelector: View {
+    @Binding var selection: SpeedSetting?
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text("G SPEED")
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .foregroundStyle(PanelStyle.label)
+            Menu {
+                Picker("G SPEED", selection: $selection) {
+                    Text("OFF").tag(SpeedSetting?.none)
+                    ForEach(SpeedSetting.allCases, id: \.self) { s in
+                        Text(s.label).tag(SpeedSetting?.some(s))
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Text(selection?.label ?? "OFF")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Color(red: 1, green: 0.7, blue: 0.1))
+                    .frame(width: 64)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.55))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+            .menuStyle(.button)
+            .buttonStyle(.plain)
+            .menuIndicator(.hidden)
+            .fixedSize()
+        }
+        .help("Speed for a program started with G in the monitor. Back at the prompt, the speed returns to what it was.")
+    }
+}
+
 enum PanelStyle {
     static let label = Color(white: 0.82)
     static let body = LinearGradient(
@@ -172,72 +207,82 @@ enum PanelStyle {
 
 // MARK: - パネル全体
 
-struct FrontPanelView: View {
-    @ObservedObject var model: PanelModel
+/// LED とレジスタの表示。`PanelLights` だけを見るので、毎フレームの更新でスイッチやメニューは描き直されない。
+struct PanelLightsView: View {
+    @ObservedObject var lights: PanelLights
 
     private let flagLabels = ["C", "Z", "I", "D", "B", "-", "V", "N"]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 26) {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(alignment: .bottom, spacing: 22) {
-                        LEDRow(title: "ADDRESS BUS", levels: model.address,
-                               bitLabels: (0..<16).map { "A\($0)" })
-                        LEDRow(title: "DATA BUS", levels: model.data,
-                               bitLabels: (0..<8).map { "D\($0)" })
-                    }
-                    HStack(alignment: .bottom, spacing: 22) {
-                        LEDRow(title: "PC", levels: model.pc)
-                        LEDRow(title: "SP", levels: model.sp)
-                    }
-                    HStack(alignment: .bottom, spacing: 22) {
-                        LEDRow(title: "A", levels: model.a)
-                        LEDRow(title: "X", levels: model.x)
-                        LEDRow(title: "Y", levels: model.y)
-                    }
-                    LEDRow(title: "STATUS P", levels: model.status, bitLabels: flagLabels,
-                           color: Color(red: 1.0, green: 0.55, blue: 0.1))
+        HStack(alignment: .top, spacing: 26) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .bottom, spacing: 22) {
+                    LEDRow(title: "ADDRESS BUS", levels: lights.address,
+                           bitLabels: (0..<16).map { "A\($0)" })
+                    LEDRow(title: "DATA BUS", levels: lights.data,
+                           bitLabels: (0..<8).map { "D\($0)" })
                 }
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("CPU")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(PanelStyle.label)
-                    HStack(spacing: 2) {
-                        SingleLED(title: "SYNC", level: model.syncLED)
-                        SingleLED(title: "READ", level: model.readLED)
-                        SingleLED(title: "WRITE", level: model.writeLED)
-                    }
-                    HStack(spacing: 2) {
-                        SingleLED(title: "RUN", level: model.runLED, color: .green)
-                        SingleLED(title: "HALT", level: model.haltLED)
-                        SingleLED(title: "IRQ", level: model.irqLED)
-                        SingleLED(title: "NMI", level: model.nmiLED)
-                    }
-                    HStack(spacing: 2) {
-                        SingleLED(title: "TX", level: model.txLED, color: .green)
-                        SingleLED(title: "RX", level: model.rxLED, color: .green)
-                    }
-                    Text("CYCLES \(model.cycleCount)")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(PanelStyle.label.opacity(0.8))
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("INSTRUCTION AT PC")
-                            .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                            .foregroundStyle(PanelStyle.label)
-                        Text(model.instructionLine.isEmpty ? " " : model.instructionLine)
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(Color(red: 0.55, green: 1.0, blue: 0.6))
-                            .lineLimit(1)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.black.opacity(0.55))
-                            .clipShape(RoundedRectangle(cornerRadius: 5))
-                    }
-                    .padding(.top, 6)
+                HStack(alignment: .bottom, spacing: 22) {
+                    LEDRow(title: "PC", levels: lights.pc)
+                    LEDRow(title: "SP", levels: lights.sp)
                 }
+                HStack(alignment: .bottom, spacing: 22) {
+                    LEDRow(title: "A", levels: lights.a)
+                    LEDRow(title: "X", levels: lights.x)
+                    LEDRow(title: "Y", levels: lights.y)
+                }
+                LEDRow(title: "STATUS P", levels: lights.status, bitLabels: flagLabels,
+                       color: Color(red: 1.0, green: 0.55, blue: 0.1))
             }
+            VStack(alignment: .leading, spacing: 10) {
+                Text("CPU")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(PanelStyle.label)
+                HStack(spacing: 2) {
+                    SingleLED(title: "SYNC", level: lights.syncLED)
+                    SingleLED(title: "READ", level: lights.readLED)
+                    SingleLED(title: "WRITE", level: lights.writeLED)
+                }
+                HStack(spacing: 2) {
+                    SingleLED(title: "RUN", level: lights.runLED, color: .green)
+                    SingleLED(title: "HALT", level: lights.haltLED)
+                    SingleLED(title: "IRQ", level: lights.irqLED)
+                    SingleLED(title: "NMI", level: lights.nmiLED)
+                }
+                HStack(spacing: 2) {
+                    SingleLED(title: "TX", level: lights.txLED, color: .green)
+                    SingleLED(title: "RX", level: lights.rxLED, color: .green)
+                }
+                Text("CYCLES \(lights.cycleCount)")
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(PanelStyle.label.opacity(0.8))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("INSTRUCTION AT PC")
+                        .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(PanelStyle.label)
+                    Text(lights.instructionLine.isEmpty ? " " : lights.instructionLine)
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(Color(red: 0.55, green: 1.0, blue: 0.6))
+                        .lineLimit(1)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.black.opacity(0.55))
+                        .clipShape(RoundedRectangle(cornerRadius: 5))
+                }
+                .padding(.top, 6)
+            }
+        }
+    }
+}
+
+struct FrontPanelView: View {
+    @ObservedObject var model: PanelModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            // LED とレジスタは毎フレーム変わるので、別のビュー(PanelLights だけを見る)にしてある
+            PanelLightsView(lights: model.lights)
 
             Divider().overlay(Color.white.opacity(0.15))
 
@@ -263,7 +308,10 @@ struct FrontPanelView: View {
                     title: "STEP MODE", upLabel: "CYCLE", downLabel: "INSTR",
                     isOn: $model.stepsByCycle)
                 Spacer(minLength: 10)
-                SpeedSelector(selection: Binding(get: { model.speed }, set: { model.setSpeed($0) }))
+                VStack(alignment: .trailing, spacing: 10) {
+                    GoSpeedSelector(selection: Binding(get: { model.goSpeed }, set: { model.setGoSpeed($0) }))
+                    SpeedSelector(selection: Binding(get: { model.speed }, set: { model.setSpeed($0) }))
+                }
             }
         }
         .padding(20)

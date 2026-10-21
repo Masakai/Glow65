@@ -24,11 +24,9 @@ struct ContentView: View {
         }
         .background(Color(white: 0.07).ignoresSafeArea())
         .sheet(isPresented: $showsLoadSheet) { LoadProgramSheet(model: model, isPresented: $showsLoadSheet) }
-        .fileImporter(isPresented: $sendingTextFile, allowedContentTypes: [.text, .plainText]) { result in
-            guard case .success(let url) = result else { return }
-            let scoped = url.startAccessingSecurityScopedResource()
-            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-            model.sendTextFile(url)
+        // .gam や .bas は、システムがテキストと認識しない拡張子なので、種類で絞らない(macOS 版と同じ)
+        .fileImporter(isPresented: $sendingTextFile, allowedContentTypes: [.data]) { result in
+            PickedFile.open(result) { model.sendTextFile($0) }
         }
 #else
         content

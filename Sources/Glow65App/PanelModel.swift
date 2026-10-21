@@ -17,33 +17,17 @@ final class PanelModel: ObservableObject {
     let runner: MachineRunner
     let terminal = TerminalModel()
 
-    // 表示用の LED の明るさ(0...1)。添字はビット番号(0 = LSB)。
-    @Published private(set) var address = [Double](repeating: 0, count: 16)
-    @Published private(set) var data = [Double](repeating: 0, count: 8)
-    @Published private(set) var pc = [Double](repeating: 0, count: 16)
-    @Published private(set) var sp = [Double](repeating: 0, count: 8)
-    @Published private(set) var a = [Double](repeating: 0, count: 8)
-    @Published private(set) var x = [Double](repeating: 0, count: 8)
-    @Published private(set) var y = [Double](repeating: 0, count: 8)
-    @Published private(set) var status = [Double](repeating: 0, count: 8)
-    @Published private(set) var readLED = 0.0
-    @Published private(set) var writeLED = 0.0
-    @Published private(set) var syncLED = 0.0
-    @Published private(set) var runLED = 0.0
-    @Published private(set) var haltLED = 0.0
-    @Published private(set) var irqLED = 0.0
-    @Published private(set) var nmiLED = 0.0
-    @Published private(set) var txLED = 0.0
-    @Published private(set) var rxLED = 0.0
-    @Published private(set) var cycleCount: UInt64 = 0
-    /// PC の位置の命令(逆アセンブルした 1 行)。電源が切れていれば空。
-    @Published private(set) var instructionLine = ""
+    /// LED とレジスタの表示。毎フレーム変わるので、スイッチやメニューとは別のモデルにしてある
+    /// (このモデルを見ているビューを、毎フレーム描き直させないため)。
+    let lights = PanelLights()
 
     // スイッチの状態
     @Published var isPowerOn = false
     @Published var isRunSwitchOn = true
     @Published var stepsByCycle = false
     @Published var speed = SpeedSetting.mhz1
+    /// モニタの G で RAM のプログラムを起動したときの速度(G SPEED)。nil なら切り替えない。
+    @Published private(set) var goSpeed: SpeedSetting?
     /// 載せている CPU。電源が OFF のときだけ変えられる。
     @Published private(set) var cpuModel: CPUModel
     @Published private(set) var romError: String?
@@ -53,8 +37,6 @@ final class PanelModel: ObservableObject {
     private var launchPrograms: [ProgramImage] = []
 
     private var timer: Timer?
-    private var lastTx: UInt64 = 0
-    private var lastRx: UInt64 = 0
     private var lastFrame = Date()
 
     init() {
@@ -367,6 +349,11 @@ final class PanelModel: ObservableObject {
         runner.setSpeed(s)
     }
 
+    func setGoSpeed(_ s: SpeedSetting?) {
+        goSpeed = s
+        runner.setGoSpeed(s)
+    }
+
     func typed(_ byte: UInt8) {
         guard isPowerOn else { return }
         runner.sendInput(byte)
@@ -374,7 +361,51 @@ final class PanelModel: ObservableObject {
 
     // MARK: 表示更新
 
-    /// 点灯は即座に、消灯はゆるやかに減衰させて、残光を表現する。
+    private func frame() {
+        terminal.flush()
+        let now = Date()
+        let dt = now.timeIntervalSince(lastFrame)
+        lastFrame = now
+
+        let s = runner.snapshot
+        // ここで書き換えるのは、値が変わったときだけ(書くたびに、このモデルを見るビューが描き直される)
+        if s.isPoweredOn != isPowerOn && !s.isPoweredOn { isPowerOn = false }
+        // G SPEED による切り替えは、ランナーの側で起きる
+        if s.speed != speed { speed = s.speed }
+        lights.update(from: s, elapsed: dt)
+    }
+}
+
+/// LED とレジスタの表示。`PanelModel` が 60Hz で `update(from:elapsed:)` を呼ぶ。
+///
+/// 点灯は即座に、消灯はゆるやかに減衰させて、残光を表現する。
+@MainActor
+final class PanelLights: ObservableObject {
+    // LED の明るさ(0...1)。添字はビット番号(0 = LSB)。
+    @Published private(set) var address = [Double](repeating: 0, count: 16)
+    @Published private(set) var data = [Double](repeating: 0, count: 8)
+    @Published private(set) var pc = [Double](repeating: 0, count: 16)
+    @Published private(set) var sp = [Double](repeating: 0, count: 8)
+    @Published private(set) var a = [Double](repeating: 0, count: 8)
+    @Published private(set) var x = [Double](repeating: 0, count: 8)
+    @Published private(set) var y = [Double](repeating: 0, count: 8)
+    @Published private(set) var status = [Double](repeating: 0, count: 8)
+    @Published private(set) var readLED = 0.0
+    @Published private(set) var writeLED = 0.0
+    @Published private(set) var syncLED = 0.0
+    @Published private(set) var runLED = 0.0
+    @Published private(set) var haltLED = 0.0
+    @Published private(set) var irqLED = 0.0
+    @Published private(set) var nmiLED = 0.0
+    @Published private(set) var txLED = 0.0
+    @Published private(set) var rxLED = 0.0
+    @Published private(set) var cycleCount: UInt64 = 0
+    /// PC の位置の命令(逆アセンブルした 1 行)。電源が切れていれば空。
+    @Published private(set) var instructionLine = ""
+
+    private var lastTx: UInt64 = 0
+    private var lastRx: UInt64 = 0
+
     private func glow(_ shown: [Double], _ target: [Double], decay: Double) -> [Double] {
         var out = shown
         for i in out.indices {
@@ -392,16 +423,10 @@ final class PanelModel: ObservableObject {
         (0..<count).map { value >> UInt16($0) & 1 == 1 ? 1 : 0 }
     }
 
-    private func frame() {
-        terminal.flush()
-        let now = Date()
-        let dt = now.timeIntervalSince(lastFrame)
-        lastFrame = now
+    /// スナップショットを表示に反映する。`elapsed` は前のフレームからの秒数。
+    func update(from s: PanelSnapshot, elapsed dt: Double) {
         // 約 50ms で 1/e に減衰
         let decay = exp(-dt / 0.05)
-
-        let s = runner.snapshot
-        if s.isPoweredOn != isPowerOn && !s.isPoweredOn { isPowerOn = false }
         cycleCount = s.cycles
         instructionLine = s.isPoweredOn ? (s.instruction?.line ?? "") : ""
 

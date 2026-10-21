@@ -22,6 +22,20 @@ public final class MachineRunner {
     private var lastTick = DispatchTime.now()
     private var pending: PendingInstruction?
     private var instantAccess: BusAccess?
+    /// モニタの G で RAM のプログラムを起動したときに切り替える速度。nil なら切り替えない。
+    private var goSpeed: SpeedSetting?
+    /// G で切り替える前の速度。G で起動したプログラムの実行中だけ値を持つ。
+    private var speedBeforeGo: SpeedSetting?
+
+    /// モニタ ROM の中で、G の切り替えに使う番地(ROM/monitor.lst)。
+    enum MonitorHook {
+        /// CMD_G の `@call: JMP (VAL)`。飛び先は VAL($F4/$F5)にある。
+        static let goJump: UInt16 = 0xF23B
+        static let goJumpBytes: [UInt8] = [0x6C, 0xF4, 0x00]
+        /// CMDLOOP(プロンプトを出すところ)。RTS で戻ったとき、RESET のあとはここを通る。
+        static let commandLoop: UInt16 = 0xF154
+        static let commandLoopBytes: [UInt8] = [0xA9, 0x2A]  // LDA #'*'
+    }
 
     private struct Registers {
         var a: UInt8, x: UInt8, y: UInt8, sp: UInt8, pc: UInt16, p: UInt8
@@ -79,6 +93,7 @@ public final class MachineRunner {
         queue.async { [self] in
             machine.powerOn()
             isRunning = true
+            leaveGoSpeed()
             resetTiming()
             instantAccess = probe.lastAccess
             publish()
@@ -96,6 +111,7 @@ public final class MachineRunner {
     public func powerOff() {
         queue.async { [self] in
             machine.powerOff()
+            leaveGoSpeed()
             resetTiming()
             instantAccess = nil
             publish()
@@ -105,6 +121,7 @@ public final class MachineRunner {
     public func reset() {
         queue.async { [self] in
             machine.reset()
+            leaveGoSpeed()
             resetTiming()
             instantAccess = probe.lastAccess
             publish()
@@ -128,11 +145,18 @@ public final class MachineRunner {
 
     public func setSpeed(_ newSpeed: SpeedSetting) {
         queue.async { [self] in
-            if !newSpeed.showsEveryCycle { finishPending() }
-            speed = newSpeed
-            credit = 0
+            // G の実行中に手で変えたら、モニタに戻っても元の速度には戻さない
+            speedBeforeGo = nil
+            switchSpeed(to: newSpeed)
             publish()
         }
+    }
+
+    /// モニタの G で RAM($0000-$7FFF)のプログラムを起動したときの速度。nil なら切り替えない。
+    ///
+    /// プロンプトに戻ると(RTS、RESET)、G の前の速度に戻す。
+    public func setGoSpeed(_ newSpeed: SpeedSetting?) {
+        queue.async { [self] in goSpeed = newSpeed }
     }
 
     /// 停止中に1命令進める。
@@ -143,6 +167,7 @@ public final class MachineRunner {
                 finishPending()
             } else {
                 prepareProbeForStepping()
+                checkMonitorHooks()
                 machine.step()
                 instantAccess = probe.lastAccess
             }
@@ -163,11 +188,14 @@ public final class MachineRunner {
                     pending = p
                     instantAccess = p.accesses[p.index]
                 }
-            } else if let p = beginInstruction() {
-                pending = p
-                instantAccess = p.accesses[0]
-                if p.accesses.count == 1 {
-                    pending = nil
+            } else {
+                checkMonitorHooks()
+                if let p = beginInstruction() {
+                    pending = p
+                    instantAccess = p.accesses[0]
+                    if p.accesses.count == 1 {
+                        pending = nil
+                    }
                 }
             }
             publish()
@@ -221,6 +249,56 @@ public final class MachineRunner {
         lastTick = .now()
     }
 
+    /// 速度を変える。持ち越しのサイクルは捨てる。
+    private func switchSpeed(to newSpeed: SpeedSetting) {
+        if !newSpeed.showsEveryCycle { finishPending() }
+        speed = newSpeed
+        credit = 0
+    }
+
+    /// G で切り替えた速度を、G の前の速度に戻す。
+    private func leaveGoSpeed() {
+        guard let before = speedBeforeGo else { return }
+        speedBeforeGo = nil
+        switchSpeed(to: before)
+    }
+
+    /// 命令ごとにモニタの番地を見張る必要があるか。
+    private var watchesMonitorHooks: Bool {
+        (goSpeed != nil || speedBeforeGo != nil) && monitorHooksAvailable
+    }
+
+    /// 載っているモニタ ROM が、`MonitorHook` の番地を使える版か。
+    private var monitorHooksAvailable: Bool {
+        func matches(_ address: UInt16, _ bytes: [UInt8]) -> Bool {
+            bytes.indices.allSatisfy { machine.bus.peek(address &+ UInt16($0)) == bytes[$0] }
+        }
+        return matches(MonitorHook.goJump, MonitorHook.goJumpBytes)
+            && matches(MonitorHook.commandLoop, MonitorHook.commandLoopBytes)
+    }
+
+    /// 次に実行する命令が G の飛び先へのジャンプか、プロンプトなら、速度を切り替える。
+    /// 速度を変えたら true。
+    @discardableResult
+    private func checkMonitorHooks() -> Bool {
+        let pc = machine.cpu.pc
+        guard pc == MonitorHook.goJump || pc == MonitorHook.commandLoop, monitorHooksAvailable else {
+            return false
+        }
+        if pc == MonitorHook.commandLoop {
+            guard speedBeforeGo != nil else { return false }
+            leaveGoSpeed()
+            return true
+        }
+        let target = UInt16(machine.bus.peek(0x00F4)) | UInt16(machine.bus.peek(0x00F5)) << 8
+        // ROM の飛び先(GAME65G の G 8003 など)は対象にしない
+        guard let goSpeed, speedBeforeGo == nil, Int(target) < MemoryMap.ramSize else { return false }
+        speedBeforeGo = speed
+        guard goSpeed != speed else { return false }
+        switchSpeed(to: goSpeed)
+        return true
+    }
+
     private func prepareProbeForStepping() {
         probe.accumulatesGlow = false
         probe.recordsAccesses = false
@@ -252,15 +330,27 @@ public final class MachineRunner {
         probe.accumulatesGlow = true
         probe.recordsAccesses = false
         guard credit >= 1 else { return }
-        let used = machine.run(cycles: Int(credit))
-        credit -= Double(used)
         instantAccess = nil
+        guard watchesMonitorHooks else {
+            credit -= Double(machine.run(cycles: Int(credit)))
+            return
+        }
+        // G の切り替えを見張るときは 1 命令ずつ。速度が変わったら、残りの持ち時間は捨てる
+        let budget = Int(credit)
+        var used = 0
+        while used < budget {
+            if checkMonitorHooks() { return }
+            used += machine.step()
+        }
+        credit -= Double(used)
     }
 
     /// 低速実行: 命令を実行しては、そのバスアクセスを時間をかけて1つずつ表示する。
     private func advanceReplay() {
         while credit > 0 {
             if pending == nil {
+                // 速度が変わったら、この回はここまで(全速になったら次からは runFast)
+                if checkMonitorHooks() { break }
                 guard let p = beginInstruction() else { break }
                 pending = p
             }

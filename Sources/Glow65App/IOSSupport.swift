@@ -122,14 +122,42 @@ struct LoadProgramSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { isPresented = false } }
             }
             .fileImporter(isPresented: $choosing, allowedContentTypes: [.data]) { result in
-                guard case .success(let url) = result else { return }
-                let scoped = url.startAccessingSecurityScopedResource()
-                defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-                model.loadProgram(at: url, addressText: address)
+                let addressText = address
+                PickedFile.open(result) { model.loadProgram(at: $0, addressText: addressText) }
                 isPresented = false
             }
         }
         .presentationDetents([.medium, .large])
+    }
+}
+
+/// ファイル App で選んだファイルを、読める場所にコピーしてから渡す。
+///
+/// iCloud Drive の、まだ iPad にダウンロードされていないファイルは、そのままでは読めない。
+/// `NSFileCoordinator` で読むと、取り寄せてから読める。取り寄せの間は画面を止めないよう、別のスレッドで待つ。
+enum PickedFile {
+    static func open(_ result: Result<URL, Error>, then use: @escaping (URL) -> Void) {
+        guard case .success(let url) = result else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            let copy = dir.appendingPathComponent(url.lastPathComponent)
+            var copied = false
+            var error: NSError?
+            NSFileCoordinator().coordinate(readingItemAt: url, options: [], error: &error) { readable in
+                do {
+                    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+                    try FileManager.default.copyItem(at: readable, to: copy)
+                    copied = true
+                } catch {}
+            }
+            DispatchQueue.main.async {
+                // コピーできなかったときは元の URL を渡す(読めなければ、渡した先が「読めない」と表示する)
+                use(copied ? copy : url)
+                try? FileManager.default.removeItem(at: dir)
+            }
+        }
     }
 }
 

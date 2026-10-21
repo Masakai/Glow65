@@ -38,3 +38,4 @@
 "Klaus Dormann's 6502 functional test (GPLv3, not included)" = "Klaus Dormann's 6502 functional test (GPLv3, not included)";
 "6502 SINGLE-BOARD COMPUTER EMULATOR" = "6502 SINGLE-BOARD COMPUTER EMULATOR";
 "CLICK OR PRESS ANY KEY" = "CLICK OR PRESS ANY KEY";
+"Speed for a program started with G in the monitor. Back at the prompt, the speed returns to what it was." = "Speed for a program started with G in the monitor. Back at the prompt, the speed returns to what it was.";
