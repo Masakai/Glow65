@@ -14,7 +14,7 @@ macOS 向けの 6502 ワンボードマイコン エミュレータ(Swift 製)�
 
 Glow65 は、架空の 6502 ボードをエミュレートします。構成は CPU、RAM 32KB、シリアルポート(UART)、小さなモニタと Microsoft BASIC と GAME 言語のインタプリタ GAME65G を載せた ROM です。ウインドウは2つの部分でできています。
 
-- **フロントパネル**: アドレスバス、データバス、PC、SP、A、X、Y、ステータスフラグ、バス信号の LED と、PC の位置の命令(逆アセンブルしたもの)の表示。スイッチは POWER、RESET、NMI、RUN/STOP、STEP、STEP MODE、SPEED。
+- **フロントパネル**: アドレスバス、データバス、PC、SP、A、X、Y、ステータスフラグ、バス信号の LED と、PC の位置の命令(逆アセンブルしたもの)の表示。スイッチは POWER、RESET、NMI、RUN/STOP、STEP、STEP MODE、SPEED、G SPEED。
 - **端末**: UART につながり、モニタ、BASIC、GAME65G を操作します。
 
 メニューとメッセージは、システムの言語に従って、日本語か英語で表示します。パネルのラベル(POWER、STEP、ADDRESS BUS など)は、実際の基板の印刷のように、英語のままです。
@@ -139,7 +139,7 @@ open iOS/Glow65iPad.xcodeproj                       # iPad かシミュレータ
 ```
 
 - パネルは、狭い画面に合わせて縮みます。端末は、画面のキーボード(端末をタップ)と外付けキーボード(ユニバーサルコントロールで共有した Mac のキーボードを含む)で入力できます。
-- ⋯ メニューに、Load Program…、Send Text File…、Paste、Send Example があります。チュートリアルのプログラムと GAME65G の例は、アプリに同梱しています。
+- ⋯ メニューに、Load Program…、Send Text File…、Paste、Send Example があります。Send Text File… では、`.gam` や `.bas` など、拡張子を問わずに選べます。チュートリアルのプログラムと GAME65G の例は、アプリに同梱しています。
 - iPad 専用のアプリです。パネルは固定の幅で描いて、狭い画面に合わせて縮めるので、iPhone は対象にしていません。
 - `iOS/Local.xcconfig`、生成されたプロジェクト、`Info.plist` は、git で管理しません。
 
@@ -154,6 +154,7 @@ open iOS/Glow65iPad.xcodeproj                       # iPad かシミュレータ
 | STEP | 停止中に、1命令(INSTR)または1バスアクセス(CYCLE)進める |
 | STEP MODE | INSTR と CYCLE の切り替え |
 | SPEED | 1Hz、10Hz、100Hz、1kHz、100kHz、1MHz |
+| G SPEED | モニタの `G` で RAM($0000-$7FFF)のプログラムを起動したときの速度(OFF、1Hz〜1MHz。既定は OFF)。起動すると SPEED がこの値に切り替わり、プロンプトに戻ると(RTS、RESET)、元の速度に戻る。飛び先が ROM(`G 8003` など)のときは切り替えない。実行中に SPEED を手で変えたら、その速度のままにする |
 | CPU | 6502(下)と 65C02(上)の切り替え。POWER が OFF のときだけ操作できる。選んでいる CPU の名前を表示 |
 | (i) ボタン | クレジットを表示 |
 | INSTRUCTION AT PC | スイッチではなく表示です。PC の位置の命令を、`0302  8D F0 03  STA $03F0` のように出します。アクセスごとの再生中は、再生している命令を示します |

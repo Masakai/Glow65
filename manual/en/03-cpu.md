@@ -186,6 +186,8 @@ On a real 6502, even a 1-byte instruction such as `CLC` takes 2 cycles, and the 
 > If you set SPEED to 10 Hz and switch to RUN, the same actions run continuously. The low LEDs of the address bus change each time the PC advances.
 >
 > If you set STEP MODE to INSTR, each press of STEP advances one instruction. The bus keeps the last bus access of that instruction. The detailed steps are in [Tutorial Chapter 1](../../tutorial/README.md).
+>
+> To watch your own program slowly, use G SPEED on the panel. If you set G SPEED to 10 Hz, only a program started with `G` in the monitor runs at 10 Hz, and typing to the monitor stays fast. Back at the monitor prompt (RTS or RESET), SPEED returns to the previous speed.
 
 ## 3.5 Instruction Format
 

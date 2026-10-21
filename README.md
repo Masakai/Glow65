@@ -14,7 +14,7 @@ A 6502 single-board computer emulator for macOS, written in Swift. It has a fron
 
 Glow65 emulates an imaginary 6502 board: a CPU, 32 KB of RAM, a serial port (UART), and ROM holding a small monitor, Microsoft BASIC, and GAME65G, an interpreter for the GAME language. The window has two parts:
 
-- **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, NMI, RUN/STOP, STEP, STEP MODE and SPEED.
+- **Front panel.** LEDs for the address bus, data bus, PC, SP, A, X, Y, the status flags, and bus signals, and a display of the instruction at the PC (disassembled). Switches for POWER, RESET, NMI, RUN/STOP, STEP, STEP MODE, SPEED and G SPEED.
 - **Terminal.** Connected to the UART. Use it to talk to the monitor, BASIC, and GAME65G.
 
 The menus and messages are in Japanese or English, following the system language. The labels on the panel (POWER, STEP, ADDRESS BUS and so on) stay in English, like the silkscreen of a real board.
@@ -139,7 +139,7 @@ open iOS/Glow65iPad.xcodeproj                       # choose an iPad or a simula
 ```
 
 - The panel shrinks to fit narrow screens. The terminal accepts an on-screen keyboard (tap the terminal) and a hardware keyboard (including a Mac keyboard shared with Universal Control).
-- The ⋯ menu has Load Program…, Send Text File…, Paste and Send Example. The tutorial programs and the GAME65G example are included in the app.
+- The ⋯ menu has Load Program…, Send Text File…, Paste and Send Example. Send Text File… accepts any file extension, including `.gam` and `.bas`. The tutorial programs and the GAME65G example are included in the app.
 - The app is for iPad only. The panel is drawn at a fixed width and scaled down to fit narrow screens, which is why an iPhone is not supported.
 - `iOS/Local.xcconfig`, the generated project and `Info.plist` are not tracked by git.
 
@@ -154,6 +154,7 @@ open iOS/Glow65iPad.xcodeproj                       # choose an iPad or a simula
 | STEP | While stopped, runs one instruction (INSTR) or one bus access (CYCLE) |
 | STEP MODE | Chooses between INSTR and CYCLE stepping |
 | SPEED | 1 Hz, 10 Hz, 100 Hz, 1 kHz, 100 kHz, 1 MHz |
+| G SPEED | The speed for a program in RAM ($0000-$7FFF) started with `G` in the monitor (OFF, or 1 Hz to 1 MHz; OFF by default). SPEED switches to this value when the program starts, and returns to the previous speed back at the prompt (RTS or RESET). A ROM target (such as `G 8003`) does not switch. If you change SPEED by hand while the program runs, that speed stays |
 | CPU | Chooses 6502 (down) or 65C02 (up). Works only while POWER is off. The label shows the selected CPU |
 | (i) button | Shows the credits |
 | INSTRUCTION AT PC | Not a switch: the instruction at the PC, for example `0302  8D F0 03  STA $03F0`. While an instruction is replayed access by access, it shows the instruction being replayed |

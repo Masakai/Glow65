@@ -85,7 +85,7 @@ The text comes out of your program, and `rts` returns to the monitor.
 
 ## 4. See it on the panel
 
-At full speed you can already see it work: each character makes the **WRITE** and **TX** LEDs flash. To look at one character, turn the program into a loop (`E 0317 4C 00 03` replaces `rts` with `jmp $0300`), run it with `G 0300`, and then set **SPEED** to **10 Hz** and **RUN/STOP** to STOP. The terminal fills with lines at first, because the loop prints the message over and over before you slow it down. Then set **STEP MODE** to CYCLE and press **STEP** until the **WRITE** LED lights with `STA $A001` under INSTRUCTION AT PC:
+At full speed you can already see it work: each character makes the **WRITE** and **TX** LEDs flash. To look at one character, turn the program into a loop (`E 0317 4C 00 03` replaces `rts` with `jmp $0300`), run it with `G 0300`, and then set **SPEED** to **10 Hz** and **RUN/STOP** to STOP. The terminal fills with lines at first, because the loop prints the message over and over before you slow it down. If you set **G SPEED** to **10 Hz** first, the program runs at 10 Hz from the moment you type `G 0300`, so the terminal does not fill up. Press RESET to go back to the monitor, and SPEED returns to the previous speed. Then set **STEP MODE** to CYCLE and press **STEP** until the **WRITE** LED lights with `STA $A001` under INSTRUCTION AT PC:
 
 You stopped the loop at an arbitrary place, so the character you see first may be any letter of the message. Keep pressing STEP until WRITE lights, and read the rows:
 
